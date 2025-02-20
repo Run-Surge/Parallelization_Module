@@ -1,0 +1,63 @@
+[
+    {
+        "code line": 0,
+        "statement": "def func1(x):",
+        "has": [
+            "x"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 1,
+        "statement": "x = x + 2",
+        "has": [
+            "x"
+        ],
+        "needs": [
+            "x"
+        ]
+    },
+    {
+        "code line": 2,
+        "statement": "y = x",
+        "has": [
+            "y"
+        ],
+        "needs": [
+            "x"
+        ]
+    },
+    {
+        "code line": 3,
+        "statement": "z = x * (x - 2 + 3) * y",
+        "has": [
+            "z"
+        ],
+        "needs": [
+            "y",
+            "x"
+        ]
+    },
+    {
+        "code line": 4,
+        "statement": "if z > x:\n    z = 9\nelif z < y:\n    x = 7\nelse:\n    z = 8",
+        "has": [
+            "z",
+            "x"
+        ],
+        "needs": [
+            "z",
+            "y",
+            "x"
+        ]
+    },
+    {
+        "code line": 5,
+        "statement": "return z + x + 1",
+        "has": [],
+        "needs": [
+            "z",
+            "x"
+        ]
+    }
+]

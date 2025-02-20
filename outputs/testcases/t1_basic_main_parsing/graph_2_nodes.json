@@ -1,0 +1,16 @@
+[
+    {
+        "code line": 0,
+        "statement": "def func2(x):",
+        "has": [
+            "x"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 1,
+        "statement": "pass",
+        "has": [],
+        "needs": []
+    }
+]

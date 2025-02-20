@@ -1,0 +1,18 @@
+[
+    {
+        "code line": 0,
+        "statement": "def func1(x):",
+        "has": [
+            "x"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 1,
+        "statement": "return x + 1",
+        "has": [],
+        "needs": [
+            "x"
+        ]
+    }
+]
