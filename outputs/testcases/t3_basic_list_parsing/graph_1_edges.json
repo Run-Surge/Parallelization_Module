@@ -1,0 +1,13 @@
+{
+    "1": {
+        "Node": 1,
+        "Depends on": [
+            {
+                "Node": 0,
+                "Dependency": [
+                    "x"
+                ]
+            }
+        ]
+    }
+}

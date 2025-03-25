@@ -1,0 +1,83 @@
+[
+    {
+        "code line": 1,
+        "statement": "x = [5, 2, 3, 4, 5]",
+        "has": [
+            "x"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 2,
+        "statement": "y = x[0] + 3",
+        "has": [
+            "y"
+        ],
+        "needs": [
+            "x"
+        ]
+    },
+    {
+        "code line": 3,
+        "statement": "z = x[-1] * y",
+        "has": [
+            "z"
+        ],
+        "needs": [
+            "x",
+            "y"
+        ]
+    },
+    {
+        "code line": 4,
+        "statement": "x = x[2:4] + [2, 2]",
+        "has": [
+            "x"
+        ],
+        "needs": [
+            "x"
+        ]
+    },
+    {
+        "code line": 5,
+        "statement": "y = x",
+        "has": [
+            "y"
+        ],
+        "needs": [
+            "x"
+        ]
+    },
+    {
+        "code line": 6,
+        "statement": "if z > x[2]:\n    z = 9\nelif z < y[0]:\n    z = 7\nelse:\n    z = 8",
+        "has": [
+            "z"
+        ],
+        "needs": [
+            "z",
+            "x",
+            "y"
+        ]
+    },
+    {
+        "code line": 7,
+        "statement": "l = func1(x)",
+        "has": [
+            "l"
+        ],
+        "needs": [
+            "func1",
+            "x"
+        ]
+    },
+    {
+        "code line": 8,
+        "statement": "func2(l)",
+        "has": [],
+        "needs": [
+            "l",
+            "func2"
+        ]
+    }
+]
