@@ -1,0 +1,30 @@
+[
+    {
+        "code line": 0,
+        "statement": "def hello3(x,y):",
+        "has": [
+            "x",
+            "y"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 1,
+        "statement": "x = x + 1",
+        "has": [
+            "x"
+        ],
+        "needs": [
+            "x"
+        ]
+    },
+    {
+        "code line": 2,
+        "statement": "return x + y",
+        "has": [],
+        "needs": [
+            "y",
+            "x"
+        ]
+    }
+]

@@ -1,0 +1,106 @@
+[
+    {
+        "code line": 1,
+        "statement": "z = add1(data)",
+        "has": [
+            "z"
+        ],
+        "needs": [
+            "add1",
+            "data"
+        ]
+    },
+    {
+        "code line": 2,
+        "statement": "x = hello2()",
+        "has": [
+            "x"
+        ],
+        "needs": [
+            "hello2"
+        ]
+    },
+    {
+        "code line": 3,
+        "statement": "y = x.copy()",
+        "has": [
+            "y"
+        ],
+        "needs": [
+            "x"
+        ]
+    },
+    {
+        "code line": 4,
+        "statement": "z = hello(z)",
+        "has": [
+            "z"
+        ],
+        "needs": [
+            "z",
+            "hello"
+        ]
+    },
+    {
+        "code line": 5,
+        "statement": "a = hello(z)",
+        "has": [
+            "a"
+        ],
+        "needs": [
+            "z",
+            "hello"
+        ]
+    },
+    {
+        "code line": 6,
+        "statement": "b = hello3(x, y)",
+        "has": [
+            "b"
+        ],
+        "needs": [
+            "y",
+            "hello3",
+            "x"
+        ]
+    },
+    {
+        "code line": 7,
+        "statement": "c = hello(z)",
+        "has": [
+            "c"
+        ],
+        "needs": [
+            "z",
+            "hello"
+        ]
+    },
+    {
+        "code line": 8,
+        "statement": "d = hello3(x)",
+        "has": [
+            "d"
+        ],
+        "needs": [
+            "hello3",
+            "x"
+        ]
+    },
+    {
+        "code line": 9,
+        "statement": "output = calc(x, y, z, a, b, c, d)",
+        "has": [
+            "output"
+        ],
+        "needs": [
+            "calc",
+            "a",
+            "y",
+            "z",
+            "d",
+            "x",
+            "c",
+            "b"
+        ]
+    }
+]

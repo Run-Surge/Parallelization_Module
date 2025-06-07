@@ -1,1 +1,7 @@
 Syntax error in .\sample_submission.py: Sorry: IndentationError: unexpected indent (sample_submission.py, line 29)
+Syntax error in .\sample_submission.py: Sorry: IndentationError: unexpected indent (sample_submission.py, line 59)
+Syntax error in .\sample_submission.py:   File ".\sample_submission.py", line 62
+    data = output(x,y,z,,a,b,c,d,)
+                        ^
+SyntaxError: invalid syntax
+

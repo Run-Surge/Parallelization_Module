@@ -1,0 +1,29 @@
+[
+    {
+        "code line": 0,
+        "statement": "def hello(z):",
+        "has": [
+            "z"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 1,
+        "statement": "z = z + 1",
+        "has": [
+            "z"
+        ],
+        "needs": [
+            "z"
+        ]
+    },
+    {
+        "code line": 2,
+        "statement": "return z",
+        "has": [],
+        "needs": [
+            "z",
+            "z"
+        ]
+    }
+]

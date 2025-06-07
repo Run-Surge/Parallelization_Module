@@ -1,0 +1,65 @@
+[
+    {
+        "code line": 0,
+        "statement": "def add1(data):",
+        "has": [
+            "data"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 1,
+        "statement": "header = data[0]",
+        "has": [
+            "header"
+        ],
+        "needs": [
+            "data"
+        ]
+    },
+    {
+        "code line": 2,
+        "statement": "rows = data[1:]",
+        "has": [
+            "rows"
+        ],
+        "needs": [
+            "data"
+        ]
+    },
+    {
+        "code line": 3,
+        "statement": "new_data = [header]",
+        "has": [
+            "new_data"
+        ],
+        "needs": [
+            "header"
+        ]
+    },
+    {
+        "code line": 4,
+        "statement": "new_data.extend(rows)",
+        "has": [],
+        "needs": [
+            "rows",
+            "new_data"
+        ]
+    },
+    {
+        "code line": 5,
+        "statement": "new_data.append(['New Row', 'Value1', 'Value2'])",
+        "has": [],
+        "needs": [
+            "new_data"
+        ]
+    },
+    {
+        "code line": 6,
+        "statement": "return new_data[0]",
+        "has": [],
+        "needs": [
+            "new_data"
+        ]
+    }
+]

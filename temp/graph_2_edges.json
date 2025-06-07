@@ -1,0 +1,25 @@
+{
+    "1": {
+        "Node": 1,
+        "Depends on": [
+            {
+                "Node": 0,
+                "Dependency": [
+                    "z"
+                ]
+            }
+        ]
+    },
+    "2": {
+        "Node": 2,
+        "Depends on": [
+            {
+                "Node": 1,
+                "Dependency": [
+                    "z",
+                    "z"
+                ]
+            }
+        ]
+    }
+}
