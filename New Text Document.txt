@@ -1,0 +1,130 @@
+        pass
+    # def estimate_int_size(self, value):        
+    #     base_size = sys.getsizeof(0)  
+    #     num_digits = math.ceil(num_bits / 30)          
+    #     extra_size = (num_digits - 1) * 4
+    #     return base_size + extra_size
+    # def estimate_str_size(self, value):
+    #     base_size = sys.getsizeof('')
+    #     extra_size = len(value)
+    #     return base_size + extra_size
+    # def estimate_float_size(self, value):
+    #     base_size = sys.getsizeof(0.0)
+    #     return base_size
+    # def estimate_bool_size(self, value):
+    #     base_size = sys.getsizeof(True)
+    #     return base_size
+    # def estimate_bytes_size(self, value):
+    #     base_size = sys.getsizeof(b'')
+    #     extra_size = len(value)
+    #     return base_size + extra_size
+    # def estimate_byte_array_size(self, value):
+    #     base_size = sys.getsizeof(bytearray()) + 1
+    #     extra_size = len(value)
+    #     return base_size + extra_size
+    # def estimate_complex_size(self, value):
+    #     base_size = sys.getsizeof(0j)
+    #     return base_size
+
+
+    🔧 Creation
+a = [1, 2, 3] – literal syntax
+
+a = list() – constructor
+
+a = [x for x in iterable] – list comprehension
+
+a = list(iterable) – from any iterable
+
+a = [0] * 10 – repeated elements
+
+a = [f(x) for x in iterable if condition] – filtered comprehension
+
+📥 Insertion / Appending
+a.append(x) – add to end
+
+a.insert(i, x) – insert at index
+
+a.extend(iterable) – append elements from iterable
+
+a += [x] – in-place extend
+
+❌ Removal
+a.pop() / a.pop(i) – remove and return
+
+a.remove(x) – remove first occurrence
+
+del a[i] – delete by index
+
+del a[i:j] – delete slice
+
+a.clear() – remove all items
+
+🔁 Iteration / Traversal
+for x in a: – loop
+
+enumerate(a) – index + value
+
+for i, x in enumerate(a):
+
+map(func, a)
+
+filter(func, a)
+
+🔎 Access / Indexing / Slicing
+a[i] – single element
+
+a[i:j] – slice
+
+a[i:j:k] – extended slice
+
+a.index(x) – index of x
+
+x in a / x not in a
+
+🔄 Modification
+a[i] = x – modify single item
+
+a[i:j] = [x, y] – modify slice
+
+a.sort() / a.sort(reverse=True)
+
+a.reverse()
+
+a[i] += 1 (for numeric elements)
+
+🧮 Aggregation / Analysis
+len(a)
+
+min(a) / max(a)
+
+sum(a)
+
+any(a) / all(a)
+
+sorted(a) – returns new list
+
+reversed(a) – iterator
+
+🧱 Copying / Cloning
+a.copy()
+
+list(a)
+
+a[:] – slice copy
+
+copy.deepcopy(a)
+
+📚 Other Operations
+*a – unpack
+
+[x for x in a] – comprehension
+
+a.count(x) – number of occurrences
+
+a * n – repeat
+
+zip(a, b)
+
+itertools.chain(a, b)
+
