@@ -21,7 +21,18 @@ def check_syntax_errors(file_path,error_file="errors.txt"):
     
 def build_ddg(file_path):
     try:
-        tree = ast.parse(open(file_path).read())
+        with open(file_path, 'r') as f:
+            code = f.read()
+
+        # Remove all content between any two "#---------------------------------------------------------------------------------------------------------"   
+        code = re.sub(
+            r"#-+\n.*?\n#-+\n",
+            "",
+            code,
+            flags=re.DOTALL
+        )
+
+        tree = ast.parse(code)
         graph=DDG_Wrapper(tree)
         graph.build_ddgs()
         return graph
