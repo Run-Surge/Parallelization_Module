@@ -1,0 +1,52 @@
+{
+    "1": {
+        "Node": 1,
+        "Depends on": [
+            {
+                "Node": 0,
+                "Dependency": [
+                    "data"
+                ]
+            }
+        ]
+    },
+    "2": {
+        "Node": 2,
+        "Depends on": [
+            {
+                "Node": 0,
+                "Dependency": [
+                    "data"
+                ]
+            }
+        ]
+    },
+    "3": {
+        "Node": 3,
+        "Depends on": [
+            {
+                "Node": 1,
+                "Dependency": [
+                    "header"
+                ]
+            }
+        ]
+    },
+    "4": {
+        "Node": 4,
+        "Depends on": [
+            {
+                "Node": 3,
+                "Dependency": [
+                    "new_data"
+                ]
+            },
+            {
+                "Node": 2,
+                "Dependency": [
+                    "rows"
+                ]
+            }
+        ]
+    }
+}

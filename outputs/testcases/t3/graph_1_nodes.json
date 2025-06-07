@@ -1,0 +1,55 @@
+[
+    {
+        "code line": 0,
+        "statement": "def add1(data):",
+        "has": [
+            "data"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 1,
+        "statement": "header = data[0]",
+        "has": [
+            "header"
+        ],
+        "needs": [
+            "data"
+        ]
+    },
+    {
+        "code line": 2,
+        "statement": "rows = data[1:]",
+        "has": [
+            "rows"
+        ],
+        "needs": [
+            "data"
+        ]
+    },
+    {
+        "code line": 3,
+        "statement": "new_data = [header]",
+        "has": [
+            "new_data"
+        ],
+        "needs": [
+            "header"
+        ]
+    },
+    {
+        "code line": 4,
+        "statement": "for row in rows:\n    new_row = []\n    for value in row:\n        try:\n            new_row.append(str(float(value) + 1))\n        except ValueError:\n            new_row.append(value)\n    new_data.append(new_row)",
+        "has": [],
+        "needs": [
+            "row",
+            "new_data",
+            "rows",
+            "new_row",
+            "str",
+            "ValueError",
+            "float",
+            "value"
+        ]
+    }
+]
