@@ -247,12 +247,12 @@ class DDG_Wrapper:
             raise ValueError("No functions or entry points to extract dependencies from. Please run 'extract_snippets' first.")
         if self.parser.entry_point:
             ddg=DDG()
-            ddg.extract_dependencies(self.parser.entry_point)
+            ddg.extract_dependencies(self.parser.entry_point,self.parser.functions)
             ddg.construct_edges()
             self.ddgs.append(ddg)
         for function in self.parser.functions:
             ddg=DDG()
-            ddg.extract_dependencies(function,function=True)
+            ddg.extract_dependencies(function,self.parser.functions,function=True)
             ddg.construct_edges()
             self.ddgs.append(ddg)
             
@@ -281,7 +281,7 @@ class DDG_Wrapper:
             with open(f"{folder_name}/graph_{index}_nodes.json", "w") as outfile:
                 outfile.write(node_data)
             with open(f"{folder_name}/graph_{index}_edges.json", "w") as outfile:
-                outfile.write(edge_data)        
+                outfile.write(edge_data)
 testcases_folder_path="testcases"
 testcase=os.path.join(testcases_folder_path, "t1_basic_main_parsing.py")
 tree = ast.parse(open(testcase).read())
