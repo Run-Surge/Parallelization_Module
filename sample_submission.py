@@ -56,6 +56,7 @@ if __name__ == '__main__':
     y = x.copy()
     z = hello(z)
     a = hello(z)
+    z = hello(a)
     b = hello3(x,y)
     c = hello(z)
     d = hello3(x)

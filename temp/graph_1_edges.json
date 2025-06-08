@@ -53,7 +53,7 @@
         "Node": 5,
         "Depends on": [
             {
-                "Node": 3,
+                "Node": 4,
                 "Dependency": [
                     "new_data"
                 ]
@@ -64,7 +64,7 @@
         "Node": 6,
         "Depends on": [
             {
-                "Node": 3,
+                "Node": 5,
                 "Dependency": [
                     "new_data"
                 ]

@@ -6,7 +6,6 @@
             "z"
         ],
         "needs": [
-            "add1",
             "data"
         ]
     },
@@ -16,9 +15,7 @@
         "has": [
             "x"
         ],
-        "needs": [
-            "hello2"
-        ]
+        "needs": []
     },
     {
         "code line": 3,
@@ -37,8 +34,7 @@
             "z"
         ],
         "needs": [
-            "z",
-            "hello"
+            "z"
         ]
     },
     {
@@ -48,59 +44,64 @@
             "a"
         ],
         "needs": [
-            "z",
-            "hello"
+            "z"
         ]
     },
     {
         "code line": 6,
+        "statement": "z = hello(a)",
+        "has": [
+            "z"
+        ],
+        "needs": [
+            "a"
+        ]
+    },
+    {
+        "code line": 7,
         "statement": "b = hello3(x, y)",
         "has": [
             "b"
         ],
         "needs": [
             "y",
-            "hello3",
             "x"
         ]
     },
     {
-        "code line": 7,
+        "code line": 8,
         "statement": "c = hello(z)",
         "has": [
             "c"
         ],
         "needs": [
-            "z",
-            "hello"
+            "z"
         ]
     },
     {
-        "code line": 8,
+        "code line": 9,
         "statement": "d = hello3(x)",
         "has": [
             "d"
         ],
         "needs": [
-            "hello3",
             "x"
         ]
     },
     {
-        "code line": 9,
+        "code line": 10,
         "statement": "output = calc(x, y, z, a, b, c, d)",
         "has": [
             "output"
         ],
         "needs": [
-            "calc",
+            "c",
+            "b",
             "a",
             "y",
-            "z",
-            "d",
             "x",
-            "c",
-            "b"
+            "z",
+            "d"
         ]
     }
 ]

@@ -282,9 +282,9 @@ class DDG_Wrapper:
                 outfile.write(node_data)
             with open(f"{folder_name}/graph_{index}_edges.json", "w") as outfile:
                 outfile.write(edge_data)
-testcases_folder_path="testcases"
-testcase=os.path.join(testcases_folder_path, "t1_basic_main_parsing.py")
-tree = ast.parse(open(testcase).read())
-graph=DDG_Wrapper(tree)
-graph.build_ddgs()
-graph.visualize_graph()
+# testcases_folder_path="testcases"
+# testcase=os.path.join(testcases_folder_path, "t1_basic_main_parsing.py")
+# tree = ast.parse(open(testcase).read())
+# graph=DDG_Wrapper(tree)
+# graph.build_ddgs()
+# graph.visualize_graph()

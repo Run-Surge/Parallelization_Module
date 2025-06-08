@@ -8,6 +8,8 @@ import glob
 import json
 
 
+from collections import defaultdict
+from typing import List, Dict, Any
 
 def group_by_needs_with_wait_index(
     statements: List[Dict[str, Any]],
@@ -16,72 +18,88 @@ def group_by_needs_with_wait_index(
     # 1) Map code_line → produced variables
     produced = {s["code line"]: s["has"] for s in statements}
 
-    # 2) Build var → producer_line map
-    var_to_producer_line = {}
-    for line, has_vars in produced.items():
-        for v in has_vars:
-            var_to_producer_line[v] = line
-
-    # 3) Map each statement to its sorted-needs tuple
+    # 2) Build needs_map: code_line → sorted tuple of needed vars
     needs_map = {
         s["code line"]: tuple(sorted(s["needs"]))
         for s in statements
     }
 
-    # 4) Bucket statements by that needs tuple
+    # 3) Bucket statements by needs‐tuple
     buckets = defaultdict(list)
     for s in statements:
         tpl = needs_map[s["code line"]]
         buckets[tpl].append(s)
 
-    # 5) Prepare ordering of distinct needs‐tuples
+    # 4) Sort distinct needs‐tuples for grouping
     distinct = list(buckets.keys())
+    # def needs_key(tpl):
+    #     if not tpl:
+    #         return (0,)
+    #     if len(tpl) == 1:
+    #         var = tpl[0]
+    #         # if external, sort by var name
+    #         if str(var) not in produced:
+    #             return (0, var)
+    #         # otherwise by latest producer line
+    #         return (1, produced.get(var, 0))
+    #     return (2, len(tpl), tpl)
+    # distinct.sort(key=needs_key)
 
-    def needs_key(need_tpl):
-        # empty needs and any external-singleton grouped first
-        if need_tpl == ():
-            return (0, )
-        if len(need_tpl) == 1:
-            var = need_tpl[0]
-            # external dependency → treat like empty
-            if var not in var_to_producer_line:
-                return (0, var)
-            # otherwise sort by producer line
-            return (1, var_to_producer_line[var])
-        # multi‐var: after singletons, by size then lex
-        return (2, len(need_tpl), need_tpl)
+    # 5) Build lookup: needs‐tpl → group index
+    tpl_to_groupidx = {tpl: idx for idx, tpl in enumerate(distinct)}
 
-    distinct.sort(key=needs_key)
+    # 6) Precompute, for each stmt_line, a var→producer_line from dependency_graph
+    #    dependency_graph keys are strings
+    dep_map: Dict[int, Dict[str,int]] = {}
+    for k, info in dependency_graph.items():
+        stmt_line = int(k)
+        dep_map[stmt_line] = {}
+        for dep in info.get("Depends on", []):
+            prod_line = dep["Node"]
+            for var in dep["Dependency"]:
+                dep_map[stmt_line][var] = prod_line
 
-    # 6) Build lookup of need‐tpl → group‐index
-    needtpl_to_groupidx = {tpl: idx for idx, tpl in enumerate(distinct)}
-
-    # 7) Compute wait index for each tpl
-    def compute_wait_index(tpl):
-        if tpl == () or (len(tpl)==1 and tpl[0] not in var_to_producer_line):
-            return None
-        # find group of each var’s producer
-        idxs = []
-        for v in tpl:
-            if v in var_to_producer_line:
-                prod_line = var_to_producer_line[v]
-                prod_needs = needs_map[prod_line]
-                idxs.append(needtpl_to_groupidx[prod_needs])
-        return max(idxs) if idxs else None
-
-    # 8) Format the result
+    # 7) Format each group, using dep_map to find wait‐indices
     result: List[List[str]] = []
-    for tpl in distinct:
-        wait_idx = compute_wait_index(tpl)
+    latest_group_idx = {}  # Track the latest group index for each variable
+
+    for group_idx, tpl in enumerate(distinct):
         grp = []
+        temp_latest_group_idx = latest_group_idx.copy()  # Temporary copy for calculating wait indices
         for s in sorted(buckets[tpl], key=lambda x: x["code line"]):
-            stmt = s["statement"]
+            stmt_line = s["code line"]
+            waits = []
+            for var in tpl:
+                prod_line = dep_map.get(stmt_line, {}).get(var)
+                if prod_line is None:
+                    wait_idx = None
+                else:
+                    # Use temp_latest_group_idx to find the correct group index
+                    wait_idx = temp_latest_group_idx.get(var, None)
+                waits.append((var, wait_idx))
+
             dep_str = ", ".join(tpl) if tpl else "none"
-            wi = str(wait_idx) if wait_idx is not None else "none"
-            grp.append(f"{stmt} : {dep_str} : {wi}")
+            if waits:
+                wait_str = ", ".join(
+                    f"{v}:{('none' if idx is None else idx)}"
+                    for v, idx in waits
+                )
+            else:
+                wait_str = "none"
+
+            grp.append(f"{s['statement']} : {dep_str} : {wait_str}")
+        
+        # Update latest_group_idx for variables produced in this group
+        for s in buckets[tpl]:
+            for var in s["has"]:
+                latest_group_idx[var] = group_idx
+
         result.append(grp)
 
-    return result
+   
+
+    return result 
+
 def check_syntax_errors(file_path,error_file="errors.txt"):
     try:
         py_compile.compile(file_path, doraise=True)
@@ -126,8 +144,55 @@ def dependency_analyzer(folder):
         print(f"\nProcessing pair: {os.path.basename(jsons[i])}, {os.path.basename(jsons[i+1])}")
         result = group_by_needs_with_wait_index(nodes, edges)
         print(result)
+        return result
 
+def get_memory_foortprint(file_path):
+    def get_file_name(tree):
+        file_name = None
+        for node in tree.body:
+            if isinstance(node, ast.Assign):
+                for target in node.targets:
+                    if isinstance(target, ast.Name) and target.id == 'FILE_NAME':
+                        if isinstance(node.value, ast.Constant):
+                            file_name = node.value.value
+        return file_name
+    def get_read_file_block(tree):
+        try_node = None
+        for node in tree.body:
+            if isinstance(node, ast.If):
+                # match: if __name__ == '__main__':
+                test = node.test
+                if (
+                    isinstance(test, ast.Compare)
+                    and isinstance(test.left, ast.Name)
+                    and test.left.id == '__name__'
+                    and any(
+                        isinstance(c, ast.Constant) and c.value == '__main__'
+                        for c in test.comparators
+                    )
+                ):
+                    # look for the Try in its body
+                    for inner in node.body:
+                        if isinstance(inner, ast.Try):
+                            try_node = inner
+                            break
 
+        # 4. Unparse (get source for) that Try node
+        if try_node is not None:
+            try_src = ast.unparse(try_node)
+            return try_src
+        else:
+            print("No try/except block found under __main__")
+                
+    memory_parser = Memory_Parser()
+    tree = ast.parse(open(file_path, 'r').read())
+    # print(ast.dump(tree, indent=4))
+    file_name = get_file_name(tree)
+    read_file_block = get_read_file_block(tree)
+    read_file_block = read_file_block.replace("FILE_NAME", f"'{file_name}'")
+    read_file_ast = ast.parse(read_file_block)
+    memory_parser._file_handler(read_file_ast)
+    print(memory_parser.vars)
 def main():
     error_file = "errors.txt"
     if len(sys.argv) < 2:
@@ -149,10 +214,13 @@ def main():
     else:
         print(f"2. Failed to build DDG for {filename}. Check {error_file} for details.")   
     
-    dependency_analyzer('temp')
+    dep_2d_list = dependency_analyzer('temp')
+    if dep_2d_list:
+        print(f"3. Dependency analysis completed for {filename}.")
+    
+    get_memory_foortprint(filename)
+        
     
 
 if __name__ == "__main__":
     main()
-
-    

@@ -40,7 +40,9 @@
     {
         "code line": 4,
         "statement": "new_data.extend(rows)",
-        "has": [],
+        "has": [
+            "new_data"
+        ],
         "needs": [
             "rows",
             "new_data"
@@ -49,7 +51,9 @@
     {
         "code line": 5,
         "statement": "new_data.append(['New Row', 'Value1', 'Value2'])",
-        "has": [],
+        "has": [
+            "new_data"
+        ],
         "needs": [
             "new_data"
         ]
