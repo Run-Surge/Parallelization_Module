@@ -14,15 +14,15 @@
         "Node": 3,
         "Depends on": [
             {
-                "Node": 2,
-                "Dependency": [
-                    "y"
-                ]
-            },
-            {
                 "Node": 1,
                 "Dependency": [
                     "x"
+                ]
+            },
+            {
+                "Node": 2,
+                "Dependency": [
+                    "y"
                 ]
             }
         ]
@@ -53,6 +53,12 @@
         "Node": 6,
         "Depends on": [
             {
+                "Node": 4,
+                "Dependency": [
+                    "x"
+                ]
+            },
+            {
                 "Node": 3,
                 "Dependency": [
                     "z"
@@ -62,12 +68,6 @@
                 "Node": 5,
                 "Dependency": [
                     "y"
-                ]
-            },
-            {
-                "Node": 4,
-                "Dependency": [
-                    "x"
                 ]
             }
         ]

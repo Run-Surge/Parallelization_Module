@@ -88,7 +88,7 @@ class DDG:
         self.edges=[]
         self.nodes=[]      
     #? TODO Handle Loops
-    def extract_dependencies(self,snippet,function=False,debug=False):
+    def extract_dependencies(self,snippet,functions,function=False,debug=False):
         #! handle the function tuple
         if function:
             func_name=snippet[0]
@@ -101,6 +101,7 @@ class DDG:
             
         sub_tree=ast.parse(snippet)
         def visit_has_needs(self, node,number):
+            print(ast.dump(node, indent=4))
             #! create a new node
             gnode = DDG_Node(number,ast.unparse(node))
             #! get variables being assigned to
@@ -108,6 +109,20 @@ class DDG:
                 for target in node.targets:
                     if isinstance(target, ast.Name):
                         gnode.has.append(target.id)
+            #! handle in place operations
+            if isinstance(node, ast.Expr):
+                list_funcs = ['pop', 'append', 'sort', 'extend', 'reverse', 'insert', 'remove', 'clear']
+                
+                call = node.value
+                if isinstance(call, ast.Call) and isinstance(call.func, ast.Attribute):
+                    func_name = call.func.attr  # e.g., 'extend'
+                    if func_name in list_funcs:
+                        target = call.func.value
+                        if isinstance(target, ast.Name):
+                            var_name = target.id  # 'y'
+                            gnode.has.append(var_name)
+
+
             #! handle if conditions
             if isinstance(node, ast.If):
                 temp = set()
@@ -116,6 +131,19 @@ class DDG:
                         for target in subnode.targets:
                             if isinstance(target, ast.Name):
                                 temp.add(target.id)
+                    #! handle in place operations
+                    elif isinstance(subnode, ast.Expr):
+                        list_funcs = ['pop', 'append', 'sort', 'extend', 'reverse', 'insert', 'remove', 'clear']
+                        
+                        call = subnode.value
+                        if isinstance(call, ast.Call) and isinstance(call.func, ast.Attribute):
+                            func_name = call.func.attr  # e.g., 'extend'
+                            if func_name in list_funcs:
+                                target = call.func.value
+                                if isinstance(target, ast.Name):
+                                    var_name = target.id  # 'y'
+                                    gnode.has.append(var_name)
+                            
                 gnode.has.extend(temp)
                 del temp
                 gc.collect()
@@ -125,6 +153,8 @@ class DDG:
                     gnode.needs.append(node.value.id)
             #! Get variables used in the assignment
             used_vars = {name.id for name in ast.walk(node) if isinstance(name, ast.Name) and isinstance(name.ctx, ast.Load)}
+            func_names = [name for name, _, _ in functions]
+            used_vars = used_vars - set(func_names)  # Exclude function names from used_vars
             gnode.needs.extend(used_vars)
             self.nodes.append(gnode)
             if debug:
@@ -205,6 +235,7 @@ class DDG:
         json2 = json.dumps(edge_dict, indent=4)
         return json1,json2
 
+        
 class DDG_Wrapper:
     def __init__(self,tree):
         self.parser=_Parser(tree)

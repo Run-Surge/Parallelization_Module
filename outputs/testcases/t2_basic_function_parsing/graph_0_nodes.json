@@ -34,21 +34,21 @@
             "z"
         ],
         "needs": [
-            "y",
-            "x"
+            "x",
+            "y"
         ]
     },
     {
         "code line": 4,
         "statement": "if z > x:\n    z = 9\nelif z < y:\n    x = 7\nelse:\n    z = 8",
         "has": [
-            "z",
-            "x"
+            "x",
+            "z"
         ],
         "needs": [
+            "x",
             "z",
-            "y",
-            "x"
+            "y"
         ]
     },
     {
@@ -56,8 +56,8 @@
         "statement": "return z + x + 1",
         "has": [],
         "needs": [
-            "z",
-            "x"
+            "x",
+            "z"
         ]
     }
 ]

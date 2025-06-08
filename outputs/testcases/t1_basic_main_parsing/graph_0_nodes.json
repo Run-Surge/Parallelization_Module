@@ -24,8 +24,8 @@
             "z"
         ],
         "needs": [
-            "y",
-            "x"
+            "x",
+            "y"
         ]
     },
     {
@@ -50,14 +50,16 @@
     },
     {
         "code line": 6,
-        "statement": "if z > x:\n    z = 9\nelif z < y:\n    z = 7\nelse:\n    z = 8",
+        "statement": "if z > x:\n    z = 9\nelif z < y:\n    l.append(7)\nelse:\n    z = 8",
         "has": [
+            "l",
             "z"
         ],
         "needs": [
+            "x",
             "z",
             "y",
-            "x"
+            "l"
         ]
     },
     {
@@ -67,7 +69,6 @@
             "l"
         ],
         "needs": [
-            "func1",
             "x"
         ]
     },
@@ -76,8 +77,7 @@
         "statement": "func2(l)",
         "has": [],
         "needs": [
-            "l",
-            "func2"
+            "l"
         ]
     }
 ]

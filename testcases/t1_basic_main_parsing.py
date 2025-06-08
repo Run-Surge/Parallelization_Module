@@ -12,7 +12,7 @@ if __name__ == '__main__':
     if z > x:
         z=9
     elif z < y:
-        z=7
+        l.append(7)
     else:
         z=8
     l = func1(x)
