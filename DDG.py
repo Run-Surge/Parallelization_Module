@@ -152,111 +152,119 @@ class DDG:
             self.nodes.append(node)
             
         sub_tree=ast.parse(snippet)
+        def check_var_is_global(nodes,var):
+            for node in nodes:
+                if var in node.has:
+                    return True 
+            return False
+        def parse_subscript(node, gnode, not_check_globals=True):
+            if isinstance(node, ast.Subscript):
+                if isinstance(node.value, ast.Name) and (not_check_globals or check_var_is_global(self.nodes,node.value.id)):
+                    gnode.has.append(node.value.id)
+        def parse_assign(node, gnode,not_check_globals=True):
+            for target in node.targets:
+                    if isinstance(target, ast.Name) and(not_check_globals or check_var_is_global(self.nodes,target.id)):
+                        gnode.has.append(target.id)
+                    elif isinstance(target, ast.Subscript):
+                        parse_subscript(target, gnode, not_check_globals)
+        def parse_Expr(node, gnode,not_check_globals=True):
+            list_funcs = ['pop', 'append', 'sort', 'extend', 'reverse', 'insert', 'remove', 'clear']
+                
+            call = node.value
+            if isinstance(call, ast.Call) and isinstance(call.func, ast.Attribute):
+                func_name = call.func.attr  # e.g., 'extend'
+                if func_name in list_funcs:
+                    target = call.func.value
+                    if isinstance(target, ast.Name) and (not_check_globals or check_var_is_global(self.nodes,target.id)):
+                        var_name = target.id  # 'y'
+                        gnode.has.append(var_name)
+        def parse_aug_assign(node, gnode):
+            target = node.target
+            if isinstance(target, ast.Name):
+                gnode.has.append(target.id)
+                gnode.needs.append(target.id)
+            elif isinstance(target, ast.Subscript):
+                parse_subscript(target, gnode)
+                
+        def parse_if(node, gnode):
+            temp = set()
+            for subnode in ast.iter_child_nodes(node):
+                if isinstance(subnode, ast.Assign):
+                    for target in subnode.targets:
+                        parse_assign(subnode, gnode, not_check_globals=False)
+                #! handle in place operations
+                elif isinstance(subnode, ast.Expr):
+                    parse_Expr(subnode, gnode, not_check_globals=False)
+                elif isinstance(subnode, ast.AugAssign):
+                    parse_aug_assign(subnode, gnode)
+                elif isinstance(subnode, ast.For):
+                    parse_for_loop(subnode, gnode, self.nodes)
+                elif isinstance(subnode, ast.If):
+                    parse_if(subnode, gnode)
+                    
+            gnode.has.extend(temp)
+            del temp
+            gc.collect()
+        def parse_for_loop(node, gnode, all_nodes):
+            # Replace target(s) with underscores
+            ReplaceForTargetsWithUnderscore().visit(node)
+            ast.fix_missing_locations(node)
+
+            temp = set()
+            list_funcs = ['pop', 'append', 'sort', 'extend', 'reverse', 'insert', 'remove', 'clear']
+
+            for subnode in ast.iter_child_nodes(node):
+                    if isinstance(subnode, ast.Assign):
+                        for target in subnode.targets:
+                            parse_assign(subnode, gnode, not_check_globals=False)
+                    #! handle in place operations
+                    elif isinstance(subnode, ast.Expr):
+                        parse_Expr(subnode, gnode, not_check_globals=False)
+                    elif isinstance(subnode, ast.AugAssign):
+                        parse_aug_assign(subnode, gnode)
+                    elif isinstance(subnode,ast.For) and subnode != node:
+                        parse_for_loop(subnode, gnode, self.nodes)
+                    elif isinstance(subnode, ast.If):
+                        parse_if(subnode, gnode)
+            gnode.has.extend(temp)
+            del temp
+            gc.collect()
+        def parse_return(node, gnode):
+            if isinstance(node.value, ast.Name):
+                gnode.needs.append(node.value.id)
+        def parse_node(node,gnode,not_check_globals=True):
+            #! get variables being assigned to
+            if isinstance(node, ast.Assign):  
+                parse_assign(node, gnode,not_check_globals)
+            #! handle in place operations
+            elif isinstance(node, ast.Expr):
+                parse_Expr(node, gnode)
+            #! handle if conditions
+            elif isinstance(node, ast.If):
+                parse_if(node, gnode)
+            #! handle the function return statement
+            elif isinstance(node, ast.Return):
+                parse_return(node, gnode)
+            #! handle For loops
+            elif isinstance (node,ast.For):
+                parse_for_loop(node, gnode, self.nodes)
+                
         def visit_has_needs(self, node,number):
             #! create a new node
             gnode = DDG_Node(number,ast.unparse(node))
-            #! get variables being assigned to
-            if isinstance(node, ast.Assign):  
-                for target in node.targets:
-                    if isinstance(target, ast.Name):
-                        gnode.has.append(target.id)
-            #! handle in place operations
-            if isinstance(node, ast.Expr):
-                list_funcs = ['pop', 'append', 'sort', 'extend', 'reverse', 'insert', 'remove', 'clear']
-                
-                call = node.value
-                if isinstance(call, ast.Call) and isinstance(call.func, ast.Attribute):
-                    func_name = call.func.attr  # e.g., 'extend'
-                    if func_name in list_funcs:
-                        target = call.func.value
-                        if isinstance(target, ast.Name):
-                            var_name = target.id  # 'y'
-                            gnode.has.append(var_name)
-            elif isinstance(node, ast.AugAssign):
-                target = node.target
-                if isinstance(target, ast.Name):
-                    gnode.has.append(target.id)
-                    gnode.needs.append(target.id)
-                
-            
-                
-
-
-            #! handle if conditions
-            if isinstance(node, ast.If):
-                temp = set()
-                for subnode in ast.walk(node):
-                    if isinstance(subnode, ast.Assign):
-                        for target in subnode.targets:
-                            if isinstance(target, ast.Name):
-                                temp.add(target.id)
-                    #! handle in place operations
-                    elif isinstance(subnode, ast.Expr):
-                        list_funcs = ['pop', 'append', 'sort', 'extend', 'reverse', 'insert', 'remove', 'clear']
-                        
-                        call = subnode.value
-                        if isinstance(call, ast.Call) and isinstance(call.func, ast.Attribute):
-                            func_name = call.func.attr  # e.g., 'extend'
-                            if func_name in list_funcs:
-                                target = call.func.value
-                                if isinstance(target, ast.Name):
-                                    var_name = target.id  # 'y'
-                                    gnode.has.append(var_name)
-                    elif isinstance(subnode, ast.AugAssign):
-                        target = subnode.target
-                        if isinstance(target, ast.Name):
-                            gnode.has.append(target.id)
-                            gnode.needs.append(target.id)
-                                    
-                gnode.has.extend(temp)
-                del temp
-                gc.collect()
-            #! handle the function return statement
-            elif isinstance(node, ast.Return):
-                if isinstance(node.value, ast.Name):
-                    gnode.needs.append(node.value.id)
-            #! handle For loops
-            elif isinstance (node,ast.For):
-                ReplaceForTargetsWithUnderscore().visit(node)
-                ast.fix_missing_locations(tree)
-                temp = set()
-                for subnode in ast.walk(node):
-                    if isinstance(subnode, ast.Assign):
-                        for target in subnode.targets:
-                            if isinstance(target, ast.Name):
-                                temp.add(target.id)
-                    #! handle in place operations
-                    elif isinstance(subnode, ast.Expr):
-                        list_funcs = ['pop', 'append', 'sort', 'extend', 'reverse', 'insert', 'remove', 'clear']
-                        
-                        call = subnode.value
-                        if isinstance(call, ast.Call) and isinstance(call.func, ast.Attribute):
-                            func_name = call.func.attr  # e.g., 'extend'
-                            if func_name in list_funcs:
-                                target = call.func.value
-                                if isinstance(target, ast.Name):
-                                    var_name = target.id  # 'y'
-                                    gnode.has.append(var_name)
-                    elif isinstance(subnode, ast.AugAssign):
-                        target = subnode.target
-                        if isinstance(target, ast.Name):
-                            gnode.has.append(target.id)
-                            gnode.needs.append(target.id)
-                                    
-                gnode.has.extend(temp)
-                del temp
-                gc.collect()
-            
+            parse_node(node, gnode)
             #! Get variables used in the assignment
-            used_vars = {name.id for name in ast.walk(node) if isinstance(name, ast.Name) and isinstance(name.ctx, ast.Load) and name.id not in  ['_','enumerate','range','zip']}
+            used_vars = {name.id for name in ast.walk(node) if isinstance(name, ast.Name) and isinstance(name.ctx, ast.Load) and name.id not in  ['_','enumerate','range','zip']and  check_var_is_global(self.nodes,name.id)}
             func_names = [name for name, _, _ in functions]
             used_vars = used_vars - set(func_names)  # Exclude function names from used_vars
             gnode.needs.extend(used_vars)
-            self.nodes.append(gnode)
             if debug:
                 self.debugger.print_DDG_node(gnode)
+            self.nodes.append(gnode)
             gnode.has = list(set(gnode.has))  # Remove duplicates
+            gnode.has = [var for var in gnode.has if check_var_is_global(self.nodes,var)]  
             gnode.needs = list(set(gnode.needs))  # Remove duplicates
+            
             
         for i,node in enumerate(sub_tree.body):
             visit_has_needs(self,node,i+1)

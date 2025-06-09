@@ -1,0 +1,31 @@
+[
+    {
+        "code line": 0,
+        "statement": "def func5(x,y):",
+        "has": [
+            "x",
+            "y"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 1,
+        "statement": "z = 5",
+        "has": [
+            "z"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 2,
+        "statement": "if x > y:\n    r = 3\n    if z < 4:\n        for i in range(100):\n            x[i] += 1\n    else:\n        e = 4",
+        "has": [
+            "x"
+        ],
+        "needs": [
+            "y",
+            "z",
+            "x"
+        ]
+    }
+]

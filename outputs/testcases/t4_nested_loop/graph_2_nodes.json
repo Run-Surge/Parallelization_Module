@@ -1,0 +1,49 @@
+[
+    {
+        "code line": 0,
+        "statement": "def func3(x):",
+        "has": [
+            "x"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 1,
+        "statement": "z = 5",
+        "has": [
+            "z"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 2,
+        "statement": "r = x[0]",
+        "has": [
+            "r"
+        ],
+        "needs": [
+            "x"
+        ]
+    },
+    {
+        "code line": 3,
+        "statement": "z = [4, 5, [4]]",
+        "has": [
+            "z"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 4,
+        "statement": "if z < r:\n    for i in range(100):\n        x[i] += 1\nelse:\n    for i in range(100):\n        z[i] -= 1",
+        "has": [
+            "z",
+            "x"
+        ],
+        "needs": [
+            "r",
+            "z",
+            "x"
+        ]
+    }
+]

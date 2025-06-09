@@ -1,0 +1,65 @@
+{
+    "3": {
+        "Node": 3,
+        "Depends on": [
+            {
+                "Node": 1,
+                "Dependency": [
+                    "z"
+                ]
+            },
+            {
+                "Node": 0,
+                "Dependency": [
+                    "x"
+                ]
+            }
+        ]
+    },
+    "6": {
+        "Node": 6,
+        "Depends on": [
+            {
+                "Node": 3,
+                "Dependency": [
+                    "z"
+                ]
+            }
+        ]
+    },
+    "7": {
+        "Node": 7,
+        "Depends on": [
+            {
+                "Node": 2,
+                "Dependency": [
+                    "l"
+                ]
+            },
+            {
+                "Node": 5,
+                "Dependency": [
+                    "nn"
+                ]
+            },
+            {
+                "Node": 6,
+                "Dependency": [
+                    "z"
+                ]
+            },
+            {
+                "Node": 0,
+                "Dependency": [
+                    "x"
+                ]
+            },
+            {
+                "Node": 4,
+                "Dependency": [
+                    "m"
+                ]
+            }
+        ]
+    }
+}

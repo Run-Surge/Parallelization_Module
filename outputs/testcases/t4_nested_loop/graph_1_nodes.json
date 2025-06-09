@@ -1,0 +1,77 @@
+[
+    {
+        "code line": 0,
+        "statement": "def func2(x):",
+        "has": [
+            "x"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 1,
+        "statement": "z = []",
+        "has": [
+            "z"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 2,
+        "statement": "l = []",
+        "has": [
+            "l"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 3,
+        "statement": "z.extend(x)",
+        "has": [
+            "z"
+        ],
+        "needs": [
+            "z",
+            "x"
+        ]
+    },
+    {
+        "code line": 4,
+        "statement": "m = 3",
+        "has": [
+            "m"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 5,
+        "statement": "nn = 4",
+        "has": [
+            "nn"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 6,
+        "statement": "z.append(1)",
+        "has": [
+            "z"
+        ],
+        "needs": [
+            "z"
+        ]
+    },
+    {
+        "code line": 7,
+        "statement": "for a in x:\n    y = a + 4\n    for b in range(20):\n        n = b * y\n        for c in range(2, 40, 3):\n            t = 1\n            c = n + t\n            for d in range(z):\n                l[nn] += d * t + c + y * m",
+        "has": [
+            "l"
+        ],
+        "needs": [
+            "l",
+            "nn",
+            "z",
+            "x",
+            "m"
+        ]
+    }
+]

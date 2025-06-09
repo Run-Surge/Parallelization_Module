@@ -60,15 +60,15 @@
         "code line": 7,
         "statement": "if z > x:\n    z = 9\nelif z < y:\n    n.append(7)\nelse:\n    z = 8\n    l += z",
         "has": [
-            "n",
             "l",
-            "z"
+            "z",
+            "n"
         ],
         "needs": [
             "l",
             "z",
-            "y",
             "x",
+            "y",
             "n"
         ]
     },
@@ -105,11 +105,8 @@
     {
         "code line": 11,
         "statement": "l += x",
-        "has": [
-            "l"
-        ],
+        "has": [],
         "needs": [
-            "l",
             "x"
         ]
     },

@@ -20,5 +20,3 @@ def func1(x,a,b):
     for i, j in zip(a, b):
         x.extend([a,b])
        
-    
-    

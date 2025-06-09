@@ -1,0 +1,85 @@
+[
+    {
+        "code line": 0,
+        "statement": "def add1(data):",
+        "has": [
+            "data"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 1,
+        "statement": "new_data = []",
+        "has": [
+            "new_data"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 2,
+        "statement": "x = 5",
+        "has": [
+            "x"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 3,
+        "statement": "m = 3",
+        "has": [
+            "m"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 4,
+        "statement": "zz = 4",
+        "has": [
+            "zz"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 5,
+        "statement": "xx = 4",
+        "has": [
+            "xx"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 6,
+        "statement": "l = []",
+        "has": [
+            "l"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 7,
+        "statement": "for row in data:\n    new_row = []\n    for value in row:\n        new_value = value + 1 + x * m\n        new_value = value\n        new_row.append(new_value)\n        x = value\n        data[0] = 5\n        l.append([zz, xx])\n    new_data.append(new_row)",
+        "has": [
+            "data",
+            "x",
+            "new_data",
+            "l"
+        ],
+        "needs": [
+            "l",
+            "data",
+            "xx",
+            "x",
+            "new_data",
+            "zz",
+            "m"
+        ]
+    },
+    {
+        "code line": 8,
+        "statement": "return new_data",
+        "has": [],
+        "needs": [
+            "new_data"
+        ]
+    }
+]

@@ -1,0 +1,49 @@
+[
+    {
+        "code line": 0,
+        "statement": "def func4(x):",
+        "has": [
+            "x"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 1,
+        "statement": "z = 5",
+        "has": [
+            "z"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 2,
+        "statement": "r = x[0]",
+        "has": [
+            "r"
+        ],
+        "needs": [
+            "x"
+        ]
+    },
+    {
+        "code line": 3,
+        "statement": "z = [4, 5, [4]]",
+        "has": [
+            "z"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 4,
+        "statement": "for i in range(100):\n    if z < r:\n        x[i] += 1\n    else:\n        z[i] -= 1",
+        "has": [
+            "z",
+            "x"
+        ],
+        "needs": [
+            "r",
+            "z",
+            "x"
+        ]
+    }
+]
