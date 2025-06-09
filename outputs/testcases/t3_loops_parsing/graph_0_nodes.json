@@ -1,0 +1,107 @@
+[
+    {
+        "code line": 0,
+        "statement": "def func1(x,a,b):",
+        "has": [
+            "x",
+            "a",
+            "b"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 1,
+        "statement": "y = 0",
+        "has": [
+            "y"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 2,
+        "statement": "for i in range(1000):\n    x.append(10)\n    x.extend(x)\n    x += 5\n    x[0] *= 2\n    y = 4 + i",
+        "has": [
+            "y",
+            "x"
+        ],
+        "needs": [
+            "x"
+        ]
+    },
+    {
+        "code line": 3,
+        "statement": "names = []",
+        "has": [
+            "names"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 4,
+        "statement": "for i in x:\n    y += i + 5\n    names.append(y)",
+        "has": [
+            "names",
+            "y"
+        ],
+        "needs": [
+            "names",
+            "y",
+            "x"
+        ]
+    },
+    {
+        "code line": 5,
+        "statement": "for key, value in d.items():\n    x += value",
+        "has": [
+            "x"
+        ],
+        "needs": [
+            "d",
+            "x"
+        ]
+    },
+    {
+        "code line": 6,
+        "statement": "for index, name in enumerate(names):\n    x.append(f'{name}{index}')\n    x.append(y)",
+        "has": [
+            "x"
+        ],
+        "needs": [
+            "names",
+            "y",
+            "x"
+        ]
+    },
+    {
+        "code line": 7,
+        "statement": "a = x",
+        "has": [
+            "a"
+        ],
+        "needs": [
+            "x"
+        ]
+    },
+    {
+        "code line": 8,
+        "statement": "b = x",
+        "has": [
+            "b"
+        ],
+        "needs": [
+            "x"
+        ]
+    },
+    {
+        "code line": 9,
+        "statement": "for i, j in zip(a, b):\n    x.extend([a, b])",
+        "has": [
+            "x"
+        ],
+        "needs": [
+            "b",
+            "x",
+            "a"
+        ]
+    }
+]

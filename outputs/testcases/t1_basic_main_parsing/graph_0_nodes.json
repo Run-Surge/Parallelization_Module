@@ -24,8 +24,8 @@
             "z"
         ],
         "needs": [
-            "x",
-            "y"
+            "y",
+            "x"
         ]
     },
     {
@@ -50,20 +50,40 @@
     },
     {
         "code line": 6,
-        "statement": "if z > x:\n    z = 9\nelif z < y:\n    l.append(7)\nelse:\n    z = 8",
+        "statement": "n = []",
         "has": [
+            "n"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 7,
+        "statement": "if z > x:\n    z = 9\nelif z < y:\n    n.append(7)\nelse:\n    z = 8\n    l += z",
+        "has": [
+            "n",
             "l",
             "z"
         ],
         "needs": [
-            "x",
+            "l",
             "z",
             "y",
-            "l"
+            "x",
+            "n"
         ]
     },
     {
-        "code line": 7,
+        "code line": 8,
+        "statement": "if z > 10:\n    y = 10",
+        "has": [
+            "y"
+        ],
+        "needs": [
+            "z"
+        ]
+    },
+    {
+        "code line": 9,
         "statement": "l = func1(x)",
         "has": [
             "l"
@@ -73,7 +93,28 @@
         ]
     },
     {
-        "code line": 8,
+        "code line": 10,
+        "statement": "l.append(1)",
+        "has": [
+            "l"
+        ],
+        "needs": [
+            "l"
+        ]
+    },
+    {
+        "code line": 11,
+        "statement": "l += x",
+        "has": [
+            "l"
+        ],
+        "needs": [
+            "l",
+            "x"
+        ]
+    },
+    {
+        "code line": 12,
         "statement": "func2(l)",
         "has": [],
         "needs": [

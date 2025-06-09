@@ -82,6 +82,58 @@ class _Parser:
             self.entry_point=textwrap.dedent(self.entry_point)
             if debug:
                 self.debugger.print_entry_point(self.entry_point)
+#! to replace loop variables with _
+class ReplaceForTargetsWithUnderscore(ast.NodeTransformer):
+    def visit_For(self, node):
+        # Visit children first
+        self.generic_visit(node)
+
+        # Collect all variable names bound in target
+        bound_names = self._extract_names(node.target)
+
+        # Replace target with matching structure filled with '_'
+        node.target = self._underscore_target_like(node.target)
+
+        # Replace all uses of those names in the loop body with '_'
+        node.body = [self._replace_names_in_stmt(stmt, bound_names) for stmt in node.body]
+        return node
+
+    def _extract_names(self, target):
+        if isinstance(target, ast.Name):
+            return {target.id}
+        elif isinstance(target, (ast.Tuple, ast.List)):
+            names = set()
+            for elt in target.elts:
+                names.update(self._extract_names(elt))
+            return names
+        return set()
+
+    def _underscore_target_like(self, target):
+        if isinstance(target, ast.Name):
+            return ast.Name(id='_', ctx=ast.Store())
+        elif isinstance(target, ast.Tuple):
+            return ast.Tuple(
+                elts=[self._underscore_target_like(e) for e in target.elts],
+                ctx=ast.Store()
+            )
+        elif isinstance(target, ast.List):
+            return ast.List(
+                elts=[self._underscore_target_like(e) for e in target.elts],
+                ctx=ast.Store()
+            )
+        return target  # fallback
+
+    def _replace_names_in_stmt(self, stmt, names_to_replace):
+        return ReplaceNamesWithUnderscore(names_to_replace).visit(stmt)
+
+class ReplaceNamesWithUnderscore(ast.NodeTransformer):
+    def __init__(self, names_to_replace):
+        self.names_to_replace = names_to_replace
+
+    def visit_Name(self, node):
+        if isinstance(node.ctx, ast.Load) and node.id in self.names_to_replace:
+            node.id = '_'
+        return node
 class DDG:
     def __init__(self):
         self.debugger=Debugger()
@@ -101,7 +153,6 @@ class DDG:
             
         sub_tree=ast.parse(snippet)
         def visit_has_needs(self, node,number):
-            print(ast.dump(node, indent=4))
             #! create a new node
             gnode = DDG_Node(number,ast.unparse(node))
             #! get variables being assigned to
@@ -121,6 +172,14 @@ class DDG:
                         if isinstance(target, ast.Name):
                             var_name = target.id  # 'y'
                             gnode.has.append(var_name)
+            elif isinstance(node, ast.AugAssign):
+                target = node.target
+                if isinstance(target, ast.Name):
+                    gnode.has.append(target.id)
+                    gnode.needs.append(target.id)
+                
+            
+                
 
 
             #! handle if conditions
@@ -143,7 +202,12 @@ class DDG:
                                 if isinstance(target, ast.Name):
                                     var_name = target.id  # 'y'
                                     gnode.has.append(var_name)
-                            
+                    elif isinstance(subnode, ast.AugAssign):
+                        target = subnode.target
+                        if isinstance(target, ast.Name):
+                            gnode.has.append(target.id)
+                            gnode.needs.append(target.id)
+                                    
                 gnode.has.extend(temp)
                 del temp
                 gc.collect()
@@ -151,14 +215,49 @@ class DDG:
             elif isinstance(node, ast.Return):
                 if isinstance(node.value, ast.Name):
                     gnode.needs.append(node.value.id)
+            #! handle For loops
+            elif isinstance (node,ast.For):
+                ReplaceForTargetsWithUnderscore().visit(node)
+                ast.fix_missing_locations(tree)
+                temp = set()
+                for subnode in ast.walk(node):
+                    if isinstance(subnode, ast.Assign):
+                        for target in subnode.targets:
+                            if isinstance(target, ast.Name):
+                                temp.add(target.id)
+                    #! handle in place operations
+                    elif isinstance(subnode, ast.Expr):
+                        list_funcs = ['pop', 'append', 'sort', 'extend', 'reverse', 'insert', 'remove', 'clear']
+                        
+                        call = subnode.value
+                        if isinstance(call, ast.Call) and isinstance(call.func, ast.Attribute):
+                            func_name = call.func.attr  # e.g., 'extend'
+                            if func_name in list_funcs:
+                                target = call.func.value
+                                if isinstance(target, ast.Name):
+                                    var_name = target.id  # 'y'
+                                    gnode.has.append(var_name)
+                    elif isinstance(subnode, ast.AugAssign):
+                        target = subnode.target
+                        if isinstance(target, ast.Name):
+                            gnode.has.append(target.id)
+                            gnode.needs.append(target.id)
+                                    
+                gnode.has.extend(temp)
+                del temp
+                gc.collect()
+            
             #! Get variables used in the assignment
-            used_vars = {name.id for name in ast.walk(node) if isinstance(name, ast.Name) and isinstance(name.ctx, ast.Load)}
+            used_vars = {name.id for name in ast.walk(node) if isinstance(name, ast.Name) and isinstance(name.ctx, ast.Load) and name.id not in  ['_','enumerate','range','zip']}
             func_names = [name for name, _, _ in functions]
             used_vars = used_vars - set(func_names)  # Exclude function names from used_vars
             gnode.needs.extend(used_vars)
             self.nodes.append(gnode)
             if debug:
                 self.debugger.print_DDG_node(gnode)
+            gnode.has = list(set(gnode.has))  # Remove duplicates
+            gnode.needs = list(set(gnode.needs))  # Remove duplicates
+            
         for i,node in enumerate(sub_tree.body):
             visit_has_needs(self,node,i+1)
             
@@ -236,6 +335,7 @@ class DDG:
         return json1,json2
 
         
+        
 class DDG_Wrapper:
     def __init__(self,tree):
         self.parser=_Parser(tree)
@@ -283,7 +383,7 @@ class DDG_Wrapper:
             with open(f"{folder_name}/graph_{index}_edges.json", "w") as outfile:
                 outfile.write(edge_data)
 testcases_folder_path="testcases"
-testcase=os.path.join(testcases_folder_path, "t1_basic_main_parsing.py")
+testcase=os.path.join(testcases_folder_path, "t3_loops_parsing.py")
 tree = ast.parse(open(testcase).read())
 graph=DDG_Wrapper(tree)
 graph.build_ddgs()
