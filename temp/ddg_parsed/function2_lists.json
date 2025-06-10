@@ -1,0 +1,26 @@
+[
+    {
+        "key": [
+            "args:none"
+        ],
+        "statements": [
+            "def hello(z):"
+        ]
+    },
+    {
+        "key": [
+            "z:0"
+        ],
+        "statements": [
+            "z = z + 1"
+        ]
+    },
+    {
+        "key": [
+            "z:1"
+        ],
+        "statements": [
+            "return z"
+        ]
+    }
+]

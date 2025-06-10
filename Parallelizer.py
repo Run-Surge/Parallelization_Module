@@ -7,6 +7,7 @@ from typing import List, Dict, Any
 import glob
 import json
 import copy
+import re
 
 from collections import defaultdict
 from typing import List, Dict, Any
@@ -28,7 +29,16 @@ def group_by_needs_with_wait_index(
             depends_on = info.get("Depends on", [])
 
             if not depends_on:
-                key = ("none:none",)
+                key = ("none:none",) if not first_no_dependency_handled else ("data:none",)
+                key = None
+                if first_no_dependency_handled:
+                    key = ("none:none",)
+                else:   
+                    if line_to_stmt[line_num].startswith("def"):
+                        key = ("args:none",)
+                    else:
+                        key = ("data:none",)
+                    
                 first_no_dependency_handled = True
                 grouped_statements[key].append(line_to_stmt[line_num])
             else:
@@ -53,17 +63,18 @@ def group_by_needs_with_wait_index(
             new_keys = []
             for key in keys:
                 lineno = key.split(":")
+                new_key = None
                 if lineno[1] == "none":
-                    continue
-                code_line = line_to_code_mapping.get(int(lineno[1]), None)
-                index = get_statement_index(grouped_list, code_line)
-                new_key = f'{lineno[0]}:{index}'
+                    new_key = key
+                else:
+                    code_line = line_to_code_mapping.get(int(lineno[1]), None)
+                    index = get_statement_index(grouped_list, code_line)
+                    new_key = f'{lineno[0]}:{index}'
                 new_keys.append(new_key) 
             new_key_tuple = tuple(new_keys)
             grouped_list[ind]["key"] = new_key_tuple
         return grouped_list
     result = get_dependency_dict(statements)
-    print(result)
     line_to_code_mapping = get_line_to_statement_map(statements)
     result = convert_keys_to_dict_indices(result,  line_to_code_mapping)
     
@@ -112,9 +123,13 @@ def dependency_analyzer(folder):
 
         print(f"\nProcessing pair: {os.path.basename(jsons[i])}, {os.path.basename(jsons[i+1])}")
         result = group_by_needs_with_wait_index(nodes, edges)
-        # print(result)
-        for x in result:
-            print(f"Key: {x['key']}, Statements: {x['statements']}")
+        save_path = 'temp'
+        index = int(re.search(r'\d+', os.path.basename(jsons[i])).group(0))
+        if index == 0:
+            json.dump(result, open(f"{save_path}/ddg_parsed/main_lists.json", 'w'), indent=4)
+        else:
+            print(index)
+            json.dump(result, open(f"{save_path}/ddg_parsed/function{index}_lists.json", 'w'), indent=4)
         results.append(result)
     return results
 

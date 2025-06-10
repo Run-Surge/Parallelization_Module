@@ -1,0 +1,18 @@
+[
+    {
+        "key": [
+            "args:none"
+        ],
+        "statements": [
+            "def hello2():"
+        ]
+    },
+    {
+        "key": [
+            "none:none"
+        ],
+        "statements": [
+            "return 4 + 3"
+        ]
+    }
+]

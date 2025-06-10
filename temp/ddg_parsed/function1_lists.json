@@ -1,0 +1,69 @@
+[
+    {
+        "key": [
+            "args:none"
+        ],
+        "statements": [
+            "def add1(lines):"
+        ]
+    },
+    {
+        "key": [
+            "none:none"
+        ],
+        "statements": [
+            "lines += [4, 5]",
+            "a = 5"
+        ]
+    },
+    {
+        "key": [
+            "lines:0"
+        ],
+        "statements": [
+            "lines.extend([[4, 5, 6]])"
+        ]
+    },
+    {
+        "key": [
+            "lines:2"
+        ],
+        "statements": [
+            "lines.extend(lines)"
+        ]
+    },
+    {
+        "key": [
+            "a:1",
+            "lines:3"
+        ],
+        "statements": [
+            "lines.extend([a, 4])"
+        ]
+    },
+    {
+        "key": [
+            "a:1",
+            "lines:4"
+        ],
+        "statements": [
+            "lines.append(a)"
+        ]
+    },
+    {
+        "key": [
+            "lines:5"
+        ],
+        "statements": [
+            "lines.append(9)"
+        ]
+    },
+    {
+        "key": [
+            "lines:6"
+        ],
+        "statements": [
+            "return lines[0]"
+        ]
+    }
+]

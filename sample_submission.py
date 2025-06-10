@@ -65,7 +65,8 @@ if __name__ == '__main__':
 #! User main function is defined here
 #! Note for boosting performance if list is modified inside the function (each function call is independent) then return pass a 
 #! copy of the list instead of the same list for performing different operations in parallel
-    z = add1(data) 
+    data = add1(data) 
+    z = add1(data)
     x = hello2()
     y = x.copy() #
     z = hello(z)

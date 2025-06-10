@@ -1,0 +1,18 @@
+[
+    {
+        "key": [
+            "args:none"
+        ],
+        "statements": [
+            "def calc(x,y,z,a,b,c,d):"
+        ]
+    },
+    {
+        "key": [
+            "z:0"
+        ],
+        "statements": [
+            "return [['Output', str(x), str(y), str(z), str(a), str(b), str(c), str(d)]]"
+        ]
+    }
+]
