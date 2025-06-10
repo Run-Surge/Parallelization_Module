@@ -18,13 +18,13 @@
         "statement": "return [['Output', str(x), str(y), str(z), str(a), str(b), str(c), str(d)]]",
         "has": [],
         "needs": [
-            "z",
-            "d",
-            "y",
             "b",
-            "x",
+            "z",
+            "y",
+            "d",
             "a",
-            "c"
+            "c",
+            "x"
         ]
     }
 ]

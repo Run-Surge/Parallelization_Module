@@ -128,7 +128,6 @@ def dependency_analyzer(folder):
         if index == 0:
             json.dump(result, open(f"{save_path}/ddg_parsed/main_lists.json", 'w'), indent=4)
         else:
-            print(index)
             json.dump(result, open(f"{save_path}/ddg_parsed/function{index}_lists.json", 'w'), indent=4)
         results.append(result)
     return results
@@ -210,7 +209,6 @@ def get_memory_foortprint(file_path, entry_point, functions):
             for node in tree.body:
                 # print(ast.dump(node, indent=4))  # Debugging: print the AST nodes
                 get_footprint(node, local_parser, func_lines_footprint)
-                print(func_lines_footprint)
                 # print(local_parser.vars)
         else:
             raise ValueError(f"Function {func_name} not found in the provided functions list.")
@@ -232,6 +230,20 @@ def get_memory_foortprint(file_path, entry_point, functions):
                     args.append(ast.dump(arg))  # fallback for complex args
 
             return func_name, args
+        def substitute_outer_keys(func_dict):
+            new_dict = defaultdict(dict)
+            
+            for func_name, inner_dict in func_dict.items():
+                # Find the function signature from inner keys (starts with 'def ')
+                func_signature = next((k for k in inner_dict if k.startswith('def ')), None)
+                if func_signature:
+                    # Extract actual signature string inside parentheses
+                    new_key = func_signature[4:].strip(':')  # Remove 'def ' and any trailing ':'
+                    new_dict[new_key] = inner_dict
+                else:
+                    new_dict[func_name] = inner_dict  # fallback if signature not found
+            
+            return new_dict
            
         tree = ast.parse(entry_point)
         main_lines_footprint = {}
@@ -243,7 +255,8 @@ def get_memory_foortprint(file_path, entry_point, functions):
                 if isinstance(value, ast.Call):
                     func_name, args = get_func_attributes(node, functions)
                     return_footprint = get_func_footprint(func_name, args, functions,func_lines_footprint,global_parser)
-                    
+        func_lines_footprint = substitute_outer_keys(func_lines_footprint)
+        print("Function Lines Footprint:", func_lines_footprint)
                     
                         
             
@@ -285,7 +298,7 @@ def main():
     if dep_2d_list:
         print(f"3. Dependency analysis completed for {filename}.")
     
-    # get_memory_foortprint(filename,entry_point,functions)
+    get_memory_foortprint(filename,entry_point,functions)
         
     
 
