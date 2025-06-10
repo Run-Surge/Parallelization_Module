@@ -111,7 +111,7 @@ class Memory_Parser:
         '''
         resets the memory parser.
         '''
-        self.vars = {'z' : (5, sys.getsizeof(0), 'int'),'y' :(10,1000,'list'), 'l' :(0,56,'list')}
+        self.vars = {}
     def _hande_primitives_type_conversions(self, node):
         if isinstance(node.func, ast.Name) and node.func.id == 'int':  
                 arg_val = self._evaluate_primtive_expression(node.args[0])
@@ -316,55 +316,55 @@ class Memory_Parser:
         
           
     def _assignmemt_handler(self,tree):
-        stmt = tree
+        stmt = tree.body[0]
         if self._assignment_type(stmt.value) == self.AssignTypes.PRIMITIVE:
             self._evaluate_primitive_assignment(stmt)
         elif self._assignment_type(stmt.value) == self.AssignTypes.LIST :
             print("List Assignment")            
             self._evaluate_list_assignment(stmt)
     def _handle_list_insertion(self, var,func,args,in_loop = 1):
-            if func == 'append':
-                #! start with $ then a variable name
-                if isinstance(args[0], str) and args[0].startswith("$"):
-                args[0] = args[0][1:]  # Remove the leading '$'
-                if args[0] not in self.vars:
-                    raise NameError(f"Variable '{args[0]}' is not defined syntax error.")
-                args[0] = self.vars[args[0]][0]  # Get the value of the variable
-                for i in range(in_loop):
+        if func == 'append':
+            #! start with $ then a variable name
+            if isinstance(args[0], str) and args[0].startswith("$"):
+               args[0] = args[0][1:]  # Remove the leading '$'
+               if args[0] not in self.vars:
+                   raise NameError(f"Variable '{args[0]}' is not defined syntax error.")
+               args[0] = self.vars[args[0]][0]  # Get the value of the variable
+            for i in range(in_loop):
+                new_node = ast.Assign(
+                    targets=[ast.Name(id=var, ctx=ast.Store())],
+                    value=ast.List(elts=[ast.Constant(value=args[0])], ctx=ast.Load())
+                )
+                new_node = self.transformer2.visit(new_node)
+                # print(f"New Node: {ast.dump(new_node)}")
+                self._evaluate_list_assignment(new_node, False)
+        elif func == 'extend':  
+            #! extend treats immutable objects as if they were re-created in memory together with their pointers.
+            
+            flattened_args = []
+            for sublist in args:
+                for item in sublist:
+                    if isinstance(item, str) and item.startswith("$"):
+                        item = item[1:]
+                        if item not in self.vars:
+                            raise NameError(f"Variable '{item}' is not defined syntax error.")
+                        if self.vars[item][2] == 'list':
+                            length = self.vars[item][0]
+                            size = self.vars[item][1]
+                            total_size = size + self.primitives_estimator.estimate_list_size(length) -  sys.getsizeof([]) #! should be 2 one for get the size of the list and one for the pointer in the original list
+                            self.vars[var] = (self.vars[var][0] + length, self.vars[var][1] + total_size, 'list')
+                            continue
+                    flattened_args.append(item)
+            args = flattened_args
+            for i in range(in_loop):
+                for arg in args:
                     new_node = ast.Assign(
                         targets=[ast.Name(id=var, ctx=ast.Store())],
-                        value=ast.List(elts=[ast.Constant(value=args[0])], ctx=ast.Load())
+                        value=ast.List(elts=[ast.Constant(value=arg)], ctx=ast.Load())
                     )
                     new_node = self.transformer2.visit(new_node)
                     # print(f"New Node: {ast.dump(new_node)}")
                     self._evaluate_list_assignment(new_node, False)
-            elif func == 'extend':  
-                #! extend treats immutable objects as if they were re-created in memory together with their pointers.
-                
-                flattened_args = []
-                for sublist in args:
-                    for item in sublist:
-                        if isinstance(item, str) and item.startswith("$"):
-                            item = item[1:]
-                            if item not in self.vars:
-                                raise NameError(f"Variable '{item}' is not defined syntax error.")
-                            if self.vars[item][2] == 'list':
-                                length = self.vars[item][0]
-                                size = self.vars[item][1]
-                                total_size = size + self.primitives_estimator.estimate_list_size(length) -  sys.getsizeof([]) #! should be 2 one for get the size of the list and one for the pointer in the original list
-                                self.vars[var] = (self.vars[var][0] + length, self.vars[var][1] + total_size, 'list')
-                                continue
-                        flattened_args.append(item)
-                args = flattened_args
-                for i in range(in_loop):
-                    for arg in args:
-                        new_node = ast.Assign(
-                            targets=[ast.Name(id=var, ctx=ast.Store())],
-                            value=ast.List(elts=[ast.Constant(value=arg)], ctx=ast.Load())
-                        )
-                        new_node = self.transformer2.visit(new_node)
-                        # print(f"New Node: {ast.dump(new_node)}")
-                        self._evaluate_list_assignment(new_node, False)
     def _insertion_handler(self, tree,in_loop = 1):
         def extract_call_info(tree):
             for node in ast.walk(tree):
@@ -402,8 +402,6 @@ class Memory_Parser:
             raise NameError(f"Variable '{var}' is not defined syntax error.")
         if self.vars[var][2] == 'list':
            self._handle_list_insertion(var, func_type,args, in_loop)   
-            
-        
             
         
     def _handle_list_deletion(self, var, func_type,in_loop = 1):
@@ -518,7 +516,7 @@ class Memory_Parser:
 
             return file_path, list_name
         file_path ,var = extract_file_info(tree)
-        file_size = os.path.getsize(file_path) + sys.getsizeof([]) #! adding the size of the list pointera
+        file_size = os.path.getsize(file_path) + sys.getsizeof([])  #! add the size of the list pointer
         length = 0
         with open(file_path, 'rb') as f:
             length = sum(1 for _ in f)
@@ -565,3 +563,4 @@ class Memory_Parser:
             new_size = int(original_size / original_length * new_length)
             return new_size, new_length
             
+        
