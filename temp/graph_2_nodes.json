@@ -22,7 +22,6 @@
         "statement": "return z",
         "has": [],
         "needs": [
-            "z",
             "z"
         ]
     }

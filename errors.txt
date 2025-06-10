@@ -5,3 +5,13 @@ Syntax error in .\sample_submission.py:   File ".\sample_submission.py", line 62
                         ^
 SyntaxError: invalid syntax
 
+Syntax error in sample_submission.py:   File "sample_submission.py", line 38
+    lines..append([4,5])
+          ^
+SyntaxError: invalid syntax
+
+Syntax error in sample_submission.py:   File "sample_submission.py", line 38
+    lines..append([4,5])
+          ^
+SyntaxError: invalid syntax
+

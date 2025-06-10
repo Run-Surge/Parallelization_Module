@@ -316,7 +316,7 @@ class Memory_Parser:
         
           
     def _assignmemt_handler(self,tree):
-        stmt = tree.body[0]
+        stmt = tree
         if self._assignment_type(stmt.value) == self.AssignTypes.PRIMITIVE:
             self._evaluate_primitive_assignment(stmt)
         elif self._assignment_type(stmt.value) == self.AssignTypes.LIST :
@@ -385,7 +385,7 @@ class Memory_Parser:
                                     raise ValueError(f"Unsupported argument type: {type(arg).__name__}")
                         return var_id, func_type, args
          
-        if isinstance(tree.body[0], ast.AugAssign): #! for handling +=
+        if isinstance(tree, ast.AugAssign): #! for handling +=
             tree = self.transformer3.visit(tree)
         else: #1 to replace insert with append
             contains_insert = any(

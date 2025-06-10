@@ -16,7 +16,6 @@
             {
                 "Node": 1,
                 "Dependency": [
-                    "z",
                     "z"
                 ]
             }
