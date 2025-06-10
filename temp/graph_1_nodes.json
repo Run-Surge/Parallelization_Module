@@ -9,10 +9,74 @@
     },
     {
         "code line": 1,
+        "statement": "lines += [4, 5]",
+        "has": [],
+        "needs": []
+    },
+    {
+        "code line": 2,
+        "statement": "lines.extend([[4, 5, 6]])",
+        "has": [
+            "lines"
+        ],
+        "needs": [
+            "lines"
+        ]
+    },
+    {
+        "code line": 3,
+        "statement": "lines.extend(lines)",
+        "has": [
+            "lines"
+        ],
+        "needs": [
+            "lines"
+        ]
+    },
+    {
+        "code line": 4,
+        "statement": "a = 5",
+        "has": [
+            "a"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 5,
+        "statement": "lines.extend([a, 4])",
+        "has": [
+            "lines"
+        ],
+        "needs": [
+            "lines",
+            "a"
+        ]
+    },
+    {
+        "code line": 6,
+        "statement": "lines.append(a)",
+        "has": [
+            "lines"
+        ],
+        "needs": [
+            "lines",
+            "a"
+        ]
+    },
+    {
+        "code line": 7,
         "statement": "lines.append(9)",
         "has": [
             "lines"
         ],
+        "needs": [
+            "lines"
+        ]
+    },
+    {
+        "code line": 8,
+        "statement": "return lines[0]",
+        "has": [],
         "needs": [
             "lines"
         ]

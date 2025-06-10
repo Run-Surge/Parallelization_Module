@@ -14,91 +14,61 @@ from typing import List, Dict, Any
 def group_by_needs_with_wait_index(
     statements: List[Dict[str, Any]],
     dependency_graph: Dict[str, Any]
-) -> List[List[str]]:
-    # 1) Map code_line → produced variables
-    produced = {s["code line"]: s["has"] for s in statements}
+) -> Dict[tuple, List[str]]:
+    
+    def get_dependency_dict(statements):
+        line_to_stmt = {stmt["code line"]: stmt["statement"] for stmt in statements}
+        grouped_statements = defaultdict(list)
+        first_no_dependency_handled = False
 
-    # 2) Build needs_map: code_line → sorted tuple of needed vars
-    needs_map = {
-        s["code line"]: tuple(sorted(s["needs"]))
-        for s in statements
-    }
+        for stmt in statements:
+            line_num = stmt["code line"]
+            line_str = str(line_num)
+            info = dependency_graph.get(line_str, {})
+            depends_on = info.get("Depends on", [])
 
-    # 3) Bucket statements by needs‐tuple
-    buckets = defaultdict(list)
-    for s in statements:
-        tpl = needs_map[s["code line"]]
-        buckets[tpl].append(s)
-
-    # 4) Sort distinct needs‐tuples for grouping
-    distinct = list(buckets.keys())
-    # def needs_key(tpl):
-    #     if not tpl:
-    #         return (0,)
-    #     if len(tpl) == 1:
-    #         var = tpl[0]
-    #         # if external, sort by var name
-    #         if str(var) not in produced:
-    #             return (0, var)
-    #         # otherwise by latest producer line
-    #         return (1, produced.get(var, 0))
-    #     return (2, len(tpl), tpl)
-    # distinct.sort(key=needs_key)
-
-    # 5) Build lookup: needs‐tpl → group index
-    tpl_to_groupidx = {tpl: idx for idx, tpl in enumerate(distinct)}
-
-    # 6) Precompute, for each stmt_line, a var→producer_line from dependency_graph
-    #    dependency_graph keys are strings
-    dep_map: Dict[int, Dict[str,int]] = {}
-    for k, info in dependency_graph.items():
-        stmt_line = int(k)
-        dep_map[stmt_line] = {}
-        for dep in info.get("Depends on", []):
-            prod_line = dep["Node"]
-            for var in dep["Dependency"]:
-                dep_map[stmt_line][var] = prod_line
-
-    # 7) Format each group, using dep_map to find wait‐indices
-    result: List[List[str]] = []
-    latest_group_idx = {}  # Track the latest group index for each variable
-
-    for group_idx, tpl in enumerate(distinct):
-        grp = []
-        temp_latest_group_idx = latest_group_idx.copy()  # Temporary copy for calculating wait indices
-        for s in sorted(buckets[tpl], key=lambda x: x["code line"]):
-            stmt_line = s["code line"]
-            waits = []
-            for var in tpl:
-                prod_line = dep_map.get(stmt_line, {}).get(var)
-                if prod_line is None:
-                    wait_idx = None
-                else:
-                    # Use temp_latest_group_idx to find the correct group index
-                    wait_idx = temp_latest_group_idx.get(var, None)
-                waits.append((var, wait_idx))
-
-            dep_str = ", ".join(tpl) if tpl else "none"
-            if waits:
-                wait_str = ", ".join(
-                    f"{v}:{('none' if idx is None else idx)}"
-                    for v, idx in waits
-                )
+            if not depends_on:
+                key = ("none:none",)
+                first_no_dependency_handled = True
+                grouped_statements[key].append(line_to_stmt[line_num])
             else:
-                wait_str = "none"
+                key_parts = [f"{dep['Dependency'][0]}:{dep['Node']}" for dep in depends_on]
+                key = tuple(sorted(key_parts))
+                grouped_statements[key].append(line_to_stmt[line_num])
 
-            grp.append(f"{s['statement']} : {dep_str} : {wait_str}")
-        
-        # Update latest_group_idx for variables produced in this group
-        for s in buckets[tpl]:
-            for var in s["has"]:
-                latest_group_idx[var] = group_idx
-
-        result.append(grp)
-
+        # Convert to list of dicts
+        result = [{"key": key, "statements": stmts} for key, stmts in grouped_statements.items()]
+        return result  
+    def get_line_to_statement_map(statements: List[Dict[str, Any]]) -> Dict[int, str]:
+        return {stmt["code line"]: stmt["statement"] for stmt in statements}
+    def convert_keys_to_dict_indices(grouped_list, line_to_code_mapping):
+        def get_statement_index(grouped_list,code):
+            for i, item in enumerate(grouped_list):
+                if code in item["statements"]:
+                    return i
+            return None
+        for ind,dictionnary in enumerate(grouped_list):
+            keys = dictionnary["key"]
+            keys = list(keys)
+            new_keys = []
+            for key in keys:
+                lineno = key.split(":")
+                if lineno[1] == "none":
+                    continue
+                code_line = line_to_code_mapping.get(int(lineno[1]), None)
+                index = get_statement_index(grouped_list, code_line)
+                new_key = f'{lineno[0]}:{index}'
+                new_keys.append(new_key) 
+            new_key_tuple = tuple(new_keys)
+            grouped_list[ind]["key"] = new_key_tuple
+        return grouped_list
+    result = get_dependency_dict(statements)
+    print(result)
+    line_to_code_mapping = get_line_to_statement_map(statements)
+    result = convert_keys_to_dict_indices(result,  line_to_code_mapping)
+    
+    return result
    
-
-    return result 
 
 def check_syntax_errors(file_path,error_file="errors.txt"):
     try:
@@ -142,7 +112,9 @@ def dependency_analyzer(folder):
 
         print(f"\nProcessing pair: {os.path.basename(jsons[i])}, {os.path.basename(jsons[i+1])}")
         result = group_by_needs_with_wait_index(nodes, edges)
-        print(result)
+        # print(result)
+        for x in result:
+            print(f"Key: {x['key']}, Statements: {x['statements']}")
         results.append(result)
     return results
 
@@ -287,7 +259,7 @@ def main():
     graph = build_ddg(filename)
     if graph:
         print(f"2. DDG built successfully for {filename}.")
-        graph.visualize_graph_data()
+        # graph.visualize_graph_data()
         graph.save_to_json('temp')
         functions = graph.parser.functions
         entry_point= graph.parser.entry_point
@@ -298,7 +270,7 @@ def main():
     if dep_2d_list:
         print(f"3. Dependency analysis completed for {filename}.")
     
-    get_memory_foortprint(filename,entry_point,functions)
+    # get_memory_foortprint(filename,entry_point,functions)
         
     
 

@@ -23,8 +23,8 @@
         "statement": "return x + y",
         "has": [],
         "needs": [
-            "x",
-            "y"
+            "y",
+            "x"
         ]
     }
 ]

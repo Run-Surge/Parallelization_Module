@@ -1,9 +1,76 @@
 {
-    "1": {
-        "Node": 1,
+    "2": {
+        "Node": 2,
         "Depends on": [
             {
                 "Node": 0,
+                "Dependency": [
+                    "lines"
+                ]
+            }
+        ]
+    },
+    "3": {
+        "Node": 3,
+        "Depends on": [
+            {
+                "Node": 2,
+                "Dependency": [
+                    "lines"
+                ]
+            }
+        ]
+    },
+    "5": {
+        "Node": 5,
+        "Depends on": [
+            {
+                "Node": 3,
+                "Dependency": [
+                    "lines"
+                ]
+            },
+            {
+                "Node": 4,
+                "Dependency": [
+                    "a"
+                ]
+            }
+        ]
+    },
+    "6": {
+        "Node": 6,
+        "Depends on": [
+            {
+                "Node": 5,
+                "Dependency": [
+                    "lines"
+                ]
+            },
+            {
+                "Node": 4,
+                "Dependency": [
+                    "a"
+                ]
+            }
+        ]
+    },
+    "7": {
+        "Node": 7,
+        "Depends on": [
+            {
+                "Node": 6,
+                "Dependency": [
+                    "lines"
+                ]
+            }
+        ]
+    },
+    "8": {
+        "Node": 8,
+        "Depends on": [
+            {
+                "Node": 7,
                 "Dependency": [
                     "lines"
                 ]

@@ -6,5 +6,120 @@
             "z"
         ],
         "needs": []
+    },
+    {
+        "code line": 2,
+        "statement": "x = hello2()",
+        "has": [
+            "x"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 3,
+        "statement": "y = x.copy()",
+        "has": [
+            "y"
+        ],
+        "needs": [
+            "x"
+        ]
+    },
+    {
+        "code line": 4,
+        "statement": "z = hello(z)",
+        "has": [
+            "z"
+        ],
+        "needs": [
+            "z"
+        ]
+    },
+    {
+        "code line": 5,
+        "statement": "a = hello(z)",
+        "has": [
+            "a"
+        ],
+        "needs": [
+            "z"
+        ]
+    },
+    {
+        "code line": 6,
+        "statement": "k = hello(a)",
+        "has": [
+            "k"
+        ],
+        "needs": [
+            "a"
+        ]
+    },
+    {
+        "code line": 7,
+        "statement": "a = hello(x)",
+        "has": [
+            "a"
+        ],
+        "needs": [
+            "x"
+        ]
+    },
+    {
+        "code line": 8,
+        "statement": "z = hello(a)",
+        "has": [
+            "z"
+        ],
+        "needs": [
+            "a"
+        ]
+    },
+    {
+        "code line": 9,
+        "statement": "b = hello3(x, y)",
+        "has": [
+            "b"
+        ],
+        "needs": [
+            "y",
+            "x"
+        ]
+    },
+    {
+        "code line": 10,
+        "statement": "c = hello(z)",
+        "has": [
+            "c"
+        ],
+        "needs": [
+            "z"
+        ]
+    },
+    {
+        "code line": 11,
+        "statement": "d = hello3(x)",
+        "has": [
+            "d"
+        ],
+        "needs": [
+            "x"
+        ]
+    },
+    {
+        "code line": 12,
+        "statement": "output = calc(x, y, z, a, b, c, d)",
+        "has": [
+            "output"
+        ],
+        "needs": [
+            "c",
+            "y",
+            "x",
+            "d",
+            "b",
+            "a",
+            "z"
+        ]
     }
 ]
