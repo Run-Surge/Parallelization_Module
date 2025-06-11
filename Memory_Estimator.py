@@ -111,7 +111,7 @@ class Memory_Parser:
         '''
         resets the memory parser.
         '''
-        self.vars = {'z' : (5, sys.getsizeof(0), 'int'),'y' :(10,1000,'list'), 'l' :(0,56,'list')}
+        self.vars = {}
     def _hande_primitives_type_conversions(self, node):
         if isinstance(node.func, ast.Name) and node.func.id == 'int':  
                 arg_val = self._evaluate_primtive_expression(node.args[0])
@@ -316,13 +316,13 @@ class Memory_Parser:
         
           
     def _assignmemt_handler(self,tree):
-        stmt = tree
+        stmt = tree.body[0]
         if self._assignment_type(stmt.value) == self.AssignTypes.PRIMITIVE:
             self._evaluate_primitive_assignment(stmt)
         elif self._assignment_type(stmt.value) == self.AssignTypes.LIST :
             print("List Assignment")            
             self._evaluate_list_assignment(stmt)
-    def _handle_list_insertion(self, var,func,args):
+    def _handle_list_insertion(self, var,func,args,in_loop = 1):
         if func == 'append':
             #! start with $ then a variable name
             if isinstance(args[0], str) and args[0].startswith("$"):
@@ -330,13 +330,14 @@ class Memory_Parser:
                if args[0] not in self.vars:
                    raise NameError(f"Variable '{args[0]}' is not defined syntax error.")
                args[0] = self.vars[args[0]][0]  # Get the value of the variable
-            new_node = ast.Assign(
-                targets=[ast.Name(id=var, ctx=ast.Store())],
-                value=ast.List(elts=[ast.Constant(value=args[0])], ctx=ast.Load())
-            )
-            new_node = self.transformer2.visit(new_node)
-            # print(f"New Node: {ast.dump(new_node)}")
-            self._evaluate_list_assignment(new_node, False)
+            for i in range(in_loop):
+                new_node = ast.Assign(
+                    targets=[ast.Name(id=var, ctx=ast.Store())],
+                    value=ast.List(elts=[ast.Constant(value=args[0])], ctx=ast.Load())
+                )
+                new_node = self.transformer2.visit(new_node)
+                # print(f"New Node: {ast.dump(new_node)}")
+                self._evaluate_list_assignment(new_node, False)
         elif func == 'extend':  
             #! extend treats immutable objects as if they were re-created in memory together with their pointers.
             
@@ -355,16 +356,16 @@ class Memory_Parser:
                             continue
                     flattened_args.append(item)
             args = flattened_args
-            
-            for arg in args:
-                new_node = ast.Assign(
-                    targets=[ast.Name(id=var, ctx=ast.Store())],
-                    value=ast.List(elts=[ast.Constant(value=arg)], ctx=ast.Load())
-                )
-                new_node = self.transformer2.visit(new_node)
-                # print(f"New Node: {ast.dump(new_node)}")
-                self._evaluate_list_assignment(new_node, False)
-    def _insertion_handler(self, tree):
+            for i in range(in_loop):
+                for arg in args:
+                    new_node = ast.Assign(
+                        targets=[ast.Name(id=var, ctx=ast.Store())],
+                        value=ast.List(elts=[ast.Constant(value=arg)], ctx=ast.Load())
+                    )
+                    new_node = self.transformer2.visit(new_node)
+                    # print(f"New Node: {ast.dump(new_node)}")
+                    self._evaluate_list_assignment(new_node, False)
+    def _insertion_handler(self, tree,in_loop = 1):
         def extract_call_info(tree):
             for node in ast.walk(tree):
                 if isinstance(node, ast.Call):
@@ -385,7 +386,7 @@ class Memory_Parser:
                                     raise ValueError(f"Unsupported argument type: {type(arg).__name__}")
                         return var_id, func_type, args
          
-        if isinstance(tree, ast.AugAssign): #! for handling +=
+        if isinstance(tree.body[0], ast.AugAssign): #! for handling +=
             tree = self.transformer3.visit(tree)
         else: #1 to replace insert with append
             contains_insert = any(
@@ -400,25 +401,27 @@ class Memory_Parser:
         if not var in self.vars:
             raise NameError(f"Variable '{var}' is not defined syntax error.")
         if self.vars[var][2] == 'list':
-           self._handle_list_insertion(var, func_type,args)   
+           self._handle_list_insertion(var, func_type,args, in_loop)   
             
         
-    def _handle_list_deletion(self, var, func_type):
+    def _handle_list_deletion(self, var, func_type,in_loop = 1):
         if func_type == 'pop':
             if self.vars[var][0] == 0:
                 raise IndexError(f"pop from empty list syntax error.")
-            total_size = self.vars[var][1]
-            total_length = self.vars[var][0]
-            new_size = total_size - (total_size // total_length)  
-            self.vars[var] = (total_length - 1, new_size, 'list')
+            for i in range(in_loop):
+                total_size = self.vars[var][1]
+                total_length = self.vars[var][0]
+                new_size = total_size - (total_size // total_length)  
+                self.vars[var] = (total_length - 1, new_size, 'list')
             return
         elif func_type == 'clear':
             self.vars[var] = (0, sys.getsizeof([]), 'list')  # Reset to empty list
         elif func_type == 'remove':
-            new_length = self.vars[var][0] - 1
-            new_size = self.vars[var][1] - (self.vars[var][1] // self.vars[var][0])
-            self.vars[var] = (new_length, new_size, 'list')
-    def _deletion_handler(self, tree):
+            for i in range(in_loop):
+                new_length = self.vars[var][0] - 1
+                new_size = self.vars[var][1] - (self.vars[var][1] // self.vars[var][0])
+                self.vars[var] = (new_length, new_size, 'list') 
+    def _deletion_handler(self, tree, in_loop = 1):
         def extract_call_info(tree):
             for node in ast.walk(tree):
                 if isinstance(node, ast.Call):
@@ -462,7 +465,7 @@ class Memory_Parser:
             raise NameError(f"Variable '{var_id}' is not defined syntax error.")
         if self.vars[var_id][2] != 'list':
             raise TypeError(f"Variable '{var_id}' is not a list syntax error.")
-        self._handle_list_deletion(var_id, func_type)
+        self._handle_list_deletion(var_id, func_type, in_loop)
                     
          
     def _list_method_handler(self, tree):
@@ -513,8 +516,51 @@ class Memory_Parser:
 
             return file_path, list_name
         file_path ,var = extract_file_info(tree)
-        file_size = os.path.getsize(file_path) + sys.getsizeof([]) #! adding the size of the list pointera
+        file_size = os.path.getsize(file_path) + sys.getsizeof([])  #! add the size of the list pointer
         length = 0
         with open(file_path, 'rb') as f:
             length = sum(1 for _ in f)
         self.vars[var] = (length, file_size, 'list')
+    def _get_return_size_length(self,node):
+        var_name = None
+        lower = None
+        upper = None
+        step = None
+        ret_stmt = node.body[0]
+        if not isinstance(ret_stmt, ast.Return):
+            return None
+
+        value = ret_stmt.value
+   
+        if isinstance(value, ast.Name):
+            var_name = value.id
+
+        # Case: return x[0] or return x[0:4] or return x[0:8:2]
+        if isinstance(value, ast.Subscript) and isinstance(value.value, ast.Name):
+            var_name = value.value.id
+
+            # Case: return x[0]
+            if isinstance(value.slice, ast.Constant):
+                lower = value.slice.value
+                upper = lower + 1
+                step = 1
+    
+            # Case: return x[0:4] or x[0:8:2]
+            elif isinstance(value.slice, ast.Slice):
+                def get_val(val): return val.value if isinstance(val, ast.Constant) else None
+                lower = get_val(value.slice.lower)
+                upper = get_val(value.slice.upper)
+                step = get_val(value.slice.step) if get_val(value.slice.step) is not None else 1
+            
+        if var_name not in self.vars:
+            raise NameError(f"Variable '{var_name}' is not defined syntax error.")
+        original_length, original_size, _ = self.vars[var_name]
+        if lower is None:
+            length = self.vars[var_name][0] if self.vars[var_name][2] == 'list' else 1
+            return original_size, length
+        else:
+            new_length = (upper - lower) // step
+            new_size = int(original_size / original_length * new_length)
+            return new_size, new_length
+            
+        
