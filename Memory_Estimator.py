@@ -244,15 +244,24 @@ class Memory_Parser:
                 step = None
             length = 0
             size = 0
-            if lower and upper:
+            if lower is not None and upper is not None:
                 length = (upper - lower) // step
                 size = total_size/total_length * length + sys.getsizeof([])
                 self.vars[var] = (length, size, 'list')  
-            elif lower and not upper:
-                size = total_size/total_length 
-                self.vars[var] = ('-1', size, 'unk') #unknown variable value as it's defined in runtime 
-                #! Note: this is an over estimation as it takes the size of the pointer into account 
-            return 
+            elif lower is not None and  upper is None:
+                if isinstance(slice, ast.Slice):
+                    length = (total_length - lower)// step
+                    size = (total_size // total_length) * length + sys.getsizeof([])
+                    self.vars[var] = (length, size, 'list')
+                else:
+                    size = total_size//total_length 
+                    self.vars[var] = ('1', size, 'list') #! assumed to be a list 
+                    #! Note: this is an over estimation as it takes the size of the pointer into account 
+            elif lower is None and upper is not None:
+                length = upper// step
+                size = total_size//total_length * length + sys.getsizeof([])
+                self.vars[var] = (length, size, 'list')
+            return  
                         
         elif (isinstance(stmt.value, ast.BinOp)): #! handle list multiplication
             op = stmt.value.op
@@ -316,7 +325,7 @@ class Memory_Parser:
         
           
     def _assignmemt_handler(self,tree):
-        stmt = tree.body[0]
+        stmt = tree
         if self._assignment_type(stmt.value) == self.AssignTypes.PRIMITIVE:
             self._evaluate_primitive_assignment(stmt)
         elif self._assignment_type(stmt.value) == self.AssignTypes.LIST :
@@ -386,7 +395,7 @@ class Memory_Parser:
                                     raise ValueError(f"Unsupported argument type: {type(arg).__name__}")
                         return var_id, func_type, args
          
-        if isinstance(tree.body[0], ast.AugAssign): #! for handling +=
+        if isinstance(tree, ast.AugAssign): #! for handling +=
             tree = self.transformer3.visit(tree)
         else: #1 to replace insert with append
             contains_insert = any(
@@ -449,11 +458,11 @@ class Memory_Parser:
                 step = None
             total_length = self.vars[var_id][0]
             total_size = self.vars[var_id][1]
-            if lower and upper:
+            if lower is not None and upper is not None:
                 length = (upper - lower) // step
                 size = total_size / total_length * length
                 self.vars[var_id] = (total_length - length, total_size - size, 'list')
-            elif lower:
+            elif lower is not None:
                 length = total_length - 1
                 size = total_size - total_size // total_length
                 self.vars[var_id] = (length, size, 'list')
