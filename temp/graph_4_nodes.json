@@ -20,11 +20,21 @@
     },
     {
         "code line": 2,
-        "statement": "return x + y",
+        "statement": "x = x + y",
+        "has": [
+            "x"
+        ],
+        "needs": [
+            "y",
+            "x"
+        ]
+    },
+    {
+        "code line": 3,
+        "statement": "return x",
         "has": [],
         "needs": [
-            "x",
-            "y"
+            "x"
         ]
     }
 ]

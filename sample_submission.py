@@ -16,6 +16,7 @@ FILE_NAME = 'test.csv'  # Name of the file to read data from
 #! all functions must have a return statement
 #! the returned value is not assumed to be by reference, but a copy of it
 #! no nested user defined functions are allowed
+#! functions return value must be 1 value and a variable or a slice of it not an operation (ex: return x / return x[0] not return x + 1)
 # def add1(data):
 #     header = data[0]
 #     rows = data[1:]
@@ -41,12 +42,16 @@ def hello(z):
     z = z + 1
     return z
 def hello2():
-    return 4 + 3
+    v  = 4 + 3
+    return v
 def hello3(x,y):
     x = x+1
-    return x + y
+    x = x + y
+    return x 
 def calc(x,y,z,a,b,c,d):
-    return [['Output', str(x), str(y), str(z), str(a), str(b), str(c), str(d)]]  # Example output format
+    # x =  [['Output', str(x), str(y), str(z), str(a), str(b), str(c), str(d)]] to be handled later
+    x = [['Output', x, y, z, a, b, c,d]] 
+    return x
 ##########################################################################################################
 
 
@@ -65,19 +70,19 @@ if __name__ == '__main__':
 #! User main function is defined here
 #! Note for boosting performance if list is modified inside the function (each function call is independent) then return pass a 
 #! copy of the list instead of the same list for performing different operations in parallel
-    # data = add1(data) 
+    data = add1(data) 
     z = add1(data)
-    # x = hello2()
-    # y = x.copy() #
-    # z = hello(z)
-    # a = hello(z) 
-    # k = hello(a)
-    # a = hello(x) #
-    # z = hello(a)
-    # b = hello3(x,y)
-    # c = hello(z)
-    # d = hello3(x) #
-    # output = calc(x,y,z,a,b,c,d)
+    x = hello2()
+    y = z.copy() 
+    z = hello(z)
+    a = hello(z) 
+    k = hello(a)
+    a = hello(x) 
+    z = hello(a)
+    b = hello3(x,y)
+    c = hello(z)
+    d = hello(x) 
+    output = calc(x,y,z,a,b,c,d)
     
     
 #---------------------------------------------------------------------------------------------------------

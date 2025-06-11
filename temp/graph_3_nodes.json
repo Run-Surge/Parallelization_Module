@@ -7,8 +7,18 @@
     },
     {
         "code line": 1,
-        "statement": "return 4 + 3",
-        "has": [],
+        "statement": "v = 4 + 3",
+        "has": [
+            "v"
+        ],
         "needs": []
+    },
+    {
+        "code line": 2,
+        "statement": "return v",
+        "has": [],
+        "needs": [
+            "v"
+        ]
     }
 ]

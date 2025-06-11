@@ -1,1 +1,13 @@
-{}
+{
+    "2": {
+        "Node": 2,
+        "Depends on": [
+            {
+                "Node": 1,
+                "Dependency": [
+                    "v"
+                ]
+            }
+        ]
+    }
+}

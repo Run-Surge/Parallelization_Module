@@ -21,7 +21,15 @@
             "y:0"
         ],
         "statements": [
-            "return x + y"
+            "x = x + y"
+        ]
+    },
+    {
+        "key": [
+            "x:2"
+        ],
+        "statements": [
+            "return x"
         ]
     }
 ]

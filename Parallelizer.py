@@ -189,7 +189,7 @@ def get_memory_foortprint(file_path, entry_point, functions):
                     local_parser._deletion_handler(tree)
             elif  isinstance(tree, ast.Delete):
                 local_parser._deletion_handler(tree.body[0])
-            print(ast.unparse(node))  # Debugging: print the source code of the node
+            # print(ast.unparse(node))  # Debugging: print the source code of the node
             func_lines_footprint[func_name][ast.unparse(node)] = sum(val[1] for val in local_parser.vars.values())
         local_parser = Memory_Parser()
         lines_footprint = {}
@@ -209,6 +209,10 @@ def get_memory_foortprint(file_path, entry_point, functions):
             for node in tree.body:
                 # print(ast.dump(node, indent=4))  # Debugging: print the AST nodes
                 get_footprint(node, local_parser, func_lines_footprint)
+           
+            return_statement = list(func_lines_footprint[func_name].keys())[-1]
+            return_footprint_size,return_footprint_length = local_parser._get_return_size_length(ast.parse(return_statement))
+            return return_footprint_size,return_footprint_length 
                 # print(local_parser.vars)
         else:
             raise ValueError(f"Function {func_name} not found in the provided functions list.")
@@ -252,10 +256,18 @@ def get_memory_foortprint(file_path, entry_point, functions):
             if isinstance(node, ast.Assign):
                 targets = [target.id for target in node.targets if isinstance(target, ast.Name)]
                 value = node.value
+                #! assumptions: only 1 return value, return value is of type list
                 if isinstance(value, ast.Call):
-                    func_name, args = get_func_attributes(node, functions)
-                    return_footprint = get_func_footprint(func_name, args, functions,func_lines_footprint,global_parser)
-        func_lines_footprint = substitute_outer_keys(func_lines_footprint)
+                    if isinstance(value.func, ast.Attribute):
+                        length,memory_footprint = global_parser._list_method_handler(value)
+                        global_parser.vars[targets[0]] = (length, memory_footprint, 'list')
+                    else:
+                        func_name, args = get_func_attributes(node, functions)
+                        return_footprint_size,return_footprint_length = get_func_footprint(func_name, args, functions,func_lines_footprint,global_parser)
+                        global_parser.vars[targets[0]] = (return_footprint_length,return_footprint_size,'list')
+                print(global_parser.vars)
+                    
+            func_lines_footprint = substitute_outer_keys(func_lines_footprint)
         print("Function Lines Footprint:", func_lines_footprint)
                     
                         

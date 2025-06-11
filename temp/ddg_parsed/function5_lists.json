@@ -9,10 +9,18 @@
     },
     {
         "key": [
-            "b:0"
+            "d:0"
         ],
         "statements": [
-            "return [['Output', str(x), str(y), str(z), str(a), str(b), str(c), str(d)]]"
+            "x = [['Output', x, y, z, a, b, c, d]]"
+        ]
+    },
+    {
+        "key": [
+            "x:1"
+        ],
+        "statements": [
+            "return x"
         ]
     }
 ]

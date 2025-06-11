@@ -12,7 +12,15 @@
             "none:none"
         ],
         "statements": [
-            "return 4 + 3"
+            "v = 4 + 3"
+        ]
+    },
+    {
+        "key": [
+            "v:1"
+        ],
+        "statements": [
+            "return v"
         ]
     }
 ]

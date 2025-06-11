@@ -5,12 +5,23 @@
             {
                 "Node": 0,
                 "Dependency": [
-                    "b",
-                    "z",
-                    "y",
                     "d",
-                    "a",
+                    "y",
+                    "x",
                     "c",
+                    "z",
+                    "a",
+                    "b"
+                ]
+            }
+        ]
+    },
+    "2": {
+        "Node": 2,
+        "Depends on": [
+            {
+                "Node": 1,
+                "Dependency": [
                     "x"
                 ]
             }
