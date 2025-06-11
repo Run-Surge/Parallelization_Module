@@ -12,7 +12,7 @@
             "data:0"
         ],
         "statements": [
-            "header = data[0]",
+            "header = data[0][0]",
             "rows = data[1:]"
         ]
     },
@@ -26,17 +26,8 @@
     },
     {
         "key": [
-            "data:0",
-            "new_data:2"
-        ],
-        "statements": [
-            "for row in data:\n    new_row = []\n    for value in row:\n        new_value = int(value) + 1\n        new_row.append(new_value)\n    new_data.append(new_row)"
-        ]
-    },
-    {
-        "key": [
             "header:1",
-            "new_data:3"
+            "new_data:2"
         ],
         "statements": [
             "new_data.insert(0, header)"
@@ -44,7 +35,7 @@
     },
     {
         "key": [
-            "new_data:4"
+            "new_data:3"
         ],
         "statements": [
             "return new_data"

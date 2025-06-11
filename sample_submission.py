@@ -18,15 +18,15 @@ FILE_NAME = 'test.csv'  # Name of the file to read data from
 #! no nested user defined functions are allowed
 #! functions return value must be 1 value and a variable or a slice of it not an operation (ex: return x / return x[0] not return x + 1)
 def add1(data):
-    header = data[0]
+    header = data[0][0]
     rows = data[1:]
     new_data = []
-    for row in data:
-        new_row = []
-        for value in row:
-            new_value = int(value) + 1  
-            new_row.append(new_value)
-        new_data.append(new_row)
+    # for row in data:
+    #     new_row = []
+    #     for value in row:
+    #         new_value = int(value) + 1  
+    #         new_row.append(new_value)
+    #     new_data.append(new_row)
     new_data.insert(0, header) 
     return new_data            
 # def add1(lines):

@@ -9,7 +9,7 @@
     },
     {
         "code line": 1,
-        "statement": "header = data[0]",
+        "statement": "header = data[0][0]",
         "has": [
             "header"
         ],
@@ -37,17 +37,6 @@
     },
     {
         "code line": 4,
-        "statement": "for row in data:\n    new_row = []\n    for value in row:\n        new_value = int(value) + 1\n        new_row.append(new_value)\n    new_data.append(new_row)",
-        "has": [
-            "new_data"
-        ],
-        "needs": [
-            "data",
-            "new_data"
-        ]
-    },
-    {
-        "code line": 5,
         "statement": "new_data.insert(0, header)",
         "has": [
             "new_data"
@@ -58,7 +47,7 @@
         ]
     },
     {
-        "code line": 6,
+        "code line": 5,
         "statement": "return new_data",
         "has": [],
         "needs": [

@@ -176,7 +176,8 @@ def get_memory_foortprint(file_path, entry_point, functions):
                     return idx
             return -1
         def get_footprint(node,local_parser,func_lines_footprint):
-            tree = copy.deepcopy(node)
+            tree = copy.deepcopy(node.body[0])  # Get the first statement in the function body
+            print(ast.dump(tree, indent=4))  # Debugging: print the AST nodes
             if isinstance(tree, ast.Assign):
                 local_parser._assignmemt_handler(tree)
             elif  isinstance(tree, ast.AugAssign):
@@ -210,6 +211,8 @@ def get_memory_foortprint(file_path, entry_point, functions):
             tree = ast.parse(code)
             for node in tree.body:
                 # print(ast.dump(node, indent=4))  # Debugging: print the AST nodes
+                #! assumption deal with multilevel indexing as first level only
+                node = ast.parse(re.sub(r'(\[[^\[\]]+\])(?:\[[^\[\]]+\])+', r'\1', ast.unparse(node)))
                 get_footprint(node, local_parser, func_lines_footprint)
            
             return_statement = list(func_lines_footprint[key].keys())[-1]
@@ -277,10 +280,10 @@ def get_memory_foortprint(file_path, entry_point, functions):
             }
             for outer_key, inner_dict in main_lines_footprint.items()
         }        
-        print("Main Lines Footprint:", main_lines_footprint)
+        # print("Main Lines Footprint:", main_lines_footprint)
         json.dump(main_lines_footprint, open('temp/memory_parsed/main_lines_footprint.json', 'w'), indent=4)
         func_lines_footprint = substitute_outer_keys(func_lines_footprint)
-        print("Function Lines Footprint:", func_lines_footprint)
+        # print("Function Lines Footprint:", func_lines_footprint)
         json.dump(func_lines_footprint, open('temp/memory_parsed/func_lines_footprint.json', 'w'), indent=4)                
                         
             

@@ -1,75 +1,10 @@
 {
-    "data = add1(data)#0:add1(lines)": {
-        "def add1(lines):": 576,
-        "lines += [4, 5]": 808,
-        "lines.extend([[4, 5, 6]])": 1068,
-        "lines.extend(lines)": 2264,
-        "a = 5": 2292,
-        "lines.extend([a, 4])": 2546,
-        "lines.append(a)": 2750,
-        "lines.append(9)": 2866,
-        "return lines[0]": 2866
-    },
-    "z = add1(data)#1:add1(lines)": {
-        "def add1(lines):": 88,
-        "lines += [4, 5]": 320,
-        "lines.extend([[4, 5, 6]])": 580,
-        "lines.extend(lines)": 1192,
-        "a = 5": 1220,
-        "lines.extend([a, 4])": 1474,
-        "lines.append(a)": 1678,
-        "lines.append(9)": 1794,
-        "return lines[0]": 1794
-    },
-    "x = hello2()#2:hello2()": {
-        "def hello2():": 0,
-        "v = 4 + 3": 28,
-        "return v": 28
-    },
-    "z = hello(z)#4:hello(z)": {
-        "def hello(z):": 147,
-        "z = z + 1": 207,
-        "return z": 207
-    },
-    "a = hello(z)#5:hello(z)": {
-        "def hello(z):": 207,
-        "z = z + 1": 267,
-        "return z": 267
-    },
-    "k = hello(a)#6:hello(z)": {
-        "def hello(z):": 267,
-        "z = z + 1": 327,
-        "return z": 327
-    },
-    "a = hello(x)#7:hello(z)": {
-        "def hello(z):": 28,
-        "z = z + 1": 88,
-        "return z": 88
-    },
-    "z = hello(a)#8:hello(z)": {
-        "def hello(z):": 88,
-        "z = z + 1": 148,
-        "return z": 148
-    },
-    "b = hello3(x, y)#9:hello3(x, y)": {
-        "def hello3(x, y):": 175,
-        "x = x + 1": 235,
-        "x = x + y": 502,
-        "return x": 502
-    },
-    "c = hello(z)#10:hello(z)": {
-        "def hello(z):": 148,
-        "z = z + 1": 208,
-        "return z": 208
-    },
-    "d = hello(x)#11:hello(z)": {
-        "def hello(z):": 28,
-        "z = z + 1": 88,
-        "return z": 88
-    },
-    "output = calc(x, y, z, a, b, c, d)#12:calc(x, y, z, a, b, c, d)": {
-        "def calc(x, y, z, a, b, c, d):": 1062,
-        "x = [['Output', x, y, z, a, b, c, d]]": 2359,
-        "return x": 2359
+    "data = add1(data)#0:add1(data)": {
+        "def add1(data):": 576,
+        "header = data[0]": 628,
+        "rows = data[1:]": 1204,
+        "new_data = []": 1260,
+        "new_data.insert(0, header)": 1488,
+        "return new_data": 1488
     }
 }
