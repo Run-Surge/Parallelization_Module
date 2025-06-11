@@ -1,0 +1,276 @@
+{
+    "data = add1(data)": {
+        "data": {
+            "length": 11,
+            "size": 576
+        }
+    },
+    "z = add1(data)": {
+        "data": {
+            "length": 1,
+            "size": 88
+        }
+    },
+    "x = hello2()": {
+        "data": {
+            "length": 1,
+            "size": 88
+        },
+        "z": {
+            "length": 1,
+            "size": 147
+        }
+    },
+    "y = z.copy()": {
+        "data": {
+            "length": 1,
+            "size": 88
+        },
+        "z": {
+            "length": 1,
+            "size": 147
+        },
+        "x": {
+            "length": 1,
+            "size": 28
+        }
+    },
+    "z = hello(z)": {
+        "data": {
+            "length": 1,
+            "size": 88
+        },
+        "z": {
+            "length": 1,
+            "size": 147
+        },
+        "x": {
+            "length": 1,
+            "size": 28
+        },
+        "y": {
+            "length": 1,
+            "size": 147
+        }
+    },
+    "a = hello(z)": {
+        "data": {
+            "length": 1,
+            "size": 88
+        },
+        "z": {
+            "length": 1,
+            "size": 207
+        },
+        "x": {
+            "length": 1,
+            "size": 28
+        },
+        "y": {
+            "length": 1,
+            "size": 147
+        }
+    },
+    "k = hello(a)": {
+        "data": {
+            "length": 1,
+            "size": 88
+        },
+        "z": {
+            "length": 1,
+            "size": 207
+        },
+        "x": {
+            "length": 1,
+            "size": 28
+        },
+        "y": {
+            "length": 1,
+            "size": 147
+        },
+        "a": {
+            "length": 1,
+            "size": 267
+        }
+    },
+    "a = hello(x)": {
+        "data": {
+            "length": 1,
+            "size": 88
+        },
+        "z": {
+            "length": 1,
+            "size": 207
+        },
+        "x": {
+            "length": 1,
+            "size": 28
+        },
+        "y": {
+            "length": 1,
+            "size": 147
+        },
+        "a": {
+            "length": 1,
+            "size": 267
+        },
+        "k": {
+            "length": 1,
+            "size": 327
+        }
+    },
+    "z = hello(a)": {
+        "data": {
+            "length": 1,
+            "size": 88
+        },
+        "z": {
+            "length": 1,
+            "size": 207
+        },
+        "x": {
+            "length": 1,
+            "size": 28
+        },
+        "y": {
+            "length": 1,
+            "size": 147
+        },
+        "a": {
+            "length": 1,
+            "size": 88
+        },
+        "k": {
+            "length": 1,
+            "size": 327
+        }
+    },
+    "b = hello3(x, y)": {
+        "data": {
+            "length": 1,
+            "size": 88
+        },
+        "z": {
+            "length": 1,
+            "size": 148
+        },
+        "x": {
+            "length": 1,
+            "size": 28
+        },
+        "y": {
+            "length": 1,
+            "size": 147
+        },
+        "a": {
+            "length": 1,
+            "size": 88
+        },
+        "k": {
+            "length": 1,
+            "size": 327
+        }
+    },
+    "c = hello(z)": {
+        "data": {
+            "length": 1,
+            "size": 88
+        },
+        "z": {
+            "length": 1,
+            "size": 148
+        },
+        "x": {
+            "length": 1,
+            "size": 28
+        },
+        "y": {
+            "length": 1,
+            "size": 147
+        },
+        "a": {
+            "length": 1,
+            "size": 88
+        },
+        "k": {
+            "length": 1,
+            "size": 327
+        },
+        "b": {
+            "length": 2,
+            "size": 355
+        }
+    },
+    "d = hello(x)": {
+        "data": {
+            "length": 1,
+            "size": 88
+        },
+        "z": {
+            "length": 1,
+            "size": 148
+        },
+        "x": {
+            "length": 1,
+            "size": 28
+        },
+        "y": {
+            "length": 1,
+            "size": 147
+        },
+        "a": {
+            "length": 1,
+            "size": 88
+        },
+        "k": {
+            "length": 1,
+            "size": 327
+        },
+        "b": {
+            "length": 2,
+            "size": 355
+        },
+        "c": {
+            "length": 1,
+            "size": 208
+        }
+    },
+    "output = calc(x, y, z, a, b, c, d)": {
+        "data": {
+            "length": 1,
+            "size": 88
+        },
+        "z": {
+            "length": 1,
+            "size": 148
+        },
+        "x": {
+            "length": 1,
+            "size": 28
+        },
+        "y": {
+            "length": 1,
+            "size": 147
+        },
+        "a": {
+            "length": 1,
+            "size": 88
+        },
+        "k": {
+            "length": 1,
+            "size": 327
+        },
+        "b": {
+            "length": 2,
+            "size": 355
+        },
+        "c": {
+            "length": 1,
+            "size": 208
+        },
+        "d": {
+            "length": 1,
+            "size": 88
+        }
+    }
+}

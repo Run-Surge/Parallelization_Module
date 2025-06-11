@@ -1,84 +1,68 @@
 [
     {
         "code line": 0,
-        "statement": "def add1(lines):",
+        "statement": "def add1(data):",
         "has": [
-            "lines"
+            "data"
         ],
         "needs": []
     },
     {
         "code line": 1,
-        "statement": "lines += [4, 5]",
-        "has": [],
-        "needs": []
+        "statement": "header = data[0]",
+        "has": [
+            "header"
+        ],
+        "needs": [
+            "data"
+        ]
     },
     {
         "code line": 2,
-        "statement": "lines.extend([[4, 5, 6]])",
+        "statement": "rows = data[1:]",
         "has": [
-            "lines"
+            "rows"
         ],
         "needs": [
-            "lines"
+            "data"
         ]
     },
     {
         "code line": 3,
-        "statement": "lines.extend(lines)",
+        "statement": "new_data = []",
         "has": [
-            "lines"
-        ],
-        "needs": [
-            "lines"
-        ]
-    },
-    {
-        "code line": 4,
-        "statement": "a = 5",
-        "has": [
-            "a"
+            "new_data"
         ],
         "needs": []
     },
     {
-        "code line": 5,
-        "statement": "lines.extend([a, 4])",
+        "code line": 4,
+        "statement": "for row in data:\n    new_row = []\n    for value in row:\n        new_value = int(value) + 1\n        new_row.append(new_value)\n    new_data.append(new_row)",
         "has": [
-            "lines"
+            "new_data"
         ],
         "needs": [
-            "lines",
-            "a"
+            "data",
+            "new_data"
+        ]
+    },
+    {
+        "code line": 5,
+        "statement": "new_data.insert(0, header)",
+        "has": [
+            "new_data"
+        ],
+        "needs": [
+            "new_data",
+            "header"
         ]
     },
     {
         "code line": 6,
-        "statement": "lines.append(a)",
-        "has": [
-            "lines"
-        ],
-        "needs": [
-            "lines",
-            "a"
-        ]
-    },
-    {
-        "code line": 7,
-        "statement": "lines.append(9)",
-        "has": [
-            "lines"
-        ],
-        "needs": [
-            "lines"
-        ]
-    },
-    {
-        "code line": 8,
-        "statement": "return lines[0]",
+        "statement": "return new_data",
         "has": [],
         "needs": [
-            "lines"
+            "new_data"
         ]
     }
 ]

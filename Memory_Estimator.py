@@ -244,13 +244,13 @@ class Memory_Parser:
                 step = None
             length = 0
             size = 0
-            if lower and upper:
+            if lower is not None and upper is not None:
                 length = (upper - lower) // step
                 size = total_size/total_length * length + sys.getsizeof([])
                 self.vars[var] = (length, size, 'list')  
-            elif lower and not upper:
-                size = total_size/total_length 
-                self.vars[var] = ('-1', size, 'unk') #unknown variable value as it's defined in runtime 
+            elif lower is not None and  upper is None:
+                size = total_size//total_length 
+                self.vars[var] = ('1', size, 'list') #! assumed to be a list 
                 #! Note: this is an over estimation as it takes the size of the pointer into account 
             return 
                         

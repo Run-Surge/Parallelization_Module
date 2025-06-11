@@ -169,7 +169,7 @@ def get_memory_foortprint(file_path, entry_point, functions):
             return try_src
         else:
             print("No try/except block found under __main__")
-    def get_func_footprint(func_name, args, functions, func_lines_footprint, global_parser):
+    def get_func_footprint(func_name, args, functions, func_lines_footprint, global_parser,main_code_line,lineno):
         def find_func_index(func_name, func_list):
             for idx, func_tuple in enumerate(func_list):
                 if func_tuple[0] == func_name:
@@ -190,7 +190,8 @@ def get_memory_foortprint(file_path, entry_point, functions):
             elif  isinstance(tree, ast.Delete):
                 local_parser._deletion_handler(tree.body[0])
             # print(ast.unparse(node))  # Debugging: print the source code of the node
-            func_lines_footprint[func_name][ast.unparse(node)] = sum(val[1] for val in local_parser.vars.values())
+            key = f"{main_code_line}#{lineno}:{func_name}"
+            func_lines_footprint[key][ast.unparse(node)] = sum(val[1] for val in local_parser.vars.values())
         local_parser = Memory_Parser()
         lines_footprint = {}
         index = find_func_index(func_name, functions)
@@ -204,13 +205,14 @@ def get_memory_foortprint(file_path, entry_point, functions):
             code = functions[index][2]
             func_def = f"def {func_name}({', '.join(fargs)}):"
             args_total_memory = sum(val[1] for val in local_parser.vars.values())
-            func_lines_footprint[func_name][func_def] = args_total_memory 
+            key = f"{main_code_line}#{lineno}:{func_name}"
+            func_lines_footprint[key][func_def] = args_total_memory 
             tree = ast.parse(code)
             for node in tree.body:
                 # print(ast.dump(node, indent=4))  # Debugging: print the AST nodes
                 get_footprint(node, local_parser, func_lines_footprint)
            
-            return_statement = list(func_lines_footprint[func_name].keys())[-1]
+            return_statement = list(func_lines_footprint[key].keys())[-1]
             return_footprint_size,return_footprint_length = local_parser._get_return_size_length(ast.parse(return_statement))
             return return_footprint_size,return_footprint_length 
                 # print(local_parser.vars)
@@ -242,7 +244,9 @@ def get_memory_foortprint(file_path, entry_point, functions):
                 func_signature = next((k for k in inner_dict if k.startswith('def ')), None)
                 if func_signature:
                     # Extract actual signature string inside parentheses
+                    old_key = func_name.split(':')[0].strip()  # Get the main code line before the first colon
                     new_key = func_signature[4:].strip(':')  # Remove 'def ' and any trailing ':'
+                    new_key = f"{old_key}:{new_key}"  # Combine main code line with function signature
                     new_dict[new_key] = inner_dict
                 else:
                     new_dict[func_name] = inner_dict  # fallback if signature not found
@@ -252,24 +256,32 @@ def get_memory_foortprint(file_path, entry_point, functions):
         tree = ast.parse(entry_point)
         main_lines_footprint = {}
         func_lines_footprint = defaultdict(dict)
-        for node in tree.body:
+        for i,node in enumerate(tree.body):
             if isinstance(node, ast.Assign):
                 targets = [target.id for target in node.targets if isinstance(target, ast.Name)]
                 value = node.value
                 #! assumptions: only 1 return value, return value is of type list
+                main_lines_footprint[ast.unparse(node)] = global_parser.vars.copy()
                 if isinstance(value, ast.Call):
                     if isinstance(value.func, ast.Attribute):
                         length,memory_footprint = global_parser._list_method_handler(value)
                         global_parser.vars[targets[0]] = (length, memory_footprint, 'list')
                     else:
                         func_name, args = get_func_attributes(node, functions)
-                        return_footprint_size,return_footprint_length = get_func_footprint(func_name, args, functions,func_lines_footprint,global_parser)
+                        return_footprint_size,return_footprint_length = get_func_footprint(func_name, args, functions,func_lines_footprint,global_parser,ast.unparse(node),i)
                         global_parser.vars[targets[0]] = (return_footprint_length,return_footprint_size,'list')
-                print(global_parser.vars)
-                    
-            func_lines_footprint = substitute_outer_keys(func_lines_footprint)
+        main_lines_footprint = {
+            outer_key: {
+                inner_key: {'length': val[0], 'size': val[1]}
+                for inner_key, val in inner_dict.items()
+            }
+            for outer_key, inner_dict in main_lines_footprint.items()
+        }        
+        print("Main Lines Footprint:", main_lines_footprint)
+        json.dump(main_lines_footprint, open('temp/memory_parsed/main_lines_footprint.json', 'w'), indent=4)
+        func_lines_footprint = substitute_outer_keys(func_lines_footprint)
         print("Function Lines Footprint:", func_lines_footprint)
-                    
+        json.dump(func_lines_footprint, open('temp/memory_parsed/func_lines_footprint.json', 'w'), indent=4)                
                         
             
                 
@@ -286,11 +298,11 @@ def get_memory_foortprint(file_path, entry_point, functions):
     # print(memory_parser.vars)
 def main():
     error_file = "errors.txt"
-    if len(sys.argv) < 2:
-        print("Usage: python Parallelizer .py <filename>")
-        sys.exit(1)
+    # if len(sys.argv) < 2:
+    #     print("Usage: python Parallelizer .py <filename>")
+    #     sys.exit(1)
 
-    filename = sys.argv[1]
+    # filename = sys.argv[1]
     filename= 'sample_submission.py'
     #! Check for syntax errors
     if check_syntax_errors(filename, error_file):
