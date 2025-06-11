@@ -249,10 +249,19 @@ class Memory_Parser:
                 size = total_size/total_length * length + sys.getsizeof([])
                 self.vars[var] = (length, size, 'list')  
             elif lower is not None and  upper is None:
-                size = total_size//total_length 
-                self.vars[var] = ('1', size, 'list') #! assumed to be a list 
-                #! Note: this is an over estimation as it takes the size of the pointer into account 
-            return 
+                if isinstance(slice, ast.Slice):
+                    length = (total_length - lower)// step
+                    size = (total_size // total_length) * length + sys.getsizeof([])
+                    self.vars[var] = (length, size, 'list')
+                else:
+                    size = total_size//total_length 
+                    self.vars[var] = ('1', size, 'list') #! assumed to be a list 
+                    #! Note: this is an over estimation as it takes the size of the pointer into account 
+            elif lower is None and upper is not None:
+                length = upper// step
+                size = total_size//total_length * length + sys.getsizeof([])
+                self.vars[var] = (length, size, 'list')
+            return  
                         
         elif (isinstance(stmt.value, ast.BinOp)): #! handle list multiplication
             op = stmt.value.op
@@ -449,11 +458,11 @@ class Memory_Parser:
                 step = None
             total_length = self.vars[var_id][0]
             total_size = self.vars[var_id][1]
-            if lower and upper:
+            if lower is not None and upper is not None:
                 length = (upper - lower) // step
                 size = total_size / total_length * length
                 self.vars[var_id] = (total_length - length, total_size - size, 'list')
-            elif lower:
+            elif lower is not None:
                 length = total_length - 1
                 size = total_size - total_size // total_length
                 self.vars[var_id] = (length, size, 'list')
