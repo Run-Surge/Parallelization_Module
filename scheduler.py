@@ -3,7 +3,7 @@ import os
 import argparse
 
 # ==============================================================================
-# 2. CORE MEMORY CALCULATION LOGIC
+# 1. CORE MEMORY CALCULATION LOGIC
 # ==============================================================================
 def calculate_peak_memory_for_statements(statements, live_vars_data, func_footprints_data, stmt_to_idx_map):
     """Calculates the true peak memory for a list of statements by simulating its execution."""
@@ -28,7 +28,7 @@ def calculate_peak_memory_for_statements(statements, live_vars_data, func_footpr
     return peak_memory_for_block
 
 # ==============================================================================
-# 3. SCHEDULING ALGORITHMS
+# 2. SCHEDULING ALGORITHMS
 # ==============================================================================
 def schedule_program_whole(program_statements, nodes_data, live_vars_data, func_footprints_data, stmt_to_idx_map):
     """Attempt 1: Tries to schedule the entire program as one single block."""
@@ -120,7 +120,7 @@ def process_and_merge_blocks(blocks_data, nodes_data, func_footprints_data, live
     return blocks, block_scheduling_info
 
 # ==============================================================================
-# 4. MAIN EXECUTION BLOCK
+# 3. MAIN EXECUTION BLOCK
 # ==============================================================================
 def main():
     """Main function to parse arguments and run the scheduling workflow."""
