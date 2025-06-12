@@ -671,7 +671,7 @@ class Memory_Parser:
         def handle_nested_loops(node, depth=0,n_outer_iterations=None, n_inner_iterations=None):
             if not isinstance(node, ast.For):
                 return
-            print("  " * depth + f"Handling loop at depth {depth}")
+            # print("  " * depth + f"Handling loop at depth {depth}")
             n_iter = n_outer_iterations if depth == 0 else n_inner_iterations
             for stmt in node.body:
                 # print(ast.dump(stmt, indent=4))
@@ -739,8 +739,8 @@ class Memory_Parser:
                                     new_size = max(size_before_loop + size_decrement * int(n_iter),0)
                                     new_length = max(len_before_loop + len_decrement * int(n_iter),0)
                                     self.vars[var_name] = (new_length,new_size, 'list')
-            print("  " * (depth + 1) + f"Statement: {ast.dump(stmt)}")
-            print(self.vars)
+            # print("  " * (depth + 1) + f"Statement: {ast.dump(stmt)}")
+            # print(self.vars)
         def get_iterable_cost_expr_only(for_node, vars_dict):
             iter_expr = for_node.iter
             cost_exprs = []

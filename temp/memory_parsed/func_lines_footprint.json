@@ -1,10 +1,71 @@
 {
     "data = add1(data)#0:add1(data)": {
-        "def add1(data):": 576,
-        "header = data[0]": 628,
-        "rows = data[1:]": 1204,
-        "new_data = []": 1260,
-        "new_data.insert(0, header)": 1488,
-        "return new_data": 1488
+        "def add1(data):": 1660,
+        "header = data[0]": 1712,
+        "rows = data[1:]": 2288,
+        "new_data = []": 2344,
+        "for row in data:\n    new_row = []\n    for value in row:\n        new_value = int(value) + 1\n        new_row.append(new_value)\n    new_data.append(new_row)": 1126896,
+        "new_data.insert(0, header)": 1127124,
+        "return new_data": 1127124
+    },
+    "z = add1(data)#1:add1(data)": {
+        "def add1(data):": 1125920,
+        "header = data[0]": 1219656,
+        "rows = data[1:]": 2250808,
+        "new_data = []": 2250864,
+        "for row in data:\n    new_row = []\n    for value in row:\n        new_value = int(value) + 1\n        new_row.append(new_value)\n    new_data.append(new_row)": 3477648,
+        "new_data.insert(0, header)": 3571560,
+        "return new_data": 3571560
+    },
+    "x = hello2()#2:hello2()": {
+        "def hello2():": 1084,
+        "v = 4 + 3": 1112,
+        "return v": 1112
+    },
+    "z = hello(z)#4:hello(z)": {
+        "def hello(z):": 1321808,
+        "z = z + 1": 1321964,
+        "return z": 1321964
+    },
+    "a = hello(z)#5:hello(z)": {
+        "def hello(z):": 1321964,
+        "z = z + 1": 1322120,
+        "return z": 1322120
+    },
+    "k = hello(a)#6:hello(z)": {
+        "def hello(z):": 1322120,
+        "z = z + 1": 1322276,
+        "return z": 1322276
+    },
+    "a = hello(x)#7:hello(z)": {
+        "def hello(z):": 1084,
+        "z = z + 1": 1144,
+        "return z": 1144
+    },
+    "z = hello(a)#8:hello(z)": {
+        "def hello(z):": 1144,
+        "z = z + 1": 1204,
+        "return z": 1204
+    },
+    "b = hello3(x, y)#9:hello3(x, y)": {
+        "def hello3(x, y):": 1320864,
+        "x = x + 1": 1320924,
+        "x = x + y": 2641708,
+        "return x": 2641708
+    },
+    "c = hello(z)#10:hello(z)": {
+        "def hello(z):": 1204,
+        "z = z + 1": 1264,
+        "return z": 1264
+    },
+    "d = hello(x)#11:hello(z)": {
+        "def hello(z):": 1084,
+        "z = z + 1": 1144,
+        "return z": 1144
+    },
+    "output = calc(x, y, z, a, b, c, d)#12:calc(x, y, z, a, b, c, d)": {
+        "def calc(x, y, z, a, b, c, d):": 2642240,
+        "x = [['Output', x, y, z, a, b, c, d]]": 5284659,
+        "return x": 5284659
     }
 }

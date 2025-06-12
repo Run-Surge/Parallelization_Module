@@ -177,7 +177,7 @@ def get_memory_foortprint(file_path, entry_point, functions):
             return -1
         def get_footprint(node,local_parser,func_lines_footprint):
             tree = copy.deepcopy(node.body[0])  # Get the first statement in the function body
-            print(ast.dump(tree, indent=4))  # Debugging: print the AST nodes
+            # print(ast.dump(tree, indent=4))  # Debugging: print the AST nodes
             if isinstance(tree, ast.Assign):
                 local_parser._assignmemt_handler(tree)
             elif  isinstance(tree, ast.AugAssign):
@@ -190,6 +190,8 @@ def get_memory_foortprint(file_path, entry_point, functions):
                     local_parser._deletion_handler(tree)
             elif  isinstance(tree, ast.Delete):
                 local_parser._deletion_handler(tree.body[0])
+            elif isinstance(tree, ast.For):
+                local_parser._handle_loop_footprint(tree)
             # print(ast.unparse(node))  # Debugging: print the source code of the node
             key = f"{main_code_line}#{lineno}:{func_name}"
             func_lines_footprint[key][ast.unparse(node)] = sum(val[1] for val in local_parser.vars.values())

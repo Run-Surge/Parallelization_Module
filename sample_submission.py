@@ -21,12 +21,12 @@ def add1(data):
     header = data[0][0]
     rows = data[1:]
     new_data = []
-    # for row in data:
-    #     new_row = []
-    #     for value in row:
-    #         new_value = int(value) + 1  
-    #         new_row.append(new_value)
-    #     new_data.append(new_row)
+    for row in data:
+        new_row = []
+        for value in row:
+            new_value = int(value) + 1  
+            new_row.append(new_value)
+        new_data.append(new_row)
     new_data.insert(0, header) 
     return new_data            
 # def add1(lines):
@@ -71,18 +71,18 @@ if __name__ == '__main__':
 #! Note for boosting performance if list is modified inside the function (each function call is independent) then return pass a 
 #! copy of the list instead of the same list for performing different operations in parallel
     data = add1(data) 
-    # z = add1(data)
-    # x = hello2()
-    # y = z.copy() 
-    # z = hello(z)
-    # a = hello(z) 
-    # k = hello(a)
-    # a = hello(x) 
-    # z = hello(a)
-    # b = hello3(x,y)
-    # c = hello(z)
-    # d = hello(x) 
-    # output = calc(x,y,z,a,b,c,d)
+    z = add1(data)
+    x = hello2()
+    y = z.copy() 
+    z = hello(z)
+    a = hello(z) 
+    k = hello(a)
+    a = hello(x) 
+    z = hello(a)
+    b = hello3(x,y)
+    c = hello(z)
+    d = hello(x) 
+    output = calc(x,y,z,a,b,c,d)
     
     
 #---------------------------------------------------------------------------------------------------------

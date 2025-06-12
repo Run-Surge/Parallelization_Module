@@ -25,15 +25,15 @@
         "Node": 4,
         "Depends on": [
             {
-                "Node": 3,
+                "Node": 0,
                 "Dependency": [
-                    "new_data"
+                    "data"
                 ]
             },
             {
-                "Node": 1,
+                "Node": 3,
                 "Dependency": [
-                    "header"
+                    "new_data"
                 ]
             }
         ]
@@ -42,7 +42,24 @@
         "Node": 5,
         "Depends on": [
             {
+                "Node": 1,
+                "Dependency": [
+                    "header"
+                ]
+            },
+            {
                 "Node": 4,
+                "Dependency": [
+                    "new_data"
+                ]
+            }
+        ]
+    },
+    "6": {
+        "Node": 6,
+        "Depends on": [
+            {
+                "Node": 5,
                 "Dependency": [
                     "new_data"
                 ]

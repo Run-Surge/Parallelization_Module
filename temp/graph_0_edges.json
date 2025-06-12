@@ -1,1 +1,165 @@
-{}
+{
+    "2": {
+        "Node": 2,
+        "Depends on": [
+            {
+                "Node": 1,
+                "Dependency": [
+                    "data"
+                ]
+            }
+        ]
+    },
+    "4": {
+        "Node": 4,
+        "Depends on": [
+            {
+                "Node": 2,
+                "Dependency": [
+                    "z"
+                ]
+            }
+        ]
+    },
+    "5": {
+        "Node": 5,
+        "Depends on": [
+            {
+                "Node": 2,
+                "Dependency": [
+                    "z"
+                ]
+            }
+        ]
+    },
+    "6": {
+        "Node": 6,
+        "Depends on": [
+            {
+                "Node": 5,
+                "Dependency": [
+                    "z"
+                ]
+            }
+        ]
+    },
+    "7": {
+        "Node": 7,
+        "Depends on": [
+            {
+                "Node": 6,
+                "Dependency": [
+                    "a"
+                ]
+            }
+        ]
+    },
+    "8": {
+        "Node": 8,
+        "Depends on": [
+            {
+                "Node": 3,
+                "Dependency": [
+                    "x"
+                ]
+            }
+        ]
+    },
+    "9": {
+        "Node": 9,
+        "Depends on": [
+            {
+                "Node": 8,
+                "Dependency": [
+                    "a"
+                ]
+            }
+        ]
+    },
+    "10": {
+        "Node": 10,
+        "Depends on": [
+            {
+                "Node": 3,
+                "Dependency": [
+                    "x"
+                ]
+            },
+            {
+                "Node": 4,
+                "Dependency": [
+                    "y"
+                ]
+            }
+        ]
+    },
+    "11": {
+        "Node": 11,
+        "Depends on": [
+            {
+                "Node": 9,
+                "Dependency": [
+                    "z"
+                ]
+            }
+        ]
+    },
+    "12": {
+        "Node": 12,
+        "Depends on": [
+            {
+                "Node": 3,
+                "Dependency": [
+                    "x"
+                ]
+            }
+        ]
+    },
+    "13": {
+        "Node": 13,
+        "Depends on": [
+            {
+                "Node": 8,
+                "Dependency": [
+                    "a"
+                ]
+            },
+            {
+                "Node": 12,
+                "Dependency": [
+                    "d"
+                ]
+            },
+            {
+                "Node": 3,
+                "Dependency": [
+                    "x"
+                ]
+            },
+            {
+                "Node": 11,
+                "Dependency": [
+                    "c"
+                ]
+            },
+            {
+                "Node": 9,
+                "Dependency": [
+                    "z"
+                ]
+            },
+            {
+                "Node": 10,
+                "Dependency": [
+                    "b"
+                ]
+            },
+            {
+                "Node": 4,
+                "Dependency": [
+                    "y"
+                ]
+            }
+        ]
+    }
+}

@@ -9,7 +9,7 @@
     },
     {
         "key": [
-            "b:0"
+            "a:0"
         ],
         "statements": [
             "x = [['Output', x, y, z, a, b, c, d]]"
