@@ -103,7 +103,7 @@ class Memory_Parser:
         LIST = "list" 
     def __init__(self):
         self.primitives_estimator = Primitives_Estimator()
-        self.vars = {}  #! varibles parsed so far (name: (value, memory, type))
+        self.vars = {'z' : (5, sys.getsizeof(0), 'int'),'y' :(10,1000,'list'), 'l' :(0,56,'list')}  #! varibles parsed so far (name: (value, memory, type))
         self.funcs = {'int':('int',0), 'str':('str',0), 'float':('float',0), 'bool':('bool',0), 'bytes':('bytes',0), 'bytearray':('bytearray',0), 'complex':('complex',0)
                       ,'list':('list',0)}  #! functions parsed so far (name: (type, memory))
         self.primitives=['int','str','float','bool','bytes','bytearray','complex','unk']  #! primitive types  
@@ -111,7 +111,7 @@ class Memory_Parser:
         '''
         resets the memory parser.
         '''
-        self.vars = {}
+        self.vars = {'z' : (5, sys.getsizeof(0), 'int'),'y' :(10,1000,'list'), 'l' :(0,56,'list')}
     def _hande_primitives_type_conversions(self, node):
         if isinstance(node.func, ast.Name) and node.func.id == 'int':  
                 arg_val = self._evaluate_primtive_expression(node.args[0])
@@ -207,77 +207,64 @@ class Memory_Parser:
         gets size of a list assignment statement.
         
         '''
-        def _parse_list_elements_sizes(node):
-            if isinstance(node, ast.List):  
-                sizes = [_parse_list_elements_sizes(el) for el in node.elts]
-                total_size = sum([size for size in sizes])
-                total_length = len(node.elts)
-                return total_size + self.primitives_estimator.estimate_list_size(total_length)                     
-            elif isinstance(node,ast.Constant):
-                return sys.getsizeof(node.value)
-            elif isinstance(node, ast.Name):
-                if node.id in self.vars:
-                    return self.vars[node.id][1]            
-        var = stmt.targets[0].id
-        multiplier = 1
-        if (isinstance(stmt.value, ast.Call)):
-            stmt=stmt.value.args[0]
-        elif (isinstance(stmt.value, ast.Subscript)):
-            target = stmt.value.value.id
-            if target not in self.vars:
-                raise NameError(f"Variable '{target}' is not defined syntax error.")
-            if self.vars[target][2] != 'list':
-                raise TypeError(f"Variable '{target}' is not a list syntax error.")
-            total_size = self.vars[target][1]
-            total_length = self.vars[target][0]
-            slice = stmt.value.slice
-            lower = None
-            upper = None
-            step = None
-            if isinstance(slice, ast.Slice):
-                lower = slice.lower.value if isinstance(slice.lower, ast.Constant) else None
-                upper = slice.upper.value if isinstance(slice.upper, ast.Constant) else None
-                step = slice.step.value if isinstance(slice.step, ast.Constant) else 1
-            elif isinstance(slice, ast.Constant):
-                lower = slice.value
+        def handle_subscript(stmt):
+                target = stmt.value.id
+                if target not in self.vars:
+                    raise NameError(f"Variable '{target}' is not defined syntax error.")
+                if self.vars[target][2] != 'list':
+                    raise TypeError(f"Variable '{target}' is not a list syntax error.")
+                total_size = self.vars[target][1]
+                total_length = self.vars[target][0]
+                slice = stmt.slice
+                lower = None
                 upper = None
-                step = None
-            length = 0
-            size = 0
-            if lower is not None and upper is not None:
-                length = (upper - lower) // step
-                size = total_size/total_length * length + sys.getsizeof([])
-                self.vars[var] = (length, size, 'list')  
-            elif lower is not None and  upper is None:
+                step = 1
+                size = None
+                length = None
                 if isinstance(slice, ast.Slice):
-                    length = (total_length - lower)// step
-                    size = (total_size // total_length) * length + sys.getsizeof([])
-                    self.vars[var] = (length, size, 'list')
-                else:
-                    size = total_size//total_length 
-                    self.vars[var] = ('1', size, 'list') #! assumed to be a list 
-                    #! Note: this is an over estimation as it takes the size of the pointer into account 
-            elif lower is None and upper is not None:
-                length = upper// step
-                size = total_size//total_length * length + sys.getsizeof([])
-                self.vars[var] = (length, size, 'list')
-            return  
-                        
-        elif (isinstance(stmt.value, ast.BinOp)): #! handle list multiplication
-            op = stmt.value.op
-            if isinstance(op, ast.Mult):
+                    lower = slice.lower.value if isinstance(slice.lower, ast.Constant) else None
+                    upper = slice.upper.value if isinstance(slice.upper, ast.Constant) else None
+                    step = slice.step.value if isinstance(slice.step, ast.Constant) else 1
+                elif isinstance(slice, ast.Constant):
+                    lower = slice.value
+                    upper = None
+                    step = 1
+                length = 0
+                size = 0
+                if lower is not None and upper is not None:
+                    length = (upper - lower) // step
+                    size = total_size/total_length * length + sys.getsizeof([])
+                elif lower is not None and  upper is None:
+                    if isinstance(slice, ast.Slice):
+                        length = (total_length - lower)// step
+                        size = (total_size // total_length) * length + sys.getsizeof([])
+                    else:
+                        size = total_size//total_length 
+                        length =1
+                        #! Note: this is an over estimation as it takes the size of the pointer into account 
+                elif lower is None and upper is not None:
+                    length = upper// step
+                    size = total_size//total_length * length + sys.getsizeof([])
+                return size, length
+        def handle_BinOp(stmt):
+            op = None
+            left = None
+            right = None
+            if isinstance(stmt, ast.BinOp):
+                op = stmt.op
+                left = stmt.left
+                right = stmt.right
+            else:
+                op = stmt.value.op
                 left = stmt.value.left
                 right = stmt.value.right
-                multiplier = right.value if  isinstance(left, ast.List) else left.value
-                list_val=left if isinstance(left, ast.List) else right
-                stmt=list_val
-            elif isinstance(op, ast.Add):
-                left = stmt.value.left
-                right = stmt.value.right
-                left_size = _parse_list_elements_sizes(left)
-                right_size = _parse_list_elements_sizes(right)
+
+            if isinstance(op, ast.Add):
+                left_size,left_length = _parse_list_elements_sizes(left)
+                right_size,right_length = _parse_list_elements_sizes(right)
                 total_size = left_size + right_size
-                total_length = 0
+                total_length = left_length if left_length  is not None else 0
+                total_length += right_length if right_length is not None else 0
                 if isinstance(left, ast.Name) and left.id in self.vars:
                     if self.vars[left.id][2] != 'list':
                         raise TypeError(f"Variable '{left.id}' is not a list synax error.")
@@ -285,15 +272,55 @@ class Memory_Parser:
                     total_size+=self.primitives_estimator.estimate_list_size(self.vars[left.id][0]) - sys.getsizeof([]) 
                 elif isinstance(left, ast.List):
                     total_length += len(left.elts)
-                if isinstance(right, ast.Name) and right.id in self.vars:
+                elif isinstance(right, ast.Name) and right.id in self.vars:
                     if self.vars[right.id][2] != 'list':
                         raise TypeError(f"Variable '{right.id}' is not a list synax error.")
                     total_length += self.vars[right.id][0]
                     total_size+=self.primitives_estimator.estimate_list_size(self.vars[right.id][0]) 
-                    
                 elif isinstance(right, ast.List):
                     total_length += len(right.elts)
-                self.vars[var] = (total_length, total_size, 'list')               
+                return total_size, total_length
+            
+        def _parse_list_elements_sizes(node):
+            if isinstance(node, ast.List):  
+                sizes = [_parse_list_elements_sizes(el)[0] for el in node.elts]
+                total_size = sum([size for size in sizes])
+                total_length = len(node.elts)
+                return total_size + self.primitives_estimator.estimate_list_size(total_length),0                     
+            elif isinstance(node,ast.Constant):
+                return sys.getsizeof(node.value),0
+            elif isinstance(node, ast.Name):
+                if node.id in self.vars:
+                    return self.vars[node.id][1],0            
+            elif (isinstance(node, ast.Subscript)):
+                size, length = handle_subscript(node)
+                return size, length
+            elif isinstance(node, ast.BinOp):
+                size, length = handle_BinOp(node)
+                return size, length
+            
+            
+        var = stmt.targets[0].id
+        multiplier = 1
+        if (isinstance(stmt.value, ast.Call)):
+            stmt=stmt.value.args[0]
+        elif (isinstance(stmt.value, ast.Subscript)):
+            size, length = handle_subscript(stmt.value)
+            self.vars[var] = (length, size, 'list')
+            return  
+                        
+        elif (isinstance(stmt.value, ast.BinOp)): 
+            #! handle list multiplication
+            op = stmt.value.op
+            left = stmt.value.left
+            right = stmt.value.right
+            if isinstance(op, ast.Mult):
+                multiplier = right.value if  isinstance(left, ast.List) else left.value
+                list_val=left if isinstance(left, ast.List) else right
+                stmt=list_val
+            else:
+                size, length = handle_BinOp(stmt)
+                self.vars[var] = (length, size, 'list')               
                 return
         elif (isinstance(stmt.value, ast.ListComp)):
             elt = stmt.value.elt
@@ -316,7 +343,7 @@ class Memory_Parser:
             stmt=stmt.value
         list_length = len(stmt.elts)
         memory = self.primitives_estimator.estimate_list_size(list_length)
-        elements_size = _parse_list_elements_sizes(stmt) * multiplier
+        elements_size = _parse_list_elements_sizes(stmt)[0] * multiplier
         list_length = list_length * multiplier
         if first:
            self.vars[var] = (list_length,elements_size,'list')
@@ -440,14 +467,14 @@ class Memory_Parser:
                         func_type = func_node.attr   # e.g., 'pop'
                         return var_id, func_type
         var_id, func_type = None, None
-        if  isinstance(tree.body[0], ast.Delete): #! handle del statements
-            stmt = tree.body[0]
+        if  isinstance(tree, ast.Delete): #! handle del statements
+            stmt = tree
             subscript = stmt.targets[0]
             var_id = subscript.value.id
             slice = subscript.slice
             lower = None
             upper = None
-            step = None
+            step = 1
             if isinstance(slice, ast.Slice):
                 lower = slice.lower.value if isinstance(slice.lower, ast.Constant) else None
                 upper = slice.upper.value if isinstance(slice.upper, ast.Constant) else None
@@ -455,17 +482,28 @@ class Memory_Parser:
             elif isinstance(slice, ast.Constant):
                 lower = slice.value
                 upper = None
-                step = None
+                step = 1 
             total_length = self.vars[var_id][0]
             total_size = self.vars[var_id][1]
             if lower is not None and upper is not None:
                 length = (upper - lower) // step
                 size = total_size / total_length * length
                 self.vars[var_id] = (total_length - length, total_size - size, 'list')
-            elif lower is not None:
-                length = total_length - 1
-                size = total_size - total_size // total_length
+            elif lower is not None and upper is None:
+                if isinstance(slice, ast.Slice):
+                        length = (total_length - lower)// step
+                        size = total_size - (total_size // total_length) * length
+                        length = total_length - length 
+                else:
+                    length = total_length - 1
+                    size = total_size - total_size // total_length
                 self.vars[var_id] = (length, size, 'list')
+            elif lower is None and upper is not None:
+                length = upper// step
+                size = total_size - total_size//total_length * length
+                length = total_length - length
+                self.vars[var_id] = (length, size, 'list')     
+
                 
             return                
         else:
@@ -569,7 +607,186 @@ class Memory_Parser:
             return original_size, length
         else:
             new_length = (upper - lower) // step
-            new_size = int(original_size / original_length * new_length)
+            new_size = int(original_size // original_length * new_length)
             return new_size, new_length
-            
+    def _handle_loop_footprint(self, node):
+        def get_number_outer_iterations(node):
+            loop_expr = None
+            iter_node = node.iter
+            # Case 1: for i in x:
+            if isinstance(iter_node, ast.Name):
+                loop_expr = f"len({iter_node.id})"
+            # Case 2: for i in range(...):
+            elif isinstance(iter_node, ast.Call) and isinstance(iter_node.func, ast.Name):
+                if iter_node.func.id == 'range':
+                    if len(iter_node.args) == 1:
+                        # range(N)
+                        if isinstance(iter_node.args[0], ast.Constant):
+                            loop_expr = str(iter_node.args[0].value)
+                        else:
+                            loop_expr = ast.unparse(iter_node.args[0])
+                    elif len(iter_node.args) in [2, 3]:
+                        start = ast.unparse(iter_node.args[0])
+                        stop = ast.unparse(iter_node.args[1])
+                        if len(iter_node.args) == 3:
+                            step = ast.unparse(iter_node.args[2])
+                            loop_expr = f"({stop} - {start}) // {step}"
+                        else:
+                            loop_expr = f"{stop} - {start}"
+                # Case 3: for index, name in enumerate(names):
+                elif iter_node.func.id == 'enumerate' and len(iter_node.args) == 1:
+                    arg_expr = ast.unparse(iter_node.args[0])
+                    loop_expr = f"len({arg_expr})"
+                # Case 4: for i, j in zip(a, b):
+                elif iter_node.func.id == 'zip':
+                    zipped_lens = []
+                    for arg in iter_node.args:
+                        zipped_lens.append(f"len({ast.unparse(arg)})")
+                    loop_expr = f"min({', '.join(zipped_lens)})"
+            # Try resolving len(x) from known vars
+            if loop_expr:
+                if loop_expr.startswith("len(") and loop_expr.endswith(")"):
+                    var = loop_expr[4:-1].strip()
+                    if var in self.vars:
+                        loop_expr = self.vars[var][0]
+                return loop_expr
+            else:
+                raise ValueError("Unsupported loop iteration expression.")
+        def has_inner_for_loop(node):
+            if not isinstance(node, ast.For):
+                return False
+
+            for child in ast.walk(node):
+                if child is not node and isinstance(child, ast.For):
+                    return True
+            return False
+        def get_assignment_targets(assign_node):
+            targets = []
+            target = assign_node.target
+            if isinstance(target, ast.Name):
+                targets.append(target.id)
+            elif isinstance(target, ast.Tuple):
+                targets.extend([elt.id for elt in target.elts if isinstance(elt, ast.Name)])
+            return targets
+        def handle_nested_loops(node, depth=0,n_outer_iterations=None, n_inner_iterations=None):
+            if not isinstance(node, ast.For):
+                return
+            print("  " * depth + f"Handling loop at depth {depth}")
+            n_iter = n_outer_iterations if depth == 0 else n_inner_iterations
+            for stmt in node.body:
+                # print(ast.dump(stmt, indent=4))
+                if isinstance(stmt, ast.For):
+                    original_vars = self.vars.copy()
+                    targets = get_assignment_targets(stmt)
+                    costs = get_iterable_cost_expr_only(stmt, self.vars)
+                    for i,target in enumerate(targets):
+                        self.vars[target] = (1,costs[i], 'unk')
+                    handle_nested_loops(stmt, depth + 1, n_outer_iterations=n_iter, n_inner_iterations=n_inner_iterations)
+                    for key in list(self.vars.keys()):
+                        if key not in original_vars:
+                            del self.vars[key]
+                    
+                else:
+                    if isinstance(stmt, ast.Assign):
+                        self._assignmemt_handler(stmt)
+                    elif  isinstance(stmt, ast.AugAssign):
+                        size_before_loop = self.vars[stmt.target.id][1]
+                        len_before_loop = self.vars[stmt.target.id][0]
+                        self._insertion_handler(stmt)
+                        size_after_loop = self.vars[stmt.target.id][1]
+                        len_after_loop = self.vars[stmt.target.id][0]
+                        size_increment = size_after_loop - size_before_loop
+                        len_increment = len_after_loop - len_before_loop
+                        new_size = size_before_loop + size_increment * int(n_iter)
+                        new_length = len_before_loop + len_increment * int(n_iter)
+                        self.vars[stmt.target.id] = (new_length,new_size, 'list')
+                    elif isinstance(stmt, ast.Expr):
+                        func = stmt.value.func.attr 
+                        if func in ['insert', 'append', 'extend']:
+                            size_before_loop = self.vars[stmt.value.func.value.id][1]
+                            len_before_loop = self.vars[stmt.value.func.value.id][0]
+                            self._insertion_handler(stmt)
+                            size_after_loop = self.vars[stmt.value.func.value.id][1]
+                            len_after_loop = self.vars[stmt.value.func.value.id][0]
+                            size_increment = size_after_loop - size_before_loop
+                            len_increment = len_after_loop - len_before_loop
+                            new_size = size_before_loop + size_increment * int(n_iter)
+                            new_length = len_before_loop + len_increment * int(n_iter)
+                            self.vars[stmt.value.func.value.id] = (new_length,new_size, 'list')
+                        elif func in ['pop', 'remove','clear']:
+                            size_before_loop = self.vars[stmt.value.func.value.id][1]
+                            len_before_loop = self.vars[stmt.value.func.value.id][0]
+                            self._deletion_handler(stmt)
+                            size_after_loop = self.vars[stmt.value.func.value.id][1]
+                            len_after_loop = self.vars[stmt.value.func.value.id][0]
+                            size_decrement = size_after_loop - size_before_loop
+                            len_decrement = len_after_loop - len_before_loop
+                            new_size = size_before_loop + size_decrement * int(n_iter)
+                            new_length = len_before_loop + len_decrement * int(n_iter)
+                            self.vars[stmt.value.func.value.id] = (new_length,new_size, 'list')
+                    elif  isinstance(stmt, ast.Delete):
+                            for target in stmt.targets:
+                                if isinstance(target, ast.Subscript) and isinstance(target.value, ast.Name):    
+                                    var_name = target.value.id        
+                                    size_before_loop = self.vars[var_name][1]
+                                    len_before_loop = self.vars[var_name][0]
+                                    self._deletion_handler(stmt)
+                                    size_after_loop = self.vars[var_name][1]
+                                    len_after_loop = self.vars[var_name][0]
+                                    size_decrement = size_after_loop - size_before_loop
+                                    len_decrement = len_after_loop - len_before_loop
+                                    #! max is to avoid negative sizes or lengths
+                                    new_size = max(size_before_loop + size_decrement * int(n_iter),0)
+                                    new_length = max(len_before_loop + len_decrement * int(n_iter),0)
+                                    self.vars[var_name] = (new_length,new_size, 'list')
+            print("  " * (depth + 1) + f"Statement: {ast.dump(stmt)}")
+            print(self.vars)
+        def get_iterable_cost_expr_only(for_node, vars_dict):
+            iter_expr = for_node.iter
+            cost_exprs = []
+
+            def var_expr(name):
+                return f"self.vars['{name}'][1]/self.vars['{name}'][0]"
+
+            if isinstance(iter_expr, ast.Call):
+                func_name = getattr(iter_expr.func, 'id', None)
+
+                if func_name == 'enumerate':
+                    arg = iter_expr.args[0]
+                    if isinstance(arg, ast.Name):
+                        name = arg.id
+                        cost_exprs.append("sys.getsizeof(100000)")
+                        cost_exprs.append(var_expr(name))
+
+                elif func_name == 'zip':
+                    for arg in iter_expr.args:
+                        if isinstance(arg, ast.Name):
+                            cost_exprs.append(var_expr(arg.id))
+
+                elif func_name == 'range':
+                    cost_exprs.append("sys.getsizeof(100000)")
+
+            elif isinstance(iter_expr, ast.Name):
+                cost_exprs.append(var_expr(iter_expr.id))
+
+            elif isinstance(iter_expr, ast.Call) and isinstance(iter_expr.func, ast.Name) and iter_expr.func.id == 'len':
+                cost_exprs.append("sys.getsizeof(100000)")
+
+            elif isinstance(iter_expr, ast.Constant) and isinstance(iter_expr.value, int):
+                cost_exprs.append("sys.getsizeof(100000)")
+            return cost_exprs
+        
+        original_vars = self.vars.copy()
+        n_outer_iterations = get_number_outer_iterations(node)
+        n_inner_iterations = 500 if has_inner_for_loop(node) else None
+        targets = get_assignment_targets(node)
+        costs = get_iterable_cost_expr_only(node, self.vars) 
+        for i,target in enumerate(targets):
+            self.vars[target] = (1,costs[i], 'unk')  # Initialize targets to empty lists
+
+        handle_nested_loops(node, depth=0, n_outer_iterations=n_outer_iterations, n_inner_iterations=n_inner_iterations)
+        for key in list(self.vars.keys()):
+            if key not in original_vars:
+                del self.vars[key]
+        
         
