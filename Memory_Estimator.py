@@ -80,6 +80,39 @@ class AugAssignToExtend(ast.NodeTransformer):
                 )
             )
         return node
+
+class AugAssignToExtend(ast.NodeTransformer):
+    def visit_AugAssign(self, node):
+        if isinstance(node.op, ast.Add):
+            return ast.Expr(
+                value=ast.Call(
+                    func=ast.Attribute(
+                        value=ast.copy_location(
+                            ast.Name(id=node.target.id, ctx=ast.Load()),
+                            node.target
+                        ),
+                        attr='extend',
+                        ctx=ast.Load()
+                    ),
+                    args=[node.value],
+                    keywords=[]
+                )
+            )
+        return node
+def convert_augassign_to_assign(node):
+    if isinstance(node, ast.AugAssign):
+        return ast.Assign(
+            targets=[node.target],
+            value=ast.BinOp(
+                left=ast.copy_location(ast.Name(id=node.target.id, ctx=ast.Load()), node),
+                op=node.op,
+                right=node.value
+            )
+        )
+    return node  # return unchanged if not AugAssign
+class AugAssignToAssignTransformer(ast.NodeTransformer):
+    def visit_AugAssign(self, node):
+        return convert_augassign_to_assign(node)
 class InsertToAppend(ast.NodeTransformer):
     def visit_Call(self, node):
         self.generic_visit(node)  # Visit children nodes first
