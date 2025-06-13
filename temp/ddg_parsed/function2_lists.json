@@ -4,23 +4,42 @@
             "args:none"
         ],
         "statements": [
-            "def hello(z):"
+            "def calculate_std(data):"
         ]
     },
     {
         "key": [
-            "z:0"
+            "none:none"
         ],
         "statements": [
-            "z = z + 1"
+            "numeric_data = []",
+            "std_values = []"
         ]
     },
     {
         "key": [
-            "z:1"
+            "data:0",
+            "numeric_data:1"
         ],
         "statements": [
-            "return z"
+            "for row in data[1:]:\n    numeric_row = []\n    for x in row:\n        numeric_row.append(float(x))\n    numeric_data.append(numeric_row)"
+        ]
+    },
+    {
+        "key": [
+            "numeric_data:2",
+            "std_values:1"
+        ],
+        "statements": [
+            "for col in zip(*numeric_data):\n    std_values.append(statistics.stdev(col))"
+        ]
+    },
+    {
+        "key": [
+            "std_values:3"
+        ],
+        "statements": [
+            "return std_values"
         ]
     }
 ]

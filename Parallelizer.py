@@ -110,6 +110,8 @@ def build_ddg(file_path):
         )
 
         tree = ast.parse(code)
+        tree = AugAssignToAssignTransformer().visit(tree)
+        ast.fix_missing_locations(tree)
         graph=DDG_Wrapper(tree)
         graph.build_ddgs()
         return graph
@@ -227,6 +229,8 @@ def get_memory_foortprint(file_path, entry_point, functions):
             agg = False
             for node in tree.body:
                 # print(ast.dump(node, indent=4))  # Debugging: print the AST nodes
+                node = AugAssignToAssignTransformer().visit(node)
+                ast.fix_missing_locations(node)
                 #! assumption deal with multilevel indexing as first level only
                 node = ast.parse(re.sub(r'(\[[^\[\]]+\])(?:\[[^\[\]]+\])+', r'\1', ast.unparse(node)))
                 #! x[i].append() --> x.append()
@@ -298,6 +302,8 @@ def get_memory_foortprint(file_path, entry_point, functions):
         main_lines_footprint = {}
         func_lines_footprint = defaultdict(dict)
         for i,node in enumerate(tree.body):
+            node = AugAssignToAssignTransformer().visit(node)
+            ast.fix_missing_locations(node)
             if isinstance(node, ast.Assign):
                 targets = [target.id for target in node.targets if isinstance(target, ast.Name)]
                 value = node.value
@@ -349,7 +355,7 @@ def main():
     #     sys.exit(1)
 
     # filename = sys.argv[1]
-    filename= 'sample_submission.py'
+    filename= 'mean_std.py'
     #! Check for syntax errors
     if check_syntax_errors(filename, error_file):
        print(f"1. Syntax check passed for {filename}.")

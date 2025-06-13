@@ -4,16 +4,7 @@
             "args:none"
         ],
         "statements": [
-            "def add1(data):"
-        ]
-    },
-    {
-        "key": [
-            "data:0"
-        ],
-        "statements": [
-            "header = data[0][0]",
-            "rows = data[1:]"
+            "def calculate_mean(data):"
         ]
     },
     {
@@ -21,33 +12,34 @@
             "none:none"
         ],
         "statements": [
-            "new_data = []"
+            "numeric_data = []",
+            "mean_values = []"
         ]
     },
     {
         "key": [
             "data:0",
-            "new_data:2"
+            "numeric_data:1"
         ],
         "statements": [
-            "for row in data:\n    new_row = []\n    for value in row:\n        new_value = int(value) + 1\n        new_row.append(new_value)\n    new_data.append(new_row)"
+            "for row in data[1:]:\n    numeric_row = []\n    for x in row:\n        numeric_row.append(float(x))\n    numeric_data.append(numeric_row)"
         ]
     },
     {
         "key": [
-            "header:1",
-            "new_data:3"
+            "mean_values:1",
+            "numeric_data:2"
         ],
         "statements": [
-            "new_data.insert(0, header)"
+            "for col in zip(*numeric_data):\n    mean_values.append(statistics.mean(col))"
         ]
     },
     {
         "key": [
-            "new_data:4"
+            "mean_values:3"
         ],
         "statements": [
-            "return new_data"
+            "return mean_values"
         ]
     }
 ]

@@ -61,9 +61,9 @@
     "b = hello3(x, y, z)#9:hello3(x, y, z)": {
         "def hello3(x, y, z):": 1320984,
         "x = x + 1": 1321044,
-        "x = x + y + z": 2642248,
+        "x = x + (y + z + 5)": 2642220,
         "aggregation": ":",
-        "return x": 2642248
+        "return x": 2642220
     },
     "c = hello(z)#10:hello(z)": {
         "def hello(z):": 1204,
@@ -78,9 +78,9 @@
         "return z": 1144
     },
     "output = calc(x, y, z, a, b, c, d)#12:calc(x, y, z, a, b, c, d)": {
-        "def calc(x, y, z, a, b, c, d):": 2642660,
-        "x = [['Output', x, y, z, a, b, c, d]]": 5285499,
+        "def calc(x, y, z, a, b, c, d):": 2642632,
+        "x = [['Output', x, y, z, a, b, c, d]]": 5285443,
         "aggregation": ":",
-        "return x": 5285499
+        "return x": 5285443
     }
 }

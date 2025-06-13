@@ -20,37 +20,34 @@ FILE_NAME = 'test.csv'  # Name of the file to read data from
 #! available aggregates are c --> concatenate, a --> average, s --> sum, m --> max, n --> min, l --> length, i --> multiply, empty string for means don't parallelize
 #! format aggregation = "type:list"
 #! each function must have an aggregation variable just before the return statement
-def add1(data):
-    header = data[0][0]
-    rows = data[1:]
-    new_data = []
-    for row in data:
-        new_row = []
-        for value in row:
-            new_value = int(value) + 1  
-            new_row.append(new_value)
-        new_data.append(new_row)
-    new_data.insert(0, header) 
-    aggregation = "s:new_data"  
-    return new_data            
-def hello(z):
-    z = z + 1
-    aggregation = ""
-    return z
-def hello2():
-    v  = 4 + 3
-    aggregation = ""
-    return v
-def hello3(x,y,z):
-    x = x+1
-    x += y + z + 5
-    aggregation = ""
-    return x 
-def calc(x,y,z,a,b,c,d):
-    # x =  [['Output', str(x), str(y), str(z), str(a), str(b), str(c), str(d)]] to be handled later
-    x = [['Output', x, y, z, a, b, c,d]] 
-    aggregation = ""
-    return x
+def calculate_mean(data):
+    numeric_data = []
+    for row in data[1:]:  # Skip header
+        numeric_row = []
+        for x in row:
+            numeric_row.append(float(x))
+        numeric_data.append(numeric_row)
+
+    mean_values = []
+    for col in zip(*numeric_data):
+        mean_values.append(statistics.mean(col))
+
+    aggregation = "a:mean_values"
+    return mean_values      
+def calculate_std(data):
+    numeric_data = []
+    for row in data[1:]:  # Skip header
+        numeric_row = []
+        for x in row:
+            numeric_row.append(float(x))
+        numeric_data.append(numeric_row)
+
+    std_values = []
+    for col in zip(*numeric_data):
+        std_values.append(statistics.stdev(col))
+
+    aggregation = "a:std_values"
+    return std_values
 ##########################################################################################################
 
 
@@ -69,19 +66,9 @@ if __name__ == '__main__':
 #! User main function is defined here
 #! Note for boosting performance if list is modified inside the function (each function call is independent) then return pass a 
 #! copy of the list instead of the same list for performing different operations in parallel
-    data = add1(data) 
-    z = add1(data)
-    x = hello2()
-    y = z.copy() 
-    z = hello(z)
-    a = hello(z) 
-    k = hello(a)
-    a = hello(x) 
-    z = hello(a)
-    b = hello3(x,y,z)
-    c = hello(z)
-    d = hello(x) 
-    output = calc(x,y,z,a,b,c,d)
+    data = calculate_mean(data)
+    std_data = calculate_std(data)
+    output = std_data
     
     
 #---------------------------------------------------------------------------------------------------------

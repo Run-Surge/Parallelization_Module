@@ -21,13 +21,13 @@
     },
     {
         "code line": 2,
-        "statement": "x = x + y + z",
+        "statement": "x = x + (y + z + 5)",
         "has": [
             "x"
         ],
         "needs": [
-            "x",
             "z",
+            "x",
             "y"
         ]
     },

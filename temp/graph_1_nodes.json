@@ -1,7 +1,7 @@
 [
     {
         "code line": 0,
-        "statement": "def add1(data):",
+        "statement": "def calculate_mean(data):",
         "has": [
             "data"
         ],
@@ -9,68 +9,56 @@
     },
     {
         "code line": 1,
-        "statement": "header = data[0][0]",
+        "statement": "numeric_data = []",
         "has": [
-            "header"
+            "numeric_data"
         ],
-        "needs": [
-            "data"
-        ]
+        "needs": []
     },
     {
         "code line": 2,
-        "statement": "rows = data[1:]",
+        "statement": "for row in data[1:]:\n    numeric_row = []\n    for x in row:\n        numeric_row.append(float(x))\n    numeric_data.append(numeric_row)",
         "has": [
-            "rows"
+            "numeric_data"
         ],
         "needs": [
-            "data"
+            "data",
+            "numeric_data"
         ]
     },
     {
         "code line": 3,
-        "statement": "new_data = []",
+        "statement": "mean_values = []",
         "has": [
-            "new_data"
+            "mean_values"
         ],
         "needs": []
     },
     {
         "code line": 4,
-        "statement": "for row in data:\n    new_row = []\n    for value in row:\n        new_value = int(value) + 1\n        new_row.append(new_value)\n    new_data.append(new_row)",
+        "statement": "for col in zip(*numeric_data):\n    mean_values.append(statistics.mean(col))",
         "has": [
-            "new_data"
+            "mean_values"
         ],
         "needs": [
-            "new_data",
-            "data"
+            "mean_values",
+            "numeric_data"
         ]
     },
     {
         "code line": 5,
-        "statement": "new_data.insert(0, header)",
-        "has": [
-            "new_data"
-        ],
-        "needs": [
-            "new_data",
-            "header"
-        ]
-    },
-    {
-        "code line": 6,
-        "statement": "aggregation = 's:new_data'",
+        "statement": "aggregation = 'a:mean_values'",
         "has": [
             "aggregation"
         ],
         "needs": []
     },
     {
-        "code line": 7,
-        "statement": "return new_data",
+        "code line": 6,
+        "statement": "return mean_values",
         "has": [],
         "needs": [
-            "new_data"
+            "mean_values"
         ]
     }
 ]
