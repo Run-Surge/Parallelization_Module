@@ -42,7 +42,12 @@ def group_by_needs_with_wait_index(
                 first_no_dependency_handled = True
                 grouped_statements[key].append(line_to_stmt[line_num])
             else:
-                key_parts = [f"{dep['Dependency'][0]}:{dep['Node']}" for dep in depends_on]
+                # key_parts = [f"{dep['Dependency'][0]}:{dep['Node']}" for dep in depends_on]
+                key_parts = [
+                    f"{var}:{dep['Node']}"
+                    for dep in depends_on
+                    for var in dep['Dependency']
+                ]
                 key = tuple(sorted(key_parts))
                 grouped_statements[key].append(line_to_stmt[line_num])
 
@@ -128,6 +133,14 @@ def dependency_analyzer(folder):
         if index == 0:
             json.dump(result, open(f"{save_path}/ddg_parsed/main_lists.json", 'w'), indent=4)
         else:
+            #! remove aggregation keys from the result
+            for item in result:
+                item["statements"] = [
+                    stmt for stmt in item.get("statements", [])
+                    if not stmt.strip().startswith("aggregation =")
+                ]
+            result = [item for item in result if item["statements"]]
+
             json.dump(result, open(f"{save_path}/ddg_parsed/function{index}_lists.json", 'w'), indent=4)
         results.append(result)
     return results
@@ -211,11 +224,34 @@ def get_memory_foortprint(file_path, entry_point, functions):
             key = f"{main_code_line}#{lineno}:{func_name}"
             func_lines_footprint[key][func_def] = args_total_memory 
             tree = ast.parse(code)
+            agg = False
             for node in tree.body:
                 # print(ast.dump(node, indent=4))  # Debugging: print the AST nodes
                 #! assumption deal with multilevel indexing as first level only
                 node = ast.parse(re.sub(r'(\[[^\[\]]+\])(?:\[[^\[\]]+\])+', r'\1', ast.unparse(node)))
-                get_footprint(node, local_parser, func_lines_footprint)
+                #! x[i].append() --> x.append()
+                pattern = r'(?:\[\s*[^]]+\s*\])+(?=\.\w+\s*\()'
+                node = ast.parse(re.sub(pattern, '', ast.unparse(node)))
+                #! if aggreagation then get the aggregation type instead of the footprint
+                if ast.unparse(node).startswith('aggregation = '):
+                    agg = True
+                    match = re.search(r'''["'](.*?)["']''', ast.unparse(node))
+                    if match:
+                       agg_type = ''
+                       agg_target = ''
+                       full_value = match.group(1)
+                       if full_value != "":
+                           agg_type, agg_target = full_value.split(':', 1)
+                       letter = match.group(1)
+                       if agg_type in ['c', 'a', 's', 'm', 'n', 'l', 'i','']:
+                           func_lines_footprint[key]["aggregation"] = f"{agg_type}:{agg_target}"
+                           agg = True
+                       else:
+                           raise ValueError(f"Invalid aggregation type: {letter}")
+                else:
+                    get_footprint(node, local_parser, func_lines_footprint)
+            if not agg:
+                raise ValueError(f"Function {func_name} does not have an aggregation type defined.")
            
             return_statement = list(func_lines_footprint[key].keys())[-1]
             return_footprint_size,return_footprint_length = local_parser._get_return_size_length(ast.parse(return_statement))
@@ -333,6 +369,7 @@ def main():
         print(f"3. Dependency analysis completed for {filename}.")
     
     get_memory_foortprint(filename,entry_point,functions)
+    print(f"4. Memory footprint analysis completed for {filename}.")
         
     
 

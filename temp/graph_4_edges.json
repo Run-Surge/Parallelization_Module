@@ -22,13 +22,14 @@
             {
                 "Node": 0,
                 "Dependency": [
+                    "z",
                     "y"
                 ]
             }
         ]
     },
-    "3": {
-        "Node": 3,
+    "4": {
+        "Node": 4,
         "Depends on": [
             {
                 "Node": 2,

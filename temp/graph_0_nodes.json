@@ -87,12 +87,13 @@
     },
     {
         "code line": 10,
-        "statement": "b = hello3(x, y)",
+        "statement": "b = hello3(x, y, z)",
         "has": [
             "b"
         ],
         "needs": [
             "x",
+            "z",
             "y"
         ]
     },
@@ -123,13 +124,13 @@
             "output"
         ],
         "needs": [
-            "b",
-            "x",
-            "z",
             "c",
+            "b",
+            "a",
+            "z",
+            "x",
             "d",
-            "y",
-            "a"
+            "y"
         ]
     }
 ]

@@ -1,22 +1,39 @@
 {
+    "1": {
+        "Node": 1,
+        "Depends on": [
+            {
+                "Node": 0,
+                "Dependency": [
+                    "data"
+                ]
+            }
+        ]
+    },
     "2": {
         "Node": 2,
         "Depends on": [
             {
                 "Node": 0,
                 "Dependency": [
-                    "lines"
+                    "data"
                 ]
             }
         ]
     },
-    "3": {
-        "Node": 3,
+    "4": {
+        "Node": 4,
         "Depends on": [
             {
-                "Node": 2,
+                "Node": 3,
                 "Dependency": [
-                    "lines"
+                    "new_data"
+                ]
+            },
+            {
+                "Node": 0,
+                "Dependency": [
+                    "data"
                 ]
             }
         ]
@@ -25,32 +42,15 @@
         "Node": 5,
         "Depends on": [
             {
-                "Node": 3,
+                "Node": 4,
                 "Dependency": [
-                    "lines"
+                    "new_data"
                 ]
             },
             {
-                "Node": 4,
+                "Node": 1,
                 "Dependency": [
-                    "a"
-                ]
-            }
-        ]
-    },
-    "6": {
-        "Node": 6,
-        "Depends on": [
-            {
-                "Node": 5,
-                "Dependency": [
-                    "lines"
-                ]
-            },
-            {
-                "Node": 4,
-                "Dependency": [
-                    "a"
+                    "header"
                 ]
             }
         ]
@@ -59,20 +59,9 @@
         "Node": 7,
         "Depends on": [
             {
-                "Node": 6,
+                "Node": 5,
                 "Dependency": [
-                    "lines"
-                ]
-            }
-        ]
-    },
-    "8": {
-        "Node": 8,
-        "Depends on": [
-            {
-                "Node": 7,
-                "Dependency": [
-                    "lines"
+                    "new_data"
                 ]
             }
         ]

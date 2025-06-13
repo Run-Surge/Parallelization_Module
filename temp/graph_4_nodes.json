@@ -1,10 +1,11 @@
 [
     {
         "code line": 0,
-        "statement": "def hello3(x,y):",
+        "statement": "def hello3(x,y,z):",
         "has": [
             "x",
-            "y"
+            "y",
+            "z"
         ],
         "needs": []
     },
@@ -20,17 +21,26 @@
     },
     {
         "code line": 2,
-        "statement": "x = x + y",
+        "statement": "x = x + y + z",
         "has": [
             "x"
         ],
         "needs": [
             "x",
+            "z",
             "y"
         ]
     },
     {
         "code line": 3,
+        "statement": "aggregation = ''",
+        "has": [
+            "aggregation"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 4,
         "statement": "return x",
         "has": [],
         "needs": [

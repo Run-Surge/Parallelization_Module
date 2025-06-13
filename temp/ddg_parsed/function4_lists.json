@@ -4,7 +4,7 @@
             "args:none"
         ],
         "statements": [
-            "def hello3(x,y):"
+            "def hello3(x,y,z):"
         ]
     },
     {
@@ -18,10 +18,11 @@
     {
         "key": [
             "x:1",
-            "y:0"
+            "y:0",
+            "z:0"
         ],
         "statements": [
-            "x = x + y"
+            "x = x + y + z"
         ]
     },
     {

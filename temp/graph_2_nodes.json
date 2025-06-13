@@ -19,6 +19,14 @@
     },
     {
         "code line": 2,
+        "statement": "aggregation = ''",
+        "has": [
+            "aggregation"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 3,
         "statement": "return z",
         "has": [],
         "needs": [

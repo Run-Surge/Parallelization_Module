@@ -20,17 +20,25 @@
             "x"
         ],
         "needs": [
-            "b",
-            "x",
-            "z",
             "c",
+            "b",
+            "a",
+            "z",
+            "x",
             "d",
-            "y",
-            "a"
+            "y"
         ]
     },
     {
         "code line": 2,
+        "statement": "aggregation = ''",
+        "has": [
+            "aggregation"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 3,
         "statement": "return x",
         "has": [],
         "needs": [

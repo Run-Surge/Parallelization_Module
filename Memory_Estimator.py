@@ -164,6 +164,8 @@ class Memory_Parser:
         evaluate primitive assignment statements.
         
         '''
+        if isinstance(stmt.targets[0],ast.Subscript):  #! handle x[0] = 5
+            return
         var_name = stmt.targets[0].id  
         result = self._evaluate_primtive_expression(stmt.value)
         memory = self.primitives_estimator.estimate_primitive_size(result)
@@ -259,27 +261,39 @@ class Memory_Parser:
                 left = stmt.value.left
                 right = stmt.value.right
 
+            left_size,left_length = _parse_list_elements_sizes(left)
+            right_size,right_length = _parse_list_elements_sizes(right)
+            total_size = left_size + right_size
+            total_length = left_length if left_length  is not None else 0
+            total_length += right_length if right_length is not None else 0
+            total_length = 1 if total_length <= 0 else total_length
             if isinstance(op, ast.Add):
-                left_size,left_length = _parse_list_elements_sizes(left)
-                right_size,right_length = _parse_list_elements_sizes(right)
-                total_size = left_size + right_size
-                total_length = left_length if left_length  is not None else 0
-                total_length += right_length if right_length is not None else 0
                 if isinstance(left, ast.Name) and left.id in self.vars:
                     if self.vars[left.id][2] != 'list':
-                        raise TypeError(f"Variable '{left.id}' is not a list synax error.")
-                    total_length += self.vars[left.id][0]
-                    total_size+=self.primitives_estimator.estimate_list_size(self.vars[left.id][0]) - sys.getsizeof([]) 
+                        total_length = -1
+                        total_size = total_size // total_length   if total_length > 0 else 0
+                    else:
+                        total_length += self.vars[left.id][0]
+                        total_size+=self.primitives_estimator.estimate_list_size(self.vars[left.id][0]) - sys.getsizeof([]) 
                 elif isinstance(left, ast.List):
                     total_length += len(left.elts)
-                elif isinstance(right, ast.Name) and right.id in self.vars:
+                if isinstance(right, ast.Name) and right.id in self.vars:
                     if self.vars[right.id][2] != 'list':
-                        raise TypeError(f"Variable '{right.id}' is not a list synax error.")
-                    total_length += self.vars[right.id][0]
-                    total_size+=self.primitives_estimator.estimate_list_size(self.vars[right.id][0]) 
+                        total_size = total_size // total_length if total_length > 0 else 0
+                        total_length = -1 
+                    else:
+                        total_length += self.vars[right.id][0]
+                        total_size+=self.primitives_estimator.estimate_list_size(self.vars[right.id][0]) 
                 elif isinstance(right, ast.List):
                     total_length += len(right.elts)
                 return total_size, total_length
+            else:
+                total_size = total_size // total_length if total_length > 0 else 0
+                total_length = -1
+                return total_size, total_length
+                
+                
+      
             
         def _parse_list_elements_sizes(node):
             if isinstance(node, ast.List):  
@@ -299,7 +313,8 @@ class Memory_Parser:
                 size, length = handle_BinOp(node)
                 return size, length
             
-            
+        if isinstance(stmt.targets[0], ast.Subscript):
+           return   
         var = stmt.targets[0].id
         multiplier = 1
         if (isinstance(stmt.value, ast.Call)):
@@ -315,12 +330,38 @@ class Memory_Parser:
             left = stmt.value.left
             right = stmt.value.right
             if isinstance(op, ast.Mult):
-                multiplier = right.value if  isinstance(left, ast.List) else left.value
-                list_val=left if isinstance(left, ast.List) else right
+                list_val = None
+                if isinstance(left,ast.Name) and left.id in self.vars and self.vars[left.id][2] == 'list':
+                    multiplier = right.value if isinstance(right, ast.Constant) else self.vars[right.id][0]
+                    length = self.vars[left.id][0]
+                    list_val = ast.List(
+                        elts=[ast.Constant(value=111111111) for _ in range(length)],
+                        ctx=ast.Load()
+                    )  
+                elif isinstance(right,ast.Name) and right.id in self.vars and self.vars[right.id][2] == 'list':
+                    multiplier = left.value if isinstance(right, ast.Constant) else self.vars[left.id][0]
+                    list_val = ast.List(
+                        elts=[ast.Constant(value=111111111) for _ in range(length)],
+                        ctx=ast.Load()
+                    )  
+                #! Inner 1d indexing is assumed to be a primitive not a list
+                elif (isinstance(left, ast.Subscript) or isinstance(right,ast.Subscript)):
+                    size, length = handle_BinOp(stmt)
+                    self.vars[var] = (1111111111, size, 'unk')  
+                    return
+                else:
+                    multiplier = right.value if  isinstance(left, ast.List) else left.value
+                    list_val=left if isinstance(left, ast.List) else right
                 stmt=list_val
             else:
                 size, length = handle_BinOp(stmt)
-                self.vars[var] = (length, size, 'list')               
+                if (not isinstance(op, ast.Add)):
+                    self.vars[var] = (1111111111, size, 'unk')
+                else:    
+                    if length == -1:
+                        self.vars[var] = (111111111, size, 'unk')
+                    else:
+                        self.vars[var] = (length, size, 'list')               
                 return
         elif (isinstance(stmt.value, ast.ListComp)):
             elt = stmt.value.elt
@@ -342,9 +383,9 @@ class Memory_Parser:
         else:
             stmt=stmt.value
         list_length = len(stmt.elts)
+        list_length = list_length * multiplier
         memory = self.primitives_estimator.estimate_list_size(list_length)
         elements_size = _parse_list_elements_sizes(stmt)[0] * multiplier
-        list_length = list_length * multiplier
         if first:
            self.vars[var] = (list_length,elements_size,'list')
         else:
@@ -671,7 +712,7 @@ class Memory_Parser:
         def handle_nested_loops(node, depth=0,n_outer_iterations=None, n_inner_iterations=None):
             if not isinstance(node, ast.For):
                 return
-            # print("  " * depth + f"Handling loop at depth {depth}")
+            print("  " * depth + f"Handling loop at depth {depth}")
             n_iter = n_outer_iterations if depth == 0 else n_inner_iterations
             for stmt in node.body:
                 # print(ast.dump(stmt, indent=4))
@@ -739,8 +780,8 @@ class Memory_Parser:
                                     new_size = max(size_before_loop + size_decrement * int(n_iter),0)
                                     new_length = max(len_before_loop + len_decrement * int(n_iter),0)
                                     self.vars[var_name] = (new_length,new_size, 'list')
-            # print("  " * (depth + 1) + f"Statement: {ast.dump(stmt)}")
-            # print(self.vars)
+            print("  " * (depth + 1) + f"Statement: {ast.dump(stmt)}")
+            print(self.vars)
         def get_iterable_cost_expr_only(for_node, vars_dict):
             iter_expr = for_node.iter
             cost_exprs = []
@@ -788,5 +829,4 @@ class Memory_Parser:
         for key in list(self.vars.keys()):
             if key not in original_vars:
                 del self.vars[key]
-        
-        
+        # print(self.vars)

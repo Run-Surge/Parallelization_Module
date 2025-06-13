@@ -68,10 +68,11 @@
     {
         "key": [
             "x:2",
-            "y:3"
+            "y:3",
+            "z:7"
         ],
         "statements": [
-            "b = hello3(x, y)"
+            "b = hello3(x, y, z)"
         ]
     },
     {
