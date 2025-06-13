@@ -4,16 +4,7 @@
             "args:none"
         ],
         "statements": [
-            "def add1(data):"
-        ]
-    },
-    {
-        "key": [
-            "data:0"
-        ],
-        "statements": [
-            "header = data[0][0]",
-            "rows = data[1:]"
+            "def add1(lines):"
         ]
     },
     {
@@ -21,33 +12,58 @@
             "none:none"
         ],
         "statements": [
-            "new_data = []"
+            "lines += [4, 5]",
+            "a = 5"
         ]
     },
     {
         "key": [
-            "data:0",
-            "new_data:2"
+            "lines:0"
         ],
         "statements": [
-            "for row in data:\n    new_row = []\n    for value in row:\n        new_value = int(value) + 1\n        new_row.append(new_value)\n    new_data.append(new_row)"
+            "lines.extend([[4, 5, 6]])"
         ]
     },
     {
         "key": [
-            "header:1",
-            "new_data:3"
+            "lines:2"
         ],
         "statements": [
-            "new_data.insert(0, header)"
+            "lines.extend(lines)"
         ]
     },
     {
         "key": [
-            "new_data:4"
+            "a:1",
+            "lines:3"
         ],
         "statements": [
-            "return new_data"
+            "lines.extend([a, 4])"
+        ]
+    },
+    {
+        "key": [
+            "a:1",
+            "lines:4"
+        ],
+        "statements": [
+            "lines.append(a)"
+        ]
+    },
+    {
+        "key": [
+            "lines:5"
+        ],
+        "statements": [
+            "lines.append(9)"
+        ]
+    },
+    {
+        "key": [
+            "lines:6"
+        ],
+        "statements": [
+            "return lines[0]"
         ]
     }
 ]

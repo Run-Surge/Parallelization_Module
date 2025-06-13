@@ -1,41 +1,48 @@
 {
-    "data = add1(data)#0:add1(data)": {
-        "def add1(data):": 1660,
-        "header = data[0]": 1712,
-        "rows = data[1:]": 2288,
-        "new_data = []": 2344,
-        "for row in data:\n    new_row = []\n    for value in row:\n        new_value = int(value) + 1\n        new_row.append(new_value)\n    new_data.append(new_row)": 1126896,
-        "new_data.insert(0, header)": 1127124,
-        "return new_data": 1127124
+    "data = add1(data)#0:add1(lines)": {
+        "def add1(lines):": 1660,
+        "lines += [4, 5]": 1892,
+        "lines.extend([[4, 5, 6]])": 2152,
+        "lines.extend(lines)": 3348,
+        "a = 5": 3376,
+        "lines.extend([a, 4])": 3630,
+        "lines.append(a)": 3834,
+        "lines.append(9)": 3950,
+        "return lines[0]": 3950
     },
-    "z = add1(data)#1:add1(data)": {
-        "def add1(data):": 1125920,
-        "header = data[0]": 1219656,
-        "rows = data[1:]": 2250808,
-        "new_data = []": 2250864,
-        "for row in data:\n    new_row = []\n    for value in row:\n        new_value = int(value) + 1\n        new_row.append(new_value)\n    new_data.append(new_row)": 3477648,
-        "new_data.insert(0, header)": 3571560,
-        "return new_data": 3571560
+    "z = add1(data)#1:add1(lines)": {
+        "def add1(lines):": 1172,
+        "lines += [4, 5]": 1404,
+        "lines.extend([[4, 5, 6]])": 1664,
+        "lines.extend(lines)": 2276,
+        "a = 5": 2304,
+        "lines.extend([a, 4])": 2558,
+        "lines.append(a)": 2762,
+        "lines.append(9)": 2878,
+        "return lines[0]": 2878
     },
     "x = hello2()#2:hello2()": {
         "def hello2():": 1084,
         "v = 4 + 3": 1112,
         "return v": 1112
     },
+    "y = z.copy()#3:copy()": {
+        "return z.copy()": 147
+    },
     "z = hello(z)#4:hello(z)": {
-        "def hello(z):": 1321808,
-        "z = z + 1": 1321964,
-        "return z": 1321964
+        "def hello(z):": 1203,
+        "z = z + 1": 1263,
+        "return z": 1263
     },
     "a = hello(z)#5:hello(z)": {
-        "def hello(z):": 1321964,
-        "z = z + 1": 1322120,
-        "return z": 1322120
+        "def hello(z):": 1263,
+        "z = z + 1": 1323,
+        "return z": 1323
     },
     "k = hello(a)#6:hello(z)": {
-        "def hello(z):": 1322120,
-        "z = z + 1": 1322276,
-        "return z": 1322276
+        "def hello(z):": 1323,
+        "z = z + 1": 1383,
+        "return z": 1383
     },
     "a = hello(x)#7:hello(z)": {
         "def hello(z):": 1084,
@@ -48,10 +55,10 @@
         "return z": 1204
     },
     "b = hello3(x, y)#9:hello3(x, y)": {
-        "def hello3(x, y):": 1320864,
-        "x = x + 1": 1320924,
-        "x = x + y": 2641708,
-        "return x": 2641708
+        "def hello3(x, y):": 259,
+        "x = x + 1": 319,
+        "x = x + y": 498,
+        "return x": 498
     },
     "c = hello(z)#10:hello(z)": {
         "def hello(z):": 1204,
@@ -64,8 +71,8 @@
         "return z": 1144
     },
     "output = calc(x, y, z, a, b, c, d)#12:calc(x, y, z, a, b, c, d)": {
-        "def calc(x, y, z, a, b, c, d):": 2642240,
-        "x = [['Output', x, y, z, a, b, c, d]]": 5284659,
-        "return x": 5284659
+        "def calc(x, y, z, a, b, c, d):": 1030,
+        "x = [['Output', x, y, z, a, b, c, d]]": 2239,
+        "return x": 2239
     }
 }

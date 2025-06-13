@@ -119,15 +119,9 @@
         "Node": 13,
         "Depends on": [
             {
-                "Node": 8,
+                "Node": 10,
                 "Dependency": [
-                    "a"
-                ]
-            },
-            {
-                "Node": 12,
-                "Dependency": [
-                    "d"
+                    "b"
                 ]
             },
             {
@@ -137,27 +131,33 @@
                 ]
             },
             {
-                "Node": 11,
-                "Dependency": [
-                    "c"
-                ]
-            },
-            {
                 "Node": 9,
                 "Dependency": [
                     "z"
                 ]
             },
             {
-                "Node": 10,
+                "Node": 11,
                 "Dependency": [
-                    "b"
+                    "c"
+                ]
+            },
+            {
+                "Node": 12,
+                "Dependency": [
+                    "d"
                 ]
             },
             {
                 "Node": 4,
                 "Dependency": [
                     "y"
+                ]
+            },
+            {
+                "Node": 8,
+                "Dependency": [
+                    "a"
                 ]
             }
         ]

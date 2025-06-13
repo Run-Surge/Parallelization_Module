@@ -31,14 +31,14 @@
             "size": 56
         },
         "data": {
-            "length": 12,
-            "size": 1124836
+            "length": 1,
+            "size": 88
         }
     },
     "x = hello2()": {
         "z": {
-            "length": 13,
-            "size": 1320752
+            "length": 1,
+            "size": 147
         },
         "y": {
             "length": 10,
@@ -49,14 +49,14 @@
             "size": 56
         },
         "data": {
-            "length": 12,
-            "size": 1124836
+            "length": 1,
+            "size": 88
         }
     },
     "y = z.copy()": {
         "z": {
-            "length": 13,
-            "size": 1320752
+            "length": 1,
+            "size": 147
         },
         "y": {
             "length": 10,
@@ -67,8 +67,8 @@
             "size": 56
         },
         "data": {
-            "length": 12,
-            "size": 1124836
+            "length": 1,
+            "size": 88
         },
         "x": {
             "length": 1,
@@ -77,20 +77,20 @@
     },
     "z = hello(z)": {
         "z": {
-            "length": 13,
-            "size": 1320752
+            "length": 1,
+            "size": 147
         },
         "y": {
-            "length": 13,
-            "size": 1320752
+            "length": 1,
+            "size": 147
         },
         "l": {
             "length": 0,
             "size": 56
         },
         "data": {
-            "length": 12,
-            "size": 1124836
+            "length": 1,
+            "size": 88
         },
         "x": {
             "length": 1,
@@ -99,20 +99,20 @@
     },
     "a = hello(z)": {
         "z": {
-            "length": 13,
-            "size": 1320908
+            "length": 1,
+            "size": 207
         },
         "y": {
-            "length": 13,
-            "size": 1320752
+            "length": 1,
+            "size": 147
         },
         "l": {
             "length": 0,
             "size": 56
         },
         "data": {
-            "length": 12,
-            "size": 1124836
+            "length": 1,
+            "size": 88
         },
         "x": {
             "length": 1,
@@ -121,76 +121,76 @@
     },
     "k = hello(a)": {
         "z": {
-            "length": 13,
-            "size": 1320908
+            "length": 1,
+            "size": 207
         },
         "y": {
-            "length": 13,
-            "size": 1320752
+            "length": 1,
+            "size": 147
         },
         "l": {
             "length": 0,
             "size": 56
         },
         "data": {
-            "length": 12,
-            "size": 1124836
+            "length": 1,
+            "size": 88
         },
         "x": {
             "length": 1,
             "size": 28
         },
         "a": {
-            "length": 13,
-            "size": 1321064
+            "length": 1,
+            "size": 267
         }
     },
     "a = hello(x)": {
         "z": {
-            "length": 13,
-            "size": 1320908
+            "length": 1,
+            "size": 207
         },
         "y": {
-            "length": 13,
-            "size": 1320752
+            "length": 1,
+            "size": 147
         },
         "l": {
             "length": 0,
             "size": 56
         },
         "data": {
-            "length": 12,
-            "size": 1124836
+            "length": 1,
+            "size": 88
         },
         "x": {
             "length": 1,
             "size": 28
         },
         "a": {
-            "length": 13,
-            "size": 1321064
+            "length": 1,
+            "size": 267
         },
         "k": {
-            "length": 13,
-            "size": 1321220
+            "length": 1,
+            "size": 327
         }
     },
     "z = hello(a)": {
         "z": {
-            "length": 13,
-            "size": 1320908
+            "length": 1,
+            "size": 207
         },
         "y": {
-            "length": 13,
-            "size": 1320752
+            "length": 1,
+            "size": 147
         },
         "l": {
             "length": 0,
             "size": 56
         },
         "data": {
-            "length": 12,
-            "size": 1124836
+            "length": 1,
+            "size": 88
         },
         "x": {
             "length": 1,
@@ -201,8 +201,8 @@
             "size": 88
         },
         "k": {
-            "length": 13,
-            "size": 1321220
+            "length": 1,
+            "size": 327
         }
     },
     "b = hello3(x, y)": {
@@ -211,16 +211,16 @@
             "size": 148
         },
         "y": {
-            "length": 13,
-            "size": 1320752
+            "length": 1,
+            "size": 147
         },
         "l": {
             "length": 0,
             "size": 56
         },
         "data": {
-            "length": 12,
-            "size": 1124836
+            "length": 1,
+            "size": 88
         },
         "x": {
             "length": 1,
@@ -231,8 +231,8 @@
             "size": 88
         },
         "k": {
-            "length": 13,
-            "size": 1321220
+            "length": 1,
+            "size": 327
         }
     },
     "c = hello(z)": {
@@ -241,16 +241,16 @@
             "size": 148
         },
         "y": {
-            "length": 13,
-            "size": 1320752
+            "length": 1,
+            "size": 147
         },
         "l": {
             "length": 0,
             "size": 56
         },
         "data": {
-            "length": 12,
-            "size": 1124836
+            "length": 1,
+            "size": 88
         },
         "x": {
             "length": 1,
@@ -261,12 +261,12 @@
             "size": 88
         },
         "k": {
-            "length": 13,
-            "size": 1321220
+            "length": 1,
+            "size": 327
         },
         "b": {
             "length": 1,
-            "size": 1320872
+            "size": 267
         }
     },
     "d = hello(x)": {
@@ -275,16 +275,16 @@
             "size": 148
         },
         "y": {
-            "length": 13,
-            "size": 1320752
+            "length": 1,
+            "size": 147
         },
         "l": {
             "length": 0,
             "size": 56
         },
         "data": {
-            "length": 12,
-            "size": 1124836
+            "length": 1,
+            "size": 88
         },
         "x": {
             "length": 1,
@@ -295,12 +295,12 @@
             "size": 88
         },
         "k": {
-            "length": 13,
-            "size": 1321220
+            "length": 1,
+            "size": 327
         },
         "b": {
             "length": 1,
-            "size": 1320872
+            "size": 267
         },
         "c": {
             "length": 1,
@@ -313,16 +313,16 @@
             "size": 148
         },
         "y": {
-            "length": 13,
-            "size": 1320752
+            "length": 1,
+            "size": 147
         },
         "l": {
             "length": 0,
             "size": 56
         },
         "data": {
-            "length": 12,
-            "size": 1124836
+            "length": 1,
+            "size": 88
         },
         "x": {
             "length": 1,
@@ -333,12 +333,12 @@
             "size": 88
         },
         "k": {
-            "length": 13,
-            "size": 1321220
+            "length": 1,
+            "size": 327
         },
         "b": {
             "length": 1,
-            "size": 1320872
+            "size": 267
         },
         "c": {
             "length": 1,

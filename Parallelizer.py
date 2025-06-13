@@ -268,9 +268,14 @@ def get_memory_foortprint(file_path, entry_point, functions):
                 #! assumptions: only 1 return value, return value is of type list
                 main_lines_footprint[ast.unparse(node)] = global_parser.vars.copy()
                 if isinstance(value, ast.Call):
+                    #! handle .copy() method
                     if isinstance(value.func, ast.Attribute):
                         length,memory_footprint = global_parser._list_method_handler(value)
                         global_parser.vars[targets[0]] = (length, memory_footprint, 'list')
+                        line_code = ast.unparse(node)
+                        key = f"{line_code}#{i}:copy()"
+                        value = {f"return {value.func.value.id}.copy()":memory_footprint}
+                        func_lines_footprint[key] = value
                     else:
                         func_name, args = get_func_attributes(node, functions)
                         return_footprint_size,return_footprint_length = get_func_footprint(func_name, args, functions,func_lines_footprint,global_parser,ast.unparse(node),i)

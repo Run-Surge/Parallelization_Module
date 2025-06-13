@@ -1,39 +1,22 @@
 {
-    "1": {
-        "Node": 1,
-        "Depends on": [
-            {
-                "Node": 0,
-                "Dependency": [
-                    "data"
-                ]
-            }
-        ]
-    },
     "2": {
         "Node": 2,
         "Depends on": [
             {
                 "Node": 0,
                 "Dependency": [
-                    "data"
+                    "lines"
                 ]
             }
         ]
     },
-    "4": {
-        "Node": 4,
+    "3": {
+        "Node": 3,
         "Depends on": [
             {
-                "Node": 0,
+                "Node": 2,
                 "Dependency": [
-                    "data"
-                ]
-            },
-            {
-                "Node": 3,
-                "Dependency": [
-                    "new_data"
+                    "lines"
                 ]
             }
         ]
@@ -42,15 +25,15 @@
         "Node": 5,
         "Depends on": [
             {
-                "Node": 1,
+                "Node": 3,
                 "Dependency": [
-                    "header"
+                    "lines"
                 ]
             },
             {
                 "Node": 4,
                 "Dependency": [
-                    "new_data"
+                    "a"
                 ]
             }
         ]
@@ -61,7 +44,35 @@
             {
                 "Node": 5,
                 "Dependency": [
-                    "new_data"
+                    "lines"
+                ]
+            },
+            {
+                "Node": 4,
+                "Dependency": [
+                    "a"
+                ]
+            }
+        ]
+    },
+    "7": {
+        "Node": 7,
+        "Depends on": [
+            {
+                "Node": 6,
+                "Dependency": [
+                    "lines"
+                ]
+            }
+        ]
+    },
+    "8": {
+        "Node": 8,
+        "Depends on": [
+            {
+                "Node": 7,
+                "Dependency": [
+                    "lines"
                 ]
             }
         ]
