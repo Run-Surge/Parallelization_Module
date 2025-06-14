@@ -4,7 +4,7 @@ import sys
 import math
 import enum
 import os
-
+from copy import deepcopy
 class Primitives_Estimator:
     def __init__(self):
         pass
@@ -163,6 +163,8 @@ class Memory_Parser:
             return left_val * right_val
         elif isinstance(node.op, ast.Div):
             return left_val / right_val
+        elif isinstance(node.op, ast.FloorDiv):
+            return left_val // right_val
         elif isinstance(node.op, ast.Pow):
             return left_val ** right_val
         elif isinstance(node.op, ast.Mod):
@@ -268,7 +270,7 @@ class Memory_Parser:
                 size = 0
                 if lower is not None and upper is not None:
                     length = (upper - lower) // step
-                    size = total_size/total_length * length + sys.getsizeof([])
+                    size = total_size//total_length * length + sys.getsizeof([])
                 elif lower is not None and  upper is None:
                     if isinstance(slice, ast.Slice):
                         length = (total_length - lower)// step
@@ -561,7 +563,7 @@ class Memory_Parser:
             total_size = self.vars[var_id][1]
             if lower is not None and upper is not None:
                 length = (upper - lower) // step
-                size = total_size / total_length * length
+                size = total_size // total_length * length
                 self.vars[var_id] = (total_length - length, total_size - size, 'list')
             elif lower is not None and upper is None:
                 if isinstance(slice, ast.Slice):
@@ -687,7 +689,11 @@ class Memory_Parser:
         def get_number_outer_iterations(node):
             loop_expr = None
             iter_node = node.iter
+            #! no subscript within the loop
+            if isinstance(iter_node, ast.Subscript):
+                iter_node = ast.Name(id=iter_node.value.id, ctx=ast.Load())
             # Case 1: for i in x:
+                
             if isinstance(iter_node, ast.Name):
                 loop_expr = f"len({iter_node.id})"
             # Case 2: for i in range(...):
@@ -759,14 +765,15 @@ class Memory_Parser:
                     for key in list(self.vars.keys()):
                         if key not in original_vars:
                             del self.vars[key]
-                    
+                elif isinstance(stmt, ast.If):
+                    self._handle_if_footprint(stmt)
                 else:
                     if isinstance(stmt, ast.Assign):
                         self._assignmemt_handler(stmt)
                     elif  isinstance(stmt, ast.AugAssign):
                         size_before_loop = self.vars[stmt.target.id][1]
                         len_before_loop = self.vars[stmt.target.id][0]
-                        self._insertion_handler(stmt)
+                        self._insertion_handler(deepcopy(stmt))
                         size_after_loop = self.vars[stmt.target.id][1]
                         len_after_loop = self.vars[stmt.target.id][0]
                         size_increment = size_after_loop - size_before_loop
@@ -779,7 +786,7 @@ class Memory_Parser:
                         if func in ['insert', 'append', 'extend']:
                             size_before_loop = self.vars[stmt.value.func.value.id][1]
                             len_before_loop = self.vars[stmt.value.func.value.id][0]
-                            self._insertion_handler(stmt)
+                            self._insertion_handler(deepcopy(stmt))
                             size_after_loop = self.vars[stmt.value.func.value.id][1]
                             len_after_loop = self.vars[stmt.value.func.value.id][0]
                             size_increment = size_after_loop - size_before_loop
@@ -790,7 +797,7 @@ class Memory_Parser:
                         elif func in ['pop', 'remove','clear']:
                             size_before_loop = self.vars[stmt.value.func.value.id][1]
                             len_before_loop = self.vars[stmt.value.func.value.id][0]
-                            self._deletion_handler(stmt)
+                            self._deletion_handler(deepcopy(stmt))
                             size_after_loop = self.vars[stmt.value.func.value.id][1]
                             len_after_loop = self.vars[stmt.value.func.value.id][0]
                             size_decrement = size_after_loop - size_before_loop
@@ -804,7 +811,7 @@ class Memory_Parser:
                                     var_name = target.value.id        
                                     size_before_loop = self.vars[var_name][1]
                                     len_before_loop = self.vars[var_name][0]
-                                    self._deletion_handler(stmt)
+                                    self._deletion_handler(deepcopy(stmt))
                                     size_after_loop = self.vars[var_name][1]
                                     len_after_loop = self.vars[var_name][0]
                                     size_decrement = size_after_loop - size_before_loop
@@ -817,10 +824,12 @@ class Memory_Parser:
             print(self.vars)
         def get_iterable_cost_expr_only(for_node, vars_dict):
             iter_expr = for_node.iter
+            if isinstance(iter_expr, ast.Subscript):
+                iter_expr = ast.Name(id=iter_expr.value.id, ctx=ast.Load())
             cost_exprs = []
 
             def var_expr(name):
-                return f"self.vars['{name}'][1]/self.vars['{name}'][0]"
+                return self.vars[name][1]//self.vars[name][0]
 
             if isinstance(iter_expr, ast.Call):
                 func_name = getattr(iter_expr.func, 'id', None)
@@ -829,7 +838,7 @@ class Memory_Parser:
                     arg = iter_expr.args[0]
                     if isinstance(arg, ast.Name):
                         name = arg.id
-                        cost_exprs.append("sys.getsizeof(100000)")
+                        cost_exprs.append(sys.getsizeof(100000))
                         cost_exprs.append(var_expr(name))
 
                 elif func_name == 'zip':
@@ -838,7 +847,7 @@ class Memory_Parser:
                             cost_exprs.append(var_expr(arg.id))
 
                 elif func_name == 'range':
-                    cost_exprs.append("sys.getsizeof(100000)")
+                    cost_exprs.append(sys.getsizeof(100000))
 
             elif isinstance(iter_expr, ast.Name):
                 cost_exprs.append(var_expr(iter_expr.id))
@@ -862,4 +871,61 @@ class Memory_Parser:
         for key in list(self.vars.keys()):
             if key not in original_vars:
                 del self.vars[key]
-        # print(self.vars)
+        print(self.vars)
+    def _handle_if_footprint(self, node):
+        def extract_all_if_blocks(root_if_node):
+            blocks = []
+            current = root_if_node
+            while isinstance(current, ast.If):
+                blocks.append(ast.Module(body=deepcopy(current.body), type_ignores=[]))
+                if len(current.orelse) == 1 and isinstance(current.orelse[0], ast.If):
+                    current = current.orelse[0]  # move to next `elif`
+                else:
+                    if current.orelse:
+                        blocks.append(ast.Module(body=deepcopy(current.orelse), type_ignores=[]))  # final `else` block
+                    break
+            return blocks
+        def handle_if_blocks(blocks):
+            vars_footprints_dicts= []
+            for block in blocks:
+                original_vars = self.vars.copy()
+                for stmt in block.body:
+                    if isinstance(stmt, ast.Assign):
+                        self._assignmemt_handler(stmt)
+                    elif isinstance(stmt, ast.AugAssign):
+                        self._insertion_handler(stmt)
+                    elif isinstance(stmt, ast.Expr):
+                        if isinstance(stmt.value, ast.Call) and isinstance(stmt.value.func, ast.Attribute):
+                            func = stmt.value.func.attr
+                            if func in ['insert', 'append', 'extend']:
+                                self._insertion_handler(stmt)
+                            elif func in ['pop', 'remove', 'clear']:
+                                self._deletion_handler(stmt)
+                    elif isinstance(stmt, ast.Delete):
+                        for target in stmt.targets:
+                            if isinstance(target, ast.Subscript) and isinstance(target.value, ast.Name):
+                                self._deletion_handler(stmt)
+                    elif isinstance(stmt, ast.If):
+                        self._handle_if_footprint(stmt)
+                    elif isinstance(stmt, ast.For):
+                        self._handle_loop_footprint(stmt)
+                vars_footprints_dicts.append(self.vars.copy())
+                self.vars = original_vars.copy()  #! Reset to original vars after each block
+            footprints = []
+            # print(vars_footprints_dicts)
+            for item in vars_footprints_dicts:
+                total_size = sum(value[1]  for value in item.values())  #! sum the values of the dicts
+                footprints.append(total_size)
+            # print(footprints)
+            max_index = footprints.index(max(footprints))  #! get the index of the max footprint
+            # print(max_index)
+            self.vars = vars_footprints_dicts[max_index]  #! set the vars to the max footprint dict
+            for key in list(self.vars.keys()):
+                if key not in original_vars:
+                    del self.vars[key]
+                
+        # original_vars = self.vars.copy()
+        blocks = extract_all_if_blocks(node)
+        # for block in blocks:
+        #     print(ast.dump(block, indent=4))
+        handle_if_blocks(blocks)
