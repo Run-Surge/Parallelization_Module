@@ -811,8 +811,22 @@ class Memory_Parser:
                     self._handle_if_footprint(stmt)
                 else:
                     if isinstance(stmt, ast.Assign):
+                        if isinstance(stmt.targets[0], ast.Subscript):
+                           return #! most probably changing a value not inserting anything 
                         stmt = self.conv_len_assignment(deepcopy(stmt))
-                        self._assignmemt_handler(stmt)
+                        if stmt.targets[0].id in self.vars: 
+                            if self.vars[stmt.targets[0].id][2] == 'list':
+                                size_before_loop = self.vars[stmt.targets[0].id][1]
+                                len_before_loop = self.vars[stmt.targets[0].id][0]
+                                self._assignmemt_handler(stmt)
+                                len_after_loop = self.vars[stmt.targets[0].id][0]
+                                size_increment = size_after_loop - size_before_loop
+                                len_increment = len_after_loop - len_before_loop
+                                new_size = size_before_loop + size_increment * int(n_iter)
+                                new_length = len_before_loop + len_increment * int(n_iter)
+                                self.vars[stmt.targets[0].id] = (new_length,new_size, 'list')
+                        else:
+                            self._assignmemt_handler(stmt)
                     elif  isinstance(stmt, ast.AugAssign):
                         size_before_loop = self.vars[stmt.target.id][1]
                         len_before_loop = self.vars[stmt.target.id][0]
