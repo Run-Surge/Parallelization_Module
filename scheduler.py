@@ -30,7 +30,7 @@ def calculate_peak_memory_for_statements(statements, live_vars_data, func_footpr
     return peak_memory_for_block
 
 # ==============================================================================
-# 1.5. CONTEXT-AWARE MEMORY CALCULATION
+# 1.1. CONTEXT-AWARE MEMORY CALCULATION
 # ==============================================================================
 def calculate_peak_memory_for_merged_block(
     block_statements,
@@ -193,7 +193,7 @@ def process_and_merge_blocks(blocks_data, nodes_data, func_footprints_data, live
     return blocks, block_scheduling_info
 
 # ==============================================================================
-# 3. FINAL CONSOLIDATION AND SCHEDULING INFO
+# 3. CONSOLIDATION AND SCHEDULING INFO
 # ==============================================================================
 def consolidate_to_block_format(
     final_blocks,
@@ -330,7 +330,7 @@ def consolidate_to_block_format(
     return final_consolidated_blocks, consolidated_schedule_info
 
 # ==============================================================================
-# LEVEL 3 PLANNER (REVISED WITH DEFERRAL LOGIC)
+# 4. PARALLELIZATION WITH DEFERRAL LOGIC
 # ==============================================================================
 def get_iterable_name(node):
     """Safely gets the variable name from a for-loop's iterable node."""
@@ -524,7 +524,7 @@ def plan_data_parallelization(
     return parallelization_plan
 
 # ==============================================================================
-# 6. FINAL EXECUTION PLAN GENERATION
+# 5. FINAL EXECUTION PLAN GENERATION
 # ==============================================================================
 def generate_execution_plan(
     consolidated_schedule_info,
@@ -672,7 +672,7 @@ def generate_execution_plan(
     
 
 # ==============================================================================
-# 5. MAIN EXECUTION BLOCK
+# 6. MAIN EXECUTION BLOCK
 # ==============================================================================
 def main():
     """Main function to parse arguments and run the scheduling workflow."""
