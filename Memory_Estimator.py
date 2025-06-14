@@ -126,6 +126,37 @@ class InsertToAppend(ast.NodeTransformer):
             # Keep only the second argument (the value to insert)
             node.args = [node.args[1]]
         return node
+def conv_len_assignment(tree):
+    #! for x = len(var) case
+    code = ast.unparse(tree)
+    pattern = r"len\((\w+)\)"
+    match = re.search(pattern, code)
+    if match:
+        var_name = match.group(1)
+        if var_name in local_parser.vars:
+            length = local_parser.vars[var_name][0] if local_parser.vars[var_name][2] == 'list' else 500
+            modified_code = re.sub(pattern, str(length), code)
+            print(f"Modified code: {modified_code}")  # Debugging: print the modified code
+            tree = ast.parse(modified_code).body[0]  
+            return tree
+        else:
+            raise ValueError(f"Variable {var_name} not found in local parser variables.")  
+    #! for x = len(var[i])
+    pattern = r"len\((\w+\[\d+\])\)" 
+    match = re.search(pattern, code)
+    if match:
+        full_index_expr = match.group(1)  # e.g., numeric_data[0]
+        var_name = full_index_expr.split('[')[0]  # Extract base variable name, e.g., numeric_data
+        if var_name in local_parser.vars:
+            length = str(local_parser.vars[var_name][0] if local_parser.vars[var_name][2] == 'list' else 500)  # Convert to string
+            # Replace only the matched part
+            modified_code = code[:match.start()] + str(length) + code[match.end():]
+            print(f"Modified code: {modified_code}")  # Debugging: print the modified code
+            tree = ast.parse(modified_code).body[0]
+            return tree
+        else:
+            raise ValueError(f"Variable {var_name} not found in local parser variables.")
+    return tree  # Return the original tree if no match is found
 class Memory_Parser:
     transformer = VariableToConstantTransformer()
     transformer2 = ConstantListToNamesTransformer()
@@ -136,7 +167,7 @@ class Memory_Parser:
         LIST = "list" 
     def __init__(self):
         self.primitives_estimator = Primitives_Estimator()
-        self.vars = {'z' : (5, sys.getsizeof(0), 'int'),'y' :(10,1000,'list'), 'l' :(0,56,'list')}  #! varibles parsed so far (name: (value, memory, type))
+        self.vars = {}  #! varibles parsed so far (name: (value, memory, type))
         self.funcs = {'int':('int',0), 'str':('str',0), 'float':('float',0), 'bool':('bool',0), 'bytes':('bytes',0), 'bytearray':('bytearray',0), 'complex':('complex',0)
                       ,'list':('list',0)}  #! functions parsed so far (name: (type, memory))
         self.primitives=['int','str','float','bool','bytes','bytearray','complex','unk']  #! primitive types  
@@ -144,7 +175,7 @@ class Memory_Parser:
         '''
         resets the memory parser.
         '''
-        self.vars = {'z' : (5, sys.getsizeof(0), 'int'),'y' :(10,1000,'list'), 'l' :(0,56,'list')}
+        self.vars = {}
     def _hande_primitives_type_conversions(self, node):
         if isinstance(node.func, ast.Name) and node.func.id == 'int':  
                 arg_val = self._evaluate_primtive_expression(node.args[0])
@@ -778,6 +809,7 @@ class Memory_Parser:
                     self._handle_if_footprint(stmt)
                 else:
                     if isinstance(stmt, ast.Assign):
+                        stmt = conv_len_assignment(deepcopy(stmt))
                         self._assignmemt_handler(stmt)
                     elif  isinstance(stmt, ast.AugAssign):
                         size_before_loop = self.vars[stmt.target.id][1]
@@ -900,6 +932,7 @@ class Memory_Parser:
                 original_vars = self.vars.copy()
                 for stmt in block.body:
                     if isinstance(stmt, ast.Assign):
+                        stmt = conv_len_assignment(deepcopy(stmt))
                         self._assignmemt_handler(stmt)
                     elif isinstance(stmt, ast.AugAssign):
                         self._insertion_handler(stmt)
