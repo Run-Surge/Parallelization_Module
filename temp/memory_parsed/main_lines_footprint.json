@@ -1,18 +1,32 @@
 {
-    "count_values = count_above_threshold(data)": {
+    "filtered = filter_above_threshold(data)": {
         "data": {
             "length": 11,
             "size": 576
         }
     },
-    "output = [count_values]": {
+    "mean_values = mean_filtered_columns(filtered)": {
         "data": {
             "length": 11,
             "size": 576
         },
-        "count_values": {
+        "filtered": {
             "length": 11,
-            "size": 2300
+            "size": 4544
+        }
+    },
+    "output = [mean_values]": {
+        "data": {
+            "length": 11,
+            "size": 576
+        },
+        "filtered": {
+            "length": 11,
+            "size": 4544
+        },
+        "mean_values": {
+            "length": 11,
+            "size": 2256
         }
     }
 }

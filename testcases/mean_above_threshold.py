@@ -45,13 +45,13 @@ def filter_above_threshold(data):
 
 def mean_filtered_columns(filtered):
     mean_values = []
+    mean = 0
     for column in filtered:
-        x = len(column)
-        if x > 0:
+        if len(column) > 0:
             total = 0
             for x in column:
                 total += x
-            mean = total / x
+            mean = total / len(column)
         else:
             mean = 0
         mean_values.append(mean)

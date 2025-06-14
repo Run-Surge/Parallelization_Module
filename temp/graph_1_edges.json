@@ -42,21 +42,9 @@
         "Node": 7,
         "Depends on": [
             {
-                "Node": 4,
-                "Dependency": [
-                    "num_columns"
-                ]
-            },
-            {
                 "Node": 6,
                 "Dependency": [
                     "filtered"
-                ]
-            },
-            {
-                "Node": 1,
-                "Dependency": [
-                    "threshold"
                 ]
             },
             {
@@ -66,9 +54,21 @@
                 ]
             },
             {
+                "Node": 1,
+                "Dependency": [
+                    "threshold"
+                ]
+            },
+            {
                 "Node": 5,
                 "Dependency": [
                     "num_rows"
+                ]
+            },
+            {
+                "Node": 4,
+                "Dependency": [
+                    "num_columns"
                 ]
             }
         ]

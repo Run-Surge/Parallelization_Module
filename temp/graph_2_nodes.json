@@ -17,17 +17,27 @@
     },
     {
         "code line": 2,
-        "statement": "for column in filtered:\n    x = len(column)\n    if x > 0:\n        total = 0\n        for x in column:\n            total = total + x\n        mean = total / x\n    else:\n        mean = 0\n    mean_values.append(mean)",
+        "statement": "mean = 0",
         "has": [
-            "mean_values"
+            "mean"
         ],
-        "needs": [
-            "filtered",
-            "mean_values"
-        ]
+        "needs": []
     },
     {
         "code line": 3,
+        "statement": "for column in filtered:\n    if len(column) > 0:\n        total = 0\n        for x in column:\n            total = total + x\n        mean = total / len(column)\n    else:\n        mean = 0\n    mean_values.append(mean)",
+        "has": [
+            "mean",
+            "mean_values"
+        ],
+        "needs": [
+            "mean",
+            "mean_values",
+            "filtered"
+        ]
+    },
+    {
+        "code line": 4,
         "statement": "aggregation = 'a:mean_values'",
         "has": [
             "aggregation"
@@ -35,7 +45,7 @@
         "needs": []
     },
     {
-        "code line": 4,
+        "code line": 5,
         "statement": "return mean_values",
         "has": [],
         "needs": [

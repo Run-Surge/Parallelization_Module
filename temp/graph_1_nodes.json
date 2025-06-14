@@ -69,11 +69,11 @@
             "filtered"
         ],
         "needs": [
-            "num_columns",
             "filtered",
-            "threshold",
             "numeric_data",
-            "num_rows"
+            "threshold",
+            "num_rows",
+            "num_columns"
         ]
     },
     {

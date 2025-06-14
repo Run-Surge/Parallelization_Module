@@ -1,14 +1,22 @@
 {
-    "count_values = count_above_threshold(data)#0:count_above_threshold(data)": {
-        "def count_above_threshold(data):": 576,
+    "filtered = filter_above_threshold(data)#0:filter_above_threshold(data)": {
+        "def filter_above_threshold(data):": 576,
         "threshold = 50": 604,
         "numeric_data = []": 660,
         "for row in data[1:]:\n    numeric_row = []\n    for x in row:\n        numeric_row.append(x)\n    numeric_data.append(numeric_row)": 1257212,
         "num_columns = len(numeric_data[0])": 1257240,
         "num_rows = len(numeric_data)": 1257268,
-        "count_values = []": 1257324,
-        "for col_idx in range(num_columns):\n    count = 0\n    for row_idx in range(num_rows):\n        if numeric_data[row_idx] > threshold:\n            count = count + 1\n    count_values.append(count)": 1259568,
-        "aggregation": "s:count_values",
-        "return count_values": 1259568
+        "filtered = []": 1257324,
+        "for col_idx in range(num_columns):\n    col_filtered = []\n    for row_idx in range(num_rows):\n        value = numeric_data[row_idx]\n        if value > threshold:\n            col_filtered.append(value)\n    filtered.append(col_filtered)": 1261812,
+        "aggregation": "c:filtered",
+        "return filtered": 1261812
+    },
+    "mean_values = mean_filtered_columns(filtered)#1:mean_filtered_columns(filtered)": {
+        "def mean_filtered_columns(filtered):": 4544,
+        "mean_values = []": 4600,
+        "mean = 0": 4628,
+        "for column in filtered:\n    if len(column) > 0:\n        total = 0\n        for x in column:\n            total = total + x\n        mean = total / len(column)\n    else:\n        mean = 0\n    mean_values.append(mean)": 6824,
+        "aggregation": "a:mean_values",
+        "return mean_values": 6824
     }
 }

@@ -1,11 +1,11 @@
 {
-    "2": {
-        "Node": 2,
+    "3": {
+        "Node": 3,
         "Depends on": [
             {
-                "Node": 0,
+                "Node": 2,
                 "Dependency": [
-                    "filtered"
+                    "mean"
                 ]
             },
             {
@@ -13,14 +13,20 @@
                 "Dependency": [
                     "mean_values"
                 ]
+            },
+            {
+                "Node": 0,
+                "Dependency": [
+                    "filtered"
+                ]
             }
         ]
     },
-    "4": {
-        "Node": 4,
+    "5": {
+        "Node": 5,
         "Depends on": [
             {
-                "Node": 2,
+                "Node": 3,
                 "Dependency": [
                     "mean_values"
                 ]

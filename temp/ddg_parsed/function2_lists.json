@@ -12,16 +12,18 @@
             "none:none"
         ],
         "statements": [
-            "mean_values = []"
+            "mean_values = []",
+            "mean = 0"
         ]
     },
     {
         "key": [
             "filtered:0",
+            "mean:1",
             "mean_values:1"
         ],
         "statements": [
-            "for column in filtered:\n    x = len(column)\n    if x > 0:\n        total = 0\n        for x in column:\n            total = total + x\n        mean = total / x\n    else:\n        mean = 0\n    mean_values.append(mean)"
+            "for column in filtered:\n    if len(column) > 0:\n        total = 0\n        for x in column:\n            total = total + x\n        mean = total / len(column)\n    else:\n        mean = 0\n    mean_values.append(mean)"
         ]
     },
     {
