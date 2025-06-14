@@ -3,3 +3,4 @@ myenv/*
 *.json
 __pycache__
 temp_scheduler.py
+*.txt
