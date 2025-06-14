@@ -5,6 +5,7 @@ import math
 import enum
 import os
 from copy import deepcopy
+import re
 class Primitives_Estimator:
     def __init__(self):
         pass
@@ -126,37 +127,6 @@ class InsertToAppend(ast.NodeTransformer):
             # Keep only the second argument (the value to insert)
             node.args = [node.args[1]]
         return node
-def conv_len_assignment(tree):
-    #! for x = len(var) case
-    code = ast.unparse(tree)
-    pattern = r"len\((\w+)\)"
-    match = re.search(pattern, code)
-    if match:
-        var_name = match.group(1)
-        if var_name in local_parser.vars:
-            length = local_parser.vars[var_name][0] if local_parser.vars[var_name][2] == 'list' else 500
-            modified_code = re.sub(pattern, str(length), code)
-            print(f"Modified code: {modified_code}")  # Debugging: print the modified code
-            tree = ast.parse(modified_code).body[0]  
-            return tree
-        else:
-            raise ValueError(f"Variable {var_name} not found in local parser variables.")  
-    #! for x = len(var[i])
-    pattern = r"len\((\w+\[\d+\])\)" 
-    match = re.search(pattern, code)
-    if match:
-        full_index_expr = match.group(1)  # e.g., numeric_data[0]
-        var_name = full_index_expr.split('[')[0]  # Extract base variable name, e.g., numeric_data
-        if var_name in local_parser.vars:
-            length = str(local_parser.vars[var_name][0] if local_parser.vars[var_name][2] == 'list' else 500)  # Convert to string
-            # Replace only the matched part
-            modified_code = code[:match.start()] + str(length) + code[match.end():]
-            print(f"Modified code: {modified_code}")  # Debugging: print the modified code
-            tree = ast.parse(modified_code).body[0]
-            return tree
-        else:
-            raise ValueError(f"Variable {var_name} not found in local parser variables.")
-    return tree  # Return the original tree if no match is found
 class Memory_Parser:
     transformer = VariableToConstantTransformer()
     transformer2 = ConstantListToNamesTransformer()
@@ -176,6 +146,37 @@ class Memory_Parser:
         resets the memory parser.
         '''
         self.vars = {}
+    def conv_len_assignment(tree):
+        #! for x = len(var) case
+        code = ast.unparse(tree)
+        pattern = r"len\((\w+)\)"
+        match = re.search(pattern, code)
+        if match:
+            var_name = match.group(1)
+            if var_name in self.vars:
+                length = self.vars[var_name][0] if self.vars[var_name][2] == 'list' else 500
+                modified_code = re.sub(pattern, str(length), code)
+                print(f"Modified code: {modified_code}")  # Debugging: print the modified code
+                tree = ast.parse(modified_code).body[0]  
+                return tree
+            else:
+                raise ValueError(f"Variable {var_name} not found in local parser variables.")  
+        #! for x = len(var[i])
+        pattern = r"len\((\w+\[\d+\])\)" 
+        match = re.search(pattern, code)
+        if match:
+            full_index_expr = match.group(1)  # e.g., numeric_data[0]
+            var_name = full_index_expr.split('[')[0]  # Extract base variable name, e.g., numeric_data
+            if var_name in self.vars:
+                length = str(self.vars[var_name][0] if self.vars[var_name][2] == 'list' else 500)  # Convert to string
+                # Replace only the matched part
+                modified_code = code[:match.start()] + str(length) + code[match.end():]
+                print(f"Modified code: {modified_code}")  # Debugging: print the modified code
+                tree = ast.parse(modified_code).body[0]
+                return tree
+            else:
+                raise ValueError(f"Variable {var_name} not found in local parser variables.")
+        return tree  # Return the original tree if no match is found
     def _hande_primitives_type_conversions(self, node):
         if isinstance(node.func, ast.Name) and node.func.id == 'int':  
                 arg_val = self._evaluate_primtive_expression(node.args[0])
