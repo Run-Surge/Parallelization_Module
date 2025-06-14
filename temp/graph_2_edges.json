@@ -20,15 +20,15 @@
         "Node": 4,
         "Depends on": [
             {
-                "Node": 3,
-                "Dependency": [
-                    "std_values"
-                ]
-            },
-            {
                 "Node": 2,
                 "Dependency": [
                     "numeric_data"
+                ]
+            },
+            {
+                "Node": 3,
+                "Dependency": [
+                    "std_values"
                 ]
             }
         ]

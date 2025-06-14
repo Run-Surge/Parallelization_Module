@@ -1,86 +1,13 @@
 {
-    "data = add1(data)#0:add1(data)": {
-        "def add1(data):": 1660,
-        "header = data[0]": 1712,
-        "rows = data[1:]": 2288,
-        "new_data = []": 2344,
-        "for row in data:\n    new_row = []\n    for value in row:\n        new_value = int(value) + 1\n        new_row.append(new_value)\n    new_data.append(new_row)": 1126896,
-        "new_data.insert(0, header)": 1127124,
-        "aggregation": "s:new_data",
-        "return new_data": 1127124
-    },
-    "z = add1(data)#1:add1(data)": {
-        "def add1(data):": 1125920,
-        "header = data[0]": 1219656,
-        "rows = data[1:]": 2250808,
-        "new_data = []": 2250864,
-        "for row in data:\n    new_row = []\n    for value in row:\n        new_value = int(value) + 1\n        new_row.append(new_value)\n    new_data.append(new_row)": 3477648,
-        "new_data.insert(0, header)": 3571560,
-        "aggregation": "s:new_data",
-        "return new_data": 3571560
-    },
-    "x = hello2()#2:hello2()": {
-        "def hello2():": 1084,
-        "v = 4 + 3": 1112,
-        "aggregation": ":",
-        "return v": 1112
-    },
-    "y = z.copy()#3:copy()": {
-        "return z.copy()": 1320752
-    },
-    "z = hello(z)#4:hello(z)": {
-        "def hello(z):": 1321808,
-        "z = z + 1": 1321964,
-        "aggregation": ":",
-        "return z": 1321964
-    },
-    "a = hello(z)#5:hello(z)": {
-        "def hello(z):": 1321964,
-        "z = z + 1": 1322120,
-        "aggregation": ":",
-        "return z": 1322120
-    },
-    "k = hello(a)#6:hello(z)": {
-        "def hello(z):": 1322120,
-        "z = z + 1": 1322276,
-        "aggregation": ":",
-        "return z": 1322276
-    },
-    "a = hello(x)#7:hello(z)": {
-        "def hello(z):": 1084,
-        "z = z + 1": 1144,
-        "aggregation": ":",
-        "return z": 1144
-    },
-    "z = hello(a)#8:hello(z)": {
-        "def hello(z):": 1144,
-        "z = z + 1": 1204,
-        "aggregation": ":",
-        "return z": 1204
-    },
-    "b = hello3(x, y, z)#9:hello3(x, y, z)": {
-        "def hello3(x, y, z):": 1320984,
-        "x = x + 1": 1321044,
-        "x = x + (y + z + 5)": 2642220,
-        "aggregation": ":",
-        "return x": 2642220
-    },
-    "c = hello(z)#10:hello(z)": {
-        "def hello(z):": 1204,
-        "z = z + 1": 1264,
-        "aggregation": ":",
-        "return z": 1264
-    },
-    "d = hello(x)#11:hello(z)": {
-        "def hello(z):": 1084,
-        "z = z + 1": 1144,
-        "aggregation": ":",
-        "return z": 1144
-    },
-    "output = calc(x, y, z, a, b, c, d)#12:calc(x, y, z, a, b, c, d)": {
-        "def calc(x, y, z, a, b, c, d):": 2642632,
-        "x = [['Output', x, y, z, a, b, c, d]]": 5285443,
-        "aggregation": ":",
-        "return x": 5285443
+    "data = calculate_mean(data)#0:calculate_mean(data)": {
+        "def calculate_mean(data):": 1660,
+        "numeric_data = []": 1716,
+        "for row in data[1:]:\n    numeric_row = []\n    for x in row:\n        numeric_row.append(x)\n    numeric_data.append(numeric_row)": 1258268,
+        "num_columns = len(numeric_data[0])": 1258296,
+        "num_rows = len(numeric_data)": 1258324,
+        "mean_values = []": 1258380,
+        "for col_idx in range(len(numeric_data)):\n    total = 0\n    for row_idx in range(num_rows):\n        total = total + numeric_data[row_idx]\n    mean = total / num_rows\n    mean_values.append(mean)": 1260580,
+        "aggregation": "a:mean_values",
+        "return mean_values": 1260580
     }
 }

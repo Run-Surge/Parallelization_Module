@@ -9,16 +9,5 @@
                 ]
             }
         ]
-    },
-    "3": {
-        "Node": 3,
-        "Depends on": [
-            {
-                "Node": 2,
-                "Dependency": [
-                    "std_data"
-                ]
-            }
-        ]
     }
 }

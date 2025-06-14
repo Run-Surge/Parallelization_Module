@@ -25,29 +25,34 @@ def calculate_mean(data):
     for row in data[1:]:  # Skip header
         numeric_row = []
         for x in row:
-            numeric_row.append(float(x))
+            numeric_row.append(x)
         numeric_data.append(numeric_row)
 
+    num_columns = len(numeric_data[0])
+    num_rows = len(numeric_data)
     mean_values = []
-    for col in zip(*numeric_data):
-        mean_values.append(statistics.mean(col))
-
+    for col_idx in range(num_columns):
+        total = 0
+        for row_idx in range(num_rows):
+            total += numeric_data[row_idx][col_idx]
+        mean = total / num_rows
+        mean_values.append(mean)
     aggregation = "a:mean_values"
-    return mean_values      
-def calculate_std(data):
-    numeric_data = []
-    for row in data[1:]:  # Skip header
-        numeric_row = []
-        for x in row:
-            numeric_row.append(float(x))
-        numeric_data.append(numeric_row)
+    return mean_values    
+# def calculate_std(data):
+#     numeric_data = []
+#     for row in data[1:]:  # Skip header
+#         numeric_row = []
+#         for x in row:
+#             numeric_row.append(x)
+#         numeric_data.append(numeric_row)
 
-    std_values = []
-    for col in zip(*numeric_data):
-        std_values.append(statistics.stdev(col))
+#     std_values = []
+#     for col in zip(*numeric_data):
+#         std_values.append(statistics.stdev(col))
 
-    aggregation = "a:std_values"
-    return std_values
+#     aggregation = "a:std_values"
+#     return std_values
 ##########################################################################################################
 
 
@@ -67,8 +72,8 @@ if __name__ == '__main__':
 #! Note for boosting performance if list is modified inside the function (each function call is independent) then return pass a 
 #! copy of the list instead of the same list for performing different operations in parallel
     data = calculate_mean(data)
-    std_data = calculate_std(data)
-    output = std_data
+    # std_data = calculate_std(data)
+    output = data
     
     
 #---------------------------------------------------------------------------------------------------------

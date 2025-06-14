@@ -12,15 +12,7 @@
             "data:0"
         ],
         "statements": [
-            "std_data = calculate_std(data)"
-        ]
-    },
-    {
-        "key": [
-            "std_data:1"
-        ],
-        "statements": [
-            "output = std_data"
+            "output = data"
         ]
     }
 ]

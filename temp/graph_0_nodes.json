@@ -9,22 +9,12 @@
     },
     {
         "code line": 2,
-        "statement": "std_data = calculate_std(data)",
-        "has": [
-            "std_data"
-        ],
-        "needs": [
-            "data"
-        ]
-    },
-    {
-        "code line": 3,
-        "statement": "output = std_data",
+        "statement": "output = data",
         "has": [
             "output"
         ],
         "needs": [
-            "std_data"
+            "data"
         ]
     }
 ]

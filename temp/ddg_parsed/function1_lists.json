@@ -22,21 +22,31 @@
             "numeric_data:1"
         ],
         "statements": [
-            "for row in data[1:]:\n    numeric_row = []\n    for x in row:\n        numeric_row.append(float(x))\n    numeric_data.append(numeric_row)"
+            "for row in data[1:]:\n    numeric_row = []\n    for x in row:\n        numeric_row.append(x)\n    numeric_data.append(numeric_row)"
+        ]
+    },
+    {
+        "key": [
+            "numeric_data:2"
+        ],
+        "statements": [
+            "num_columns = len(numeric_data[0])",
+            "num_rows = len(numeric_data)"
         ]
     },
     {
         "key": [
             "mean_values:1",
+            "num_rows:3",
             "numeric_data:2"
         ],
         "statements": [
-            "for col in zip(*numeric_data):\n    mean_values.append(statistics.mean(col))"
+            "for col_idx in range(len(numeric_data)):\n    total = 0\n    for row_idx in range(num_rows):\n        total = total + numeric_data[row_idx][col_idx]\n    mean = total / num_rows\n    mean_values.append(mean)"
         ]
     },
     {
         "key": [
-            "mean_values:3"
+            "mean_values:4"
         ],
         "statements": [
             "return mean_values"

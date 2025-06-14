@@ -194,6 +194,33 @@ def get_memory_foortprint(file_path, entry_point, functions):
             tree = copy.deepcopy(node.body[0])  # Get the first statement in the function body
             # print(ast.dump(tree, indent=4))  # Debugging: print the AST nodes
             if isinstance(tree, ast.Assign):
+                #! for x = len(var) case
+                code = ast.unparse(tree)
+                pattern = r"len\((\w+)\)"
+                match = re.search(pattern, code)
+                if match:
+                    var_name = match.group(1)
+                    if var_name in local_parser.vars:
+                        length = local_parser.vars[var_name][0]
+                        modified_code = re.sub(pattern, str(length), code)
+                        print(f"Modified code: {modified_code}")  # Debugging: print the modified code
+                        tree = ast.parse(modified_code).body[0]  
+                    else:
+                        raise ValueError(f"Variable {var_name} not found in local parser variables.")  
+                #! for x = len(var[i])
+                pattern = r"len\((\w+\[\d+\])\)" 
+                match = re.search(pattern, code)
+                if match:
+                    full_index_expr = match.group(1)  # e.g., numeric_data[0]
+                    var_name = full_index_expr.split('[')[0]  # Extract base variable name, e.g., numeric_data
+                    if var_name in local_parser.vars:
+                        length = str(local_parser.vars[var_name][0])  # Convert to string
+                        # Replace only the matched part
+                        modified_code = code[:match.start()] + str(length) + code[match.end():]
+                        print(f"Modified code: {modified_code}")  # Debugging: print the modified code
+                        tree = ast.parse(modified_code).body[0]
+                    else:
+                        raise ValueError(f"Variable {var_name} not found in local parser variables.")
                 local_parser._assignmemt_handler(tree)
             elif  isinstance(tree, ast.AugAssign):
                 local_parser._insertion_handler(tree)
@@ -361,6 +388,8 @@ def main():
        print(f"1. Syntax check passed for {filename}.")
     
     graph = build_ddg(filename)
+    functions = None
+    entry_point = None
     if graph:
         print(f"2. DDG built successfully for {filename}.")
         # graph.visualize_graph_data()
