@@ -1,7 +1,7 @@
 [
     {
         "code line": 0,
-        "statement": "def calculate_mean(data):",
+        "statement": "def filter_above_threshold(data):",
         "has": [
             "data"
         ],
@@ -9,6 +9,14 @@
     },
     {
         "code line": 1,
+        "statement": "threshold = 50",
+        "has": [
+            "threshold"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 2,
         "statement": "numeric_data = []",
         "has": [
             "numeric_data"
@@ -16,7 +24,7 @@
         "needs": []
     },
     {
-        "code line": 2,
+        "code line": 3,
         "statement": "for row in data[1:]:\n    numeric_row = []\n    for x in row:\n        numeric_row.append(x)\n    numeric_data.append(numeric_row)",
         "has": [
             "numeric_data"
@@ -27,7 +35,7 @@
         ]
     },
     {
-        "code line": 3,
+        "code line": 4,
         "statement": "num_columns = len(numeric_data[0])",
         "has": [
             "num_columns"
@@ -37,7 +45,7 @@
         ]
     },
     {
-        "code line": 4,
+        "code line": 5,
         "statement": "num_rows = len(numeric_data)",
         "has": [
             "num_rows"
@@ -47,40 +55,41 @@
         ]
     },
     {
-        "code line": 5,
-        "statement": "mean_values = []",
+        "code line": 6,
+        "statement": "filtered = []",
         "has": [
-            "mean_values"
+            "filtered"
         ],
         "needs": []
     },
     {
-        "code line": 6,
-        "statement": "for col_idx in range(num_columns):\n    total = 0\n    for row_idx in range(num_rows):\n        total = total + numeric_data[row_idx][col_idx]\n    mean = total / num_rows\n    mean_values.append(mean)",
+        "code line": 7,
+        "statement": "for col_idx in range(num_columns):\n    col_filtered = []\n    for row_idx in range(num_rows):\n        value = numeric_data[row_idx][col_idx]\n        if value > threshold:\n            col_filtered.append(value)\n    filtered.append(col_filtered)",
         "has": [
-            "mean_values"
+            "filtered"
         ],
         "needs": [
-            "numeric_data",
-            "mean_values",
             "num_columns",
+            "filtered",
+            "threshold",
+            "numeric_data",
             "num_rows"
         ]
     },
     {
-        "code line": 7,
-        "statement": "aggregation = 'a:mean_values'",
+        "code line": 8,
+        "statement": "aggregation = 'c:filtered'",
         "has": [
             "aggregation"
         ],
         "needs": []
     },
     {
-        "code line": 8,
-        "statement": "return mean_values",
+        "code line": 9,
+        "statement": "return filtered",
         "has": [],
         "needs": [
-            "mean_values"
+            "filtered"
         ]
     }
 ]

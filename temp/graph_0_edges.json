@@ -5,7 +5,7 @@
             {
                 "Node": 1,
                 "Dependency": [
-                    "mean_values"
+                    "filtered"
                 ]
             }
         ]
@@ -16,7 +16,7 @@
             {
                 "Node": 2,
                 "Dependency": [
-                    "std_data"
+                    "mean_values"
                 ]
             }
         ]

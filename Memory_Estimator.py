@@ -136,7 +136,7 @@ class Memory_Parser:
         LIST = "list" 
     def __init__(self):
         self.primitives_estimator = Primitives_Estimator()
-        self.vars = {'z' : (5, sys.getsizeof(0), 'int'),'y' :(10,1000,'list'), 'l' :(0,56,'list')}  #! varibles parsed so far (name: (value, memory, type))
+        self.vars = {}  #! varibles parsed so far (name: (value, memory, type))
         self.funcs = {'int':('int',0), 'str':('str',0), 'float':('float',0), 'bool':('bool',0), 'bytes':('bytes',0), 'bytearray':('bytearray',0), 'complex':('complex',0)
                       ,'list':('list',0)}  #! functions parsed so far (name: (type, memory))
         self.primitives=['int','str','float','bool','bytes','bytearray','complex','unk']  #! primitive types  
@@ -144,7 +144,7 @@ class Memory_Parser:
         '''
         resets the memory parser.
         '''
-        self.vars = {'z' : (5, sys.getsizeof(0), 'int'),'y' :(10,1000,'list'), 'l' :(0,56,'list')}
+        self.vars = {}
     def _hande_primitives_type_conversions(self, node):
         if isinstance(node.func, ast.Name) and node.func.id == 'int':  
                 arg_val = self._evaluate_primtive_expression(node.args[0])

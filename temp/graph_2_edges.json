@@ -5,24 +5,13 @@
             {
                 "Node": 0,
                 "Dependency": [
-                    "data"
+                    "filtered"
                 ]
             },
             {
                 "Node": 1,
                 "Dependency": [
-                    "numeric_data"
-                ]
-            }
-        ]
-    },
-    "3": {
-        "Node": 3,
-        "Depends on": [
-            {
-                "Node": 2,
-                "Dependency": [
-                    "numeric_data"
+                    "mean_values"
                 ]
             }
         ]
@@ -33,53 +22,7 @@
             {
                 "Node": 2,
                 "Dependency": [
-                    "numeric_data"
-                ]
-            }
-        ]
-    },
-    "6": {
-        "Node": 6,
-        "Depends on": [
-            {
-                "Node": 5,
-                "Dependency": [
-                    "std_values"
-                ]
-            },
-            {
-                "Node": 0,
-                "Dependency": [
                     "mean_values"
-                ]
-            },
-            {
-                "Node": 4,
-                "Dependency": [
-                    "num_rows"
-                ]
-            },
-            {
-                "Node": 3,
-                "Dependency": [
-                    "num_columns"
-                ]
-            },
-            {
-                "Node": 2,
-                "Dependency": [
-                    "numeric_data"
-                ]
-            }
-        ]
-    },
-    "8": {
-        "Node": 8,
-        "Depends on": [
-            {
-                "Node": 6,
-                "Dependency": [
-                    "std_values"
                 ]
             }
         ]

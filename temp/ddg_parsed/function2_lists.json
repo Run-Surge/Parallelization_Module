@@ -4,7 +4,7 @@
             "args:none"
         ],
         "statements": [
-            "def calculate_std(data,mean_values):"
+            "def mean_filtered_columns(filtered):"
         ]
     },
     {
@@ -12,46 +12,24 @@
             "none:none"
         ],
         "statements": [
-            "numeric_data = []",
-            "std_values = []"
+            "mean_values = []"
         ]
     },
     {
         "key": [
-            "data:0",
-            "numeric_data:1"
+            "filtered:0",
+            "mean_values:1"
         ],
         "statements": [
-            "for row in data[1:]:\n    numeric_row = []\n    for x in row:\n        numeric_row.append(x)\n    numeric_data.append(numeric_row)"
+            "for column in filtered:\n    x = len(column)\n    if x > 0:\n        total = 0\n        for x in column:\n            total = total + x\n        mean = total / x\n    else:\n        mean = 0\n    mean_values.append(mean)"
         ]
     },
     {
         "key": [
-            "numeric_data:2"
+            "mean_values:2"
         ],
         "statements": [
-            "num_columns = len(numeric_data[0])",
-            "num_rows = len(numeric_data)"
-        ]
-    },
-    {
-        "key": [
-            "mean_values:0",
-            "num_columns:3",
-            "num_rows:3",
-            "numeric_data:2",
-            "std_values:1"
-        ],
-        "statements": [
-            "for col_idx in range(num_columns):\n    variance = 0\n    for row_idx in range(num_rows):\n        diff = numeric_data[row_idx][col_idx] - mean_values[col_idx]\n        variance = variance + diff ** 2\n    std = (variance / num_rows) ** 0.5\n    std_values.append(std)"
-        ]
-    },
-    {
-        "key": [
-            "std_values:4"
-        ],
-        "statements": [
-            "return std_values"
+            "return mean_values"
         ]
     }
 ]

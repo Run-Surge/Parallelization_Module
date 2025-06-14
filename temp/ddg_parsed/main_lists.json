@@ -4,23 +4,23 @@
             "data:none"
         ],
         "statements": [
-            "mean_values = calculate_mean(data)"
+            "filtered = filter_above_threshold(data)"
         ]
     },
     {
         "key": [
-            "mean_values:0"
+            "filtered:0"
         ],
         "statements": [
-            "std_data = calculate_std(data, mean_values)"
+            "mean_values = mean_filtered_columns(filtered)"
         ]
     },
     {
         "key": [
-            "std_data:1"
+            "mean_values:1"
         ],
         "statements": [
-            "output = std_data"
+            "output = [mean_values]"
         ]
     }
 ]

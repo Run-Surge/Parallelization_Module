@@ -4,7 +4,7 @@
             "args:none"
         ],
         "statements": [
-            "def calculate_mean(data):"
+            "def filter_above_threshold(data):"
         ]
     },
     {
@@ -12,8 +12,9 @@
             "none:none"
         ],
         "statements": [
+            "threshold = 50",
             "numeric_data = []",
-            "mean_values = []"
+            "filtered = []"
         ]
     },
     {
@@ -36,21 +37,22 @@
     },
     {
         "key": [
-            "mean_values:1",
+            "filtered:1",
             "num_columns:3",
             "num_rows:3",
-            "numeric_data:2"
+            "numeric_data:2",
+            "threshold:1"
         ],
         "statements": [
-            "for col_idx in range(num_columns):\n    total = 0\n    for row_idx in range(num_rows):\n        total = total + numeric_data[row_idx][col_idx]\n    mean = total / num_rows\n    mean_values.append(mean)"
+            "for col_idx in range(num_columns):\n    col_filtered = []\n    for row_idx in range(num_rows):\n        value = numeric_data[row_idx][col_idx]\n        if value > threshold:\n            col_filtered.append(value)\n    filtered.append(col_filtered)"
         ]
     },
     {
         "key": [
-            "mean_values:4"
+            "filtered:4"
         ],
         "statements": [
-            "return mean_values"
+            "return filtered"
         ]
     }
 ]

@@ -382,7 +382,7 @@ def main():
     #     sys.exit(1)
 
     # filename = sys.argv[1]
-    filename= 'mean_std.py'
+    filename= 'testcases/mean_above_threshold.py'
     #! Check for syntax errors
     if check_syntax_errors(filename, error_file):
        print(f"1. Syntax check passed for {filename}.")

@@ -1,6 +1,6 @@
 {
-    "2": {
-        "Node": 2,
+    "3": {
+        "Node": 3,
         "Depends on": [
             {
                 "Node": 0,
@@ -8,17 +8,6 @@
                     "data"
                 ]
             },
-            {
-                "Node": 1,
-                "Dependency": [
-                    "numeric_data"
-                ]
-            }
-        ]
-    },
-    "3": {
-        "Node": 3,
-        "Depends on": [
             {
                 "Node": 2,
                 "Dependency": [
@@ -31,18 +20,47 @@
         "Node": 4,
         "Depends on": [
             {
-                "Node": 2,
+                "Node": 3,
                 "Dependency": [
                     "numeric_data"
                 ]
             }
         ]
     },
-    "6": {
-        "Node": 6,
+    "5": {
+        "Node": 5,
         "Depends on": [
             {
-                "Node": 2,
+                "Node": 3,
+                "Dependency": [
+                    "numeric_data"
+                ]
+            }
+        ]
+    },
+    "7": {
+        "Node": 7,
+        "Depends on": [
+            {
+                "Node": 4,
+                "Dependency": [
+                    "num_columns"
+                ]
+            },
+            {
+                "Node": 6,
+                "Dependency": [
+                    "filtered"
+                ]
+            },
+            {
+                "Node": 1,
+                "Dependency": [
+                    "threshold"
+                ]
+            },
+            {
+                "Node": 3,
                 "Dependency": [
                     "numeric_data"
                 ]
@@ -50,30 +68,18 @@
             {
                 "Node": 5,
                 "Dependency": [
-                    "mean_values"
-                ]
-            },
-            {
-                "Node": 3,
-                "Dependency": [
-                    "num_columns"
-                ]
-            },
-            {
-                "Node": 4,
-                "Dependency": [
                     "num_rows"
                 ]
             }
         ]
     },
-    "8": {
-        "Node": 8,
+    "9": {
+        "Node": 9,
         "Depends on": [
             {
-                "Node": 6,
+                "Node": 7,
                 "Dependency": [
-                    "mean_values"
+                    "filtered"
                 ]
             }
         ]
