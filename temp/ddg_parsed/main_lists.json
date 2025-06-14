@@ -4,15 +4,23 @@
             "data:none"
         ],
         "statements": [
-            "data = calculate_mean(data)"
+            "mean_values = calculate_mean(data)"
         ]
     },
     {
         "key": [
-            "data:0"
+            "mean_values:0"
         ],
         "statements": [
-            "output = data"
+            "std_data = calculate_std(data, mean_values)"
+        ]
+    },
+    {
+        "key": [
+            "std_data:1"
+        ],
+        "statements": [
+            "output = std_data"
         ]
     }
 ]

@@ -39,20 +39,29 @@ def calculate_mean(data):
         mean_values.append(mean)
     aggregation = "a:mean_values"
     return mean_values    
-# def calculate_std(data):
-#     numeric_data = []
-#     for row in data[1:]:  # Skip header
-#         numeric_row = []
-#         for x in row:
-#             numeric_row.append(x)
-#         numeric_data.append(numeric_row)
+def calculate_std(data,mean_values):
+    
+    numeric_data = []
+    for row in data[1:]:  # Skip header
+        numeric_row = []
+        for x in row:
+            numeric_row.append(x)
+        numeric_data.append(numeric_row)
 
-#     std_values = []
-#     for col in zip(*numeric_data):
-#         std_values.append(statistics.stdev(col))
+    # Now, calculate std for each column
+    num_columns = len(numeric_data[0])
+    num_rows = len(numeric_data)
+    std_values = []
+    for col_idx in range(num_columns):
+        variance = 0
+        for row_idx in range(num_rows):
+            diff = numeric_data[row_idx][col_idx] - mean_values[col_idx]
+            variance += diff ** 2
+        std = (variance / num_rows) ** 0.5
+        std_values.append(std)
 
-#     aggregation = "a:std_values"
-#     return std_values
+    aggregation = "a:std_values"
+    return std_values
 ##########################################################################################################
 
 
@@ -71,9 +80,9 @@ if __name__ == '__main__':
 #! User main function is defined here
 #! Note for boosting performance if list is modified inside the function (each function call is independent) then return pass a 
 #! copy of the list instead of the same list for performing different operations in parallel
-    data = calculate_mean(data)
-    # std_data = calculate_std(data)
-    output = data
+    mean_values = calculate_mean(data)
+    std_data = calculate_std(data,mean_values)
+    output = std_data
     
     
 #---------------------------------------------------------------------------------------------------------

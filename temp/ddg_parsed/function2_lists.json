@@ -4,7 +4,7 @@
             "args:none"
         ],
         "statements": [
-            "def calculate_std(data):"
+            "def calculate_std(data,mean_values):"
         ]
     },
     {
@@ -27,16 +27,28 @@
     },
     {
         "key": [
-            "numeric_data:2",
-            "std_values:1"
+            "numeric_data:2"
         ],
         "statements": [
-            "for col in zip(*numeric_data):\n    std_values.append(statistics.stdev(col))"
+            "num_columns = len(numeric_data[0])",
+            "num_rows = len(numeric_data)"
         ]
     },
     {
         "key": [
-            "std_values:3"
+            "mean_values:0",
+            "num_columns:3",
+            "num_rows:3",
+            "numeric_data:2",
+            "std_values:1"
+        ],
+        "statements": [
+            "for col_idx in range(num_columns):\n    variance = 0\n    for row_idx in range(num_rows):\n        diff = numeric_data[row_idx][col_idx] - mean_values[col_idx]\n        variance = variance + diff ** 2\n    std = (variance / num_rows) ** 0.5\n    std_values.append(std)"
+        ]
+    },
+    {
+        "key": [
+            "std_values:4"
         ],
         "statements": [
             "return std_values"

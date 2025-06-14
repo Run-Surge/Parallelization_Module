@@ -490,6 +490,8 @@ class Memory_Parser:
                             if isinstance(arg, ast.Name):
                                 # Capture variable name as a string
                                args.append([f"${arg.id}"])
+                            elif isinstance(arg, ast.Call):
+                                args.append(111111111111111)
                             else:
                                 node = self.transformer.visit(node)
                                 try:
@@ -705,6 +707,11 @@ class Memory_Parser:
                             loop_expr = str(iter_node.args[0].value)
                         else:
                             loop_expr = ast.unparse(iter_node.args[0])
+                            if not loop_expr.startswith("len("):
+                                if loop_expr in self.vars:
+                                    loop_expr = self.vars[loop_expr][0]
+                                else:
+                                    raise ValueError(f"Variable '{loop_expr}' is not defined syntax error.") 
                     elif len(iter_node.args) in [2, 3]:
                         start = ast.unparse(iter_node.args[0])
                         stop = ast.unparse(iter_node.args[1])
@@ -724,6 +731,8 @@ class Memory_Parser:
                         zipped_lens.append(f"len({ast.unparse(arg)})")
                     loop_expr = f"min({', '.join(zipped_lens)})"
             # Try resolving len(x) from known vars
+            if isinstance(loop_expr, int):
+                return loop_expr 
             if loop_expr:
                 if loop_expr.startswith("len(") and loop_expr.endswith(")"):
                     var = loop_expr[4:-1].strip()

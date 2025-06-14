@@ -1,9 +1,10 @@
 [
     {
         "code line": 0,
-        "statement": "def calculate_std(data):",
+        "statement": "def calculate_std(data,mean_values):",
         "has": [
-            "data"
+            "data",
+            "mean_values"
         ],
         "needs": []
     },
@@ -28,6 +29,26 @@
     },
     {
         "code line": 3,
+        "statement": "num_columns = len(numeric_data[0])",
+        "has": [
+            "num_columns"
+        ],
+        "needs": [
+            "numeric_data"
+        ]
+    },
+    {
+        "code line": 4,
+        "statement": "num_rows = len(numeric_data)",
+        "has": [
+            "num_rows"
+        ],
+        "needs": [
+            "numeric_data"
+        ]
+    },
+    {
+        "code line": 5,
         "statement": "std_values = []",
         "has": [
             "std_values"
@@ -35,18 +56,21 @@
         "needs": []
     },
     {
-        "code line": 4,
-        "statement": "for col in zip(*numeric_data):\n    std_values.append(statistics.stdev(col))",
+        "code line": 6,
+        "statement": "for col_idx in range(num_columns):\n    variance = 0\n    for row_idx in range(num_rows):\n        diff = numeric_data[row_idx][col_idx] - mean_values[col_idx]\n        variance = variance + diff ** 2\n    std = (variance / num_rows) ** 0.5\n    std_values.append(std)",
         "has": [
             "std_values"
         ],
         "needs": [
-            "numeric_data",
-            "std_values"
+            "std_values",
+            "mean_values",
+            "num_rows",
+            "num_columns",
+            "numeric_data"
         ]
     },
     {
-        "code line": 5,
+        "code line": 7,
         "statement": "aggregation = 'a:std_values'",
         "has": [
             "aggregation"
@@ -54,7 +78,7 @@
         "needs": []
     },
     {
-        "code line": 6,
+        "code line": 8,
         "statement": "return std_values",
         "has": [],
         "needs": [

@@ -22,8 +22,8 @@
             "numeric_data"
         ],
         "needs": [
-            "numeric_data",
-            "data"
+            "data",
+            "numeric_data"
         ]
     },
     {
@@ -56,13 +56,14 @@
     },
     {
         "code line": 6,
-        "statement": "for col_idx in range(len(numeric_data)):\n    total = 0\n    for row_idx in range(num_rows):\n        total = total + numeric_data[row_idx][col_idx]\n    mean = total / num_rows\n    mean_values.append(mean)",
+        "statement": "for col_idx in range(num_columns):\n    total = 0\n    for row_idx in range(num_rows):\n        total = total + numeric_data[row_idx][col_idx]\n    mean = total / num_rows\n    mean_values.append(mean)",
         "has": [
             "mean_values"
         ],
         "needs": [
             "numeric_data",
             "mean_values",
+            "num_columns",
             "num_rows"
         ]
     },

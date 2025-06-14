@@ -1,5 +1,5 @@
 {
-    "data = calculate_mean(data)": {
+    "mean_values = calculate_mean(data)": {
         "z": {
             "length": 5,
             "size": 28
@@ -17,7 +17,7 @@
             "size": 576
         }
     },
-    "output = data": {
+    "std_data = calculate_std(data, mean_values)": {
         "z": {
             "length": 5,
             "size": 28
@@ -31,6 +31,36 @@
             "size": 56
         },
         "data": {
+            "length": 11,
+            "size": 576
+        },
+        "mean_values": {
+            "length": 11,
+            "size": 2256
+        }
+    },
+    "output = std_data": {
+        "z": {
+            "length": 5,
+            "size": 28
+        },
+        "y": {
+            "length": 10,
+            "size": 1000
+        },
+        "l": {
+            "length": 0,
+            "size": 56
+        },
+        "data": {
+            "length": 11,
+            "size": 576
+        },
+        "mean_values": {
+            "length": 11,
+            "size": 2256
+        },
+        "std_data": {
             "length": 11,
             "size": 2256
         }

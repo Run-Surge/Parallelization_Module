@@ -1,20 +1,30 @@
 [
     {
         "code line": 1,
-        "statement": "data = calculate_mean(data)",
+        "statement": "mean_values = calculate_mean(data)",
         "has": [
-            "data"
+            "mean_values"
         ],
         "needs": []
     },
     {
         "code line": 2,
-        "statement": "output = data",
+        "statement": "std_data = calculate_std(data, mean_values)",
+        "has": [
+            "std_data"
+        ],
+        "needs": [
+            "mean_values"
+        ]
+    },
+    {
+        "code line": 3,
+        "statement": "output = std_data",
         "has": [
             "output"
         ],
         "needs": [
-            "data"
+            "std_data"
         ]
     }
 ]
