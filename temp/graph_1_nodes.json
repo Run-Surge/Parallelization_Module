@@ -17,7 +17,7 @@
     },
     {
         "code line": 2,
-        "statement": "for row in data[1:]:\n    numeric_row = []\n    for x in row:\n        numeric_row.append(x)\n    numeric_data.append(numeric_row)",
+        "statement": "for row in data[1:]:\n    numeric_row = []\n    for x in row:\n        numeric_row.append(float(x))\n    numeric_data.append(numeric_row)",
         "has": [
             "numeric_data"
         ],

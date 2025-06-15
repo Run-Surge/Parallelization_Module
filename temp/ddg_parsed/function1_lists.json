@@ -21,7 +21,7 @@
             "numeric_data:1"
         ],
         "statements": [
-            "for row in data[1:]:\n    numeric_row = []\n    for x in row:\n        numeric_row.append(x)\n    numeric_data.append(numeric_row)"
+            "for row in data[1:]:\n    numeric_row = []\n    for x in row:\n        numeric_row.append(float(x))\n    numeric_data.append(numeric_row)"
         ]
     },
     {

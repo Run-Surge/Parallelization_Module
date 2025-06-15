@@ -26,5 +26,28 @@
                 ]
             }
         ]
+    },
+    "4": {
+        "Node": 4,
+        "Depends on": [
+            {
+                "Node": 3,
+                "Dependency": [
+                    "stds"
+                ]
+            },
+            {
+                "Node": 2,
+                "Dependency": [
+                    "means"
+                ]
+            },
+            {
+                "Node": 1,
+                "Dependency": [
+                    "numeric_data"
+                ]
+            }
+        ]
     }
 }

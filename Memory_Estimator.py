@@ -197,7 +197,7 @@ class Memory_Parser:
         elif isinstance(node.op, ast.Div):
             return left_val / right_val if right_val != 0 else 0
         elif isinstance(node.op, ast.FloorDiv):
-            return left_val // right_val
+            return left_val // right_val if right_val != 0 else 0
         elif isinstance(node.op, ast.Pow):
             return left_val ** right_val
         elif isinstance(node.op, ast.Mod):
@@ -794,7 +794,7 @@ class Memory_Parser:
             if not isinstance(node, ast.For):
                 return
             print("  " * depth + f"Handling loop at depth {depth}")
-            n_iter = n_outer_iterations if depth == 0 else n_inner_iterations
+            n_iter = n_outer_iterations if depth == 0 else n_inner_iterations * n_outer_iterations
             for stmt in node.body:
                 # print(ast.dump(stmt, indent=4))
                 if isinstance(stmt, ast.For):
@@ -804,12 +804,13 @@ class Memory_Parser:
                     for i,target in enumerate(targets):
                         self.vars[target] = (1,costs[i], 'unk')
                     handle_nested_loops(stmt, depth + 1, n_outer_iterations=n_iter, n_inner_iterations=n_inner_iterations)
-                    for key in list(self.vars.keys()):
-                        if key not in original_vars:
-                            del self.vars[key]
+                    # for key in list(self.vars.keys()):
+                    #     if key not in original_vars:
+                    #         del self.vars[key]
                 elif isinstance(stmt, ast.If):
-                    self._handle_if_footprint(stmt)
+                    self._handle_if_footprint(stmt,n_iter)
                 else:
+                    #! if a list it's most likely an augmented assignment
                     if isinstance(stmt, ast.Assign):
                         if isinstance(stmt.targets[0], ast.Subscript):
                            return #! most probably changing a value not inserting anything 
@@ -819,6 +820,7 @@ class Memory_Parser:
                                 size_before_loop = self.vars[stmt.targets[0].id][1]
                                 len_before_loop = self.vars[stmt.targets[0].id][0]
                                 self._assignmemt_handler(stmt)
+                                size_after_loop = self.vars[stmt.targets[0].id][1]
                                 len_after_loop = self.vars[stmt.targets[0].id][0]
                                 size_increment = size_after_loop - size_before_loop
                                 len_increment = len_after_loop - len_before_loop
@@ -925,11 +927,11 @@ class Memory_Parser:
             self.vars[target] = (1,costs[i], 'unk')  # Initialize targets to empty lists
 
         handle_nested_loops(node, depth=0, n_outer_iterations=n_outer_iterations, n_inner_iterations=n_inner_iterations)
-        for key in list(self.vars.keys()):
-            if key not in original_vars:
-                del self.vars[key]
+        # for key in list(self.vars.keys()):
+        #     if key not in original_vars:
+        #         del self.vars[key]
         print(self.vars)
-    def _handle_if_footprint(self, node):
+    def _handle_if_footprint(self, node, n_iterations=1):
         def extract_all_if_blocks(root_if_node):
             blocks = []
             current = root_if_node
@@ -942,29 +944,82 @@ class Memory_Parser:
                         blocks.append(ast.Module(body=deepcopy(current.orelse), type_ignores=[]))  # final `else` block
                     break
             return blocks
-        def handle_if_blocks(blocks):
+        def handle_if_blocks(blocks,n_iterations = 1):
             vars_footprints_dicts= []
+            n_iter = n_iterations
             for block in blocks:
                 original_vars = self.vars.copy()
                 for stmt in block.body:
                     if isinstance(stmt, ast.Assign):
+                        if isinstance(stmt.targets[0], ast.Subscript):
+                           return #! most probably changing a value not inserting anything 
                         stmt = self.conv_len_assignment(deepcopy(stmt))
-                        self._assignmemt_handler(stmt)
-                    elif isinstance(stmt, ast.AugAssign):
-                        self._insertion_handler(stmt)
+                        if stmt.targets[0].id in self.vars: 
+                            if self.vars[stmt.targets[0].id][2] == 'list':
+                                size_before_loop = self.vars[stmt.targets[0].id][1]
+                                len_before_loop = self.vars[stmt.targets[0].id][0]
+                                self._assignmemt_handler(stmt)
+                                size_after_loop = self.vars[stmt.targets[0].id][1]
+                                len_after_loop = self.vars[stmt.targets[0].id][0]
+                                size_increment = size_after_loop - size_before_loop
+                                len_increment = len_after_loop - len_before_loop
+                                new_size = size_before_loop + size_increment * int(n_iter)
+                                new_length = len_before_loop + len_increment * int(n_iter)
+                                self.vars[stmt.targets[0].id] = (new_length,new_size, 'list')
+                        else:
+                            self._assignmemt_handler(stmt)
+                    elif  isinstance(stmt, ast.AugAssign):
+                        size_before_loop = self.vars[stmt.target.id][1]
+                        len_before_loop = self.vars[stmt.target.id][0]
+                        self._insertion_handler(deepcopy(stmt))
+                        size_after_loop = self.vars[stmt.target.id][1]
+                        len_after_loop = self.vars[stmt.target.id][0]
+                        size_increment = size_after_loop - size_before_loop
+                        len_increment = len_after_loop - len_before_loop
+                        new_size = size_before_loop + size_increment * int(n_iter)
+                        new_length = len_before_loop + len_increment * int(n_iter)
+                        self.vars[stmt.target.id] = (new_length,new_size, 'list')
                     elif isinstance(stmt, ast.Expr):
-                        if isinstance(stmt.value, ast.Call) and isinstance(stmt.value.func, ast.Attribute):
-                            func = stmt.value.func.attr
-                            if func in ['insert', 'append', 'extend']:
-                                self._insertion_handler(stmt)
-                            elif func in ['pop', 'remove', 'clear']:
-                                self._deletion_handler(stmt)
-                    elif isinstance(stmt, ast.Delete):
-                        for target in stmt.targets:
-                            if isinstance(target, ast.Subscript) and isinstance(target.value, ast.Name):
-                                self._deletion_handler(stmt)
+                        func = stmt.value.func.attr 
+                        if func in ['insert', 'append', 'extend']:
+                            size_before_loop = self.vars[stmt.value.func.value.id][1]
+                            len_before_loop = self.vars[stmt.value.func.value.id][0]
+                            self._insertion_handler(deepcopy(stmt))
+                            size_after_loop = self.vars[stmt.value.func.value.id][1]
+                            len_after_loop = self.vars[stmt.value.func.value.id][0]
+                            size_increment = size_after_loop - size_before_loop
+                            len_increment = len_after_loop - len_before_loop
+                            new_size = size_before_loop + size_increment * int(n_iter)
+                            new_length = len_before_loop + len_increment * int(n_iter)
+                            self.vars[stmt.value.func.value.id] = (new_length,new_size, 'list')
+                        elif func in ['pop', 'remove','clear']:
+                            size_before_loop = self.vars[stmt.value.func.value.id][1]
+                            len_before_loop = self.vars[stmt.value.func.value.id][0]
+                            self._deletion_handler(deepcopy(stmt))
+                            size_after_loop = self.vars[stmt.value.func.value.id][1]
+                            len_after_loop = self.vars[stmt.value.func.value.id][0]
+                            size_decrement = size_after_loop - size_before_loop
+                            len_decrement = len_after_loop - len_before_loop
+                            new_size = size_before_loop + size_decrement * int(n_iter)
+                            new_length = len_before_loop + len_decrement * int(n_iter)
+                            self.vars[stmt.value.func.value.id] = (new_length,new_size, 'list')
+                        elif isinstance(stmt, ast.Delete):
+                            for target in stmt.targets:
+                                if isinstance(target, ast.Subscript) and isinstance(target.value, ast.Name):    
+                                    var_name = target.value.id        
+                                    size_before_loop = self.vars[var_name][1]
+                                    len_before_loop = self.vars[var_name][0]
+                                    self._deletion_handler(deepcopy(stmt))
+                                    size_after_loop = self.vars[var_name][1]
+                                    len_after_loop = self.vars[var_name][0]
+                                    size_decrement = size_after_loop - size_before_loop
+                                    len_decrement = len_after_loop - len_before_loop
+                                    #! max is to avoid negative sizes or lengths
+                                    new_size = max(size_before_loop + size_decrement * int(n_iter),0)
+                                    new_length = max(len_before_loop + len_decrement * int(n_iter),0)
+                                    self.vars[var_name] = (new_length,new_size, 'list')
                     elif isinstance(stmt, ast.If):
-                        self._handle_if_footprint(stmt)
+                        self._handle_if_footprint(stmt, n_iterations)
                     elif isinstance(stmt, ast.For):
                         self._handle_loop_footprint(stmt)
                 vars_footprints_dicts.append(self.vars.copy())
@@ -978,12 +1033,17 @@ class Memory_Parser:
             max_index = footprints.index(max(footprints))  #! get the index of the max footprint
             # print(max_index)
             self.vars = vars_footprints_dicts[max_index]  #! set the vars to the max footprint dict
-            for key in list(self.vars.keys()):
-                if key not in original_vars:
-                    del self.vars[key]
+            # for key in list(self.vars.keys()):
+            #     if key not in original_vars:
+            #         del self.vars[key]
                 
         # original_vars = self.vars.copy()
         blocks = extract_all_if_blocks(node)
         # for block in blocks:
         #     print(ast.dump(block, indent=4))
-        handle_if_blocks(blocks)
+        handle_if_blocks(blocks, n_iterations)
+       
+            
+       
+        
+        

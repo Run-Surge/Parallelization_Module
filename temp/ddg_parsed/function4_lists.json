@@ -4,33 +4,45 @@
             "args:none"
         ],
         "statements": [
-            "def hello3(x,y,z):"
+            "def normalize_data(numeric_data,means,stds):"
         ]
     },
     {
         "key": [
-            "x:0"
+            "numeric_data:0"
         ],
         "statements": [
-            "x = x + 1"
+            "num_columns = len(numeric_data[0])",
+            "num_rows = len(numeric_data)"
         ]
     },
     {
         "key": [
-            "x:1",
-            "y:0",
-            "z:0"
+            "none:none"
         ],
         "statements": [
-            "x = x + (y + z + 5)"
+            "normalized_data = []"
         ]
     },
     {
         "key": [
-            "x:2"
+            "means:0",
+            "normalized_data:2",
+            "num_columns:1",
+            "num_rows:1",
+            "numeric_data:0",
+            "stds:0"
         ],
         "statements": [
-            "return x"
+            "for row_idx in range(num_rows):\n    norm_row = []\n    for col_idx in range(num_columns):\n        val = numeric_data[row_idx][col_idx]\n        std_i = stds[col_idx]\n        if std_i == 0:\n            norm_val = 0.0\n        else:\n            norm_val = (val - means[col_idx]) / std_i\n        norm_row.append(norm_val)\n    normalized_data.append(norm_row)"
+        ]
+    },
+    {
+        "key": [
+            "normalized_data:3"
+        ],
+        "statements": [
+            "return normalized_data"
         ]
     }
 ]

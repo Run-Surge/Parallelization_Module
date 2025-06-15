@@ -25,6 +25,12 @@
         "Node": 4,
         "Depends on": [
             {
+                "Node": 2,
+                "Dependency": [
+                    "num_rows"
+                ]
+            },
+            {
                 "Node": 1,
                 "Dependency": [
                     "num_columns"
@@ -33,20 +39,14 @@
             {
                 "Node": 3,
                 "Dependency": [
-                    "matrix"
-                ]
-            },
-            {
-                "Node": 2,
-                "Dependency": [
-                    "num_rows"
+                    "stds"
                 ]
             },
             {
                 "Node": 0,
                 "Dependency": [
-                    "numeric_data",
-                    "means"
+                    "means",
+                    "numeric_data"
                 ]
             }
         ]
@@ -57,7 +57,7 @@
             {
                 "Node": 4,
                 "Dependency": [
-                    "matrix"
+                    "stds"
                 ]
             }
         ]

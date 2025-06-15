@@ -4,7 +4,7 @@
             "args:none"
         ],
         "statements": [
-            "def compute_correlation_matrix(numeric_data,means):"
+            "def compute_column_stds(numeric_data,means):"
         ]
     },
     {
@@ -21,27 +21,27 @@
             "none:none"
         ],
         "statements": [
-            "matrix = []"
+            "stds = []"
         ]
     },
     {
         "key": [
-            "matrix:2",
             "means:0",
             "num_columns:1",
             "num_rows:1",
-            "numeric_data:0"
+            "numeric_data:0",
+            "stds:2"
         ],
         "statements": [
-            "for i in range(num_columns):\n    row = []\n    for j in range(num_columns):\n        num = 0\n        denom1 = 0\n        denom2 = 0\n        corr = 0\n        for k in range(num_rows):\n            xi = numeric_data[k][i] - means[i]\n            xj = numeric_data[k][j] - means[j]\n            num = num + xi * xj\n            denom1 = denom1 + xi * xi\n            denom2 = denom2 + xj * xj\n        if denom1 == 0 or denom2 == 0:\n            corr = 0\n        else:\n            corr = num / (denom1 ** 0.5 * denom2 ** 0.5)\n        row.append(corr)\n    matrix.append(row)"
+            "for col_idx in range(num_columns):\n    var_sum = 0.0\n    mean_i = means[col_idx]\n    for row_idx in range(num_rows):\n        diff = numeric_data[row_idx][col_idx] - mean_i\n        var_sum = var_sum + diff * diff\n    std = (var_sum / num_rows) ** 0.5\n    stds.append(std)"
         ]
     },
     {
         "key": [
-            "matrix:3"
+            "stds:3"
         ],
         "statements": [
-            "return matrix"
+            "return stds"
         ]
     }
 ]

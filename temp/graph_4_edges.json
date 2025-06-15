@@ -5,7 +5,7 @@
             {
                 "Node": 0,
                 "Dependency": [
-                    "x"
+                    "numeric_data"
                 ]
             }
         ]
@@ -16,14 +16,7 @@
             {
                 "Node": 0,
                 "Dependency": [
-                    "z",
-                    "y"
-                ]
-            },
-            {
-                "Node": 1,
-                "Dependency": [
-                    "x"
+                    "numeric_data"
                 ]
             }
         ]
@@ -34,7 +27,38 @@
             {
                 "Node": 2,
                 "Dependency": [
-                    "x"
+                    "num_rows"
+                ]
+            },
+            {
+                "Node": 1,
+                "Dependency": [
+                    "num_columns"
+                ]
+            },
+            {
+                "Node": 3,
+                "Dependency": [
+                    "normalized_data"
+                ]
+            },
+            {
+                "Node": 0,
+                "Dependency": [
+                    "stds",
+                    "means",
+                    "numeric_data"
+                ]
+            }
+        ]
+    },
+    "6": {
+        "Node": 6,
+        "Depends on": [
+            {
+                "Node": 4,
+                "Dependency": [
+                    "normalized_data"
                 ]
             }
         ]

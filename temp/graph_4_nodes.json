@@ -1,50 +1,71 @@
 [
     {
         "code line": 0,
-        "statement": "def hello3(x,y,z):",
+        "statement": "def normalize_data(numeric_data,means,stds):",
         "has": [
-            "x",
-            "y",
-            "z"
+            "numeric_data",
+            "means",
+            "stds"
         ],
         "needs": []
     },
     {
         "code line": 1,
-        "statement": "x = x + 1",
+        "statement": "num_columns = len(numeric_data[0])",
         "has": [
-            "x"
+            "num_columns"
         ],
         "needs": [
-            "x"
+            "numeric_data"
         ]
     },
     {
         "code line": 2,
-        "statement": "x = x + (y + z + 5)",
+        "statement": "num_rows = len(numeric_data)",
         "has": [
-            "x"
+            "num_rows"
         ],
         "needs": [
-            "z",
-            "x",
-            "y"
+            "numeric_data"
         ]
     },
     {
         "code line": 3,
-        "statement": "aggregation = ''",
+        "statement": "normalized_data = []",
+        "has": [
+            "normalized_data"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 4,
+        "statement": "for row_idx in range(num_rows):\n    norm_row = []\n    for col_idx in range(num_columns):\n        val = numeric_data[row_idx][col_idx]\n        std_i = stds[col_idx]\n        if std_i == 0:\n            norm_val = 0.0\n        else:\n            norm_val = (val - means[col_idx]) / std_i\n        norm_row.append(norm_val)\n    normalized_data.append(norm_row)",
+        "has": [
+            "normalized_data"
+        ],
+        "needs": [
+            "num_rows",
+            "num_columns",
+            "normalized_data",
+            "stds",
+            "means",
+            "numeric_data"
+        ]
+    },
+    {
+        "code line": 5,
+        "statement": "aggregation = 'c:normalized_data'",
         "has": [
             "aggregation"
         ],
         "needs": []
     },
     {
-        "code line": 4,
-        "statement": "return x",
+        "code line": 6,
+        "statement": "return normalized_data",
         "has": [],
         "needs": [
-            "x"
+            "normalized_data"
         ]
     }
 ]

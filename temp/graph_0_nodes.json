@@ -19,11 +19,23 @@
     },
     {
         "code line": 3,
-        "statement": "output = compute_correlation_matrix(numeric_data, means)",
+        "statement": "stds = compute_column_stds(numeric_data, means)",
+        "has": [
+            "stds"
+        ],
+        "needs": [
+            "means",
+            "numeric_data"
+        ]
+    },
+    {
+        "code line": 4,
+        "statement": "output = normalize_data(numeric_data, means, stds)",
         "has": [
             "output"
         ],
         "needs": [
+            "stds",
             "means",
             "numeric_data"
         ]

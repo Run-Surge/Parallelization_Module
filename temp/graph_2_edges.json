@@ -25,9 +25,9 @@
         "Node": 4,
         "Depends on": [
             {
-                "Node": 0,
+                "Node": 2,
                 "Dependency": [
-                    "numeric_data"
+                    "num_rows"
                 ]
             },
             {
@@ -37,15 +37,15 @@
                 ]
             },
             {
-                "Node": 3,
+                "Node": 0,
                 "Dependency": [
-                    "means"
+                    "numeric_data"
                 ]
             },
             {
-                "Node": 2,
+                "Node": 3,
                 "Dependency": [
-                    "num_rows"
+                    "means"
                 ]
             }
         ]

@@ -2,26 +2,35 @@
     "numeric_data = preprocess_data(data)#0:preprocess_data(data)": {
         "def preprocess_data(data):": 576,
         "numeric_data = []": 632,
-        "for row in data[1:]:\n    numeric_row = []\n    for x in row:\n        numeric_row.append(x)\n    numeric_data.append(numeric_row)": 1257184,
+        "for row in data[1:]:\n    numeric_row = []\n    for x in row:\n        numeric_row.append(float(x))\n    numeric_data.append(numeric_row)": 7923344,
         "aggregation": "c:numeric_data",
-        "return numeric_data": 1257184
+        "return numeric_data": 7923344
     },
     "means = compute_column_means(numeric_data)#1:compute_column_means(numeric_data)": {
-        "def compute_column_means(numeric_data):": 1256608,
-        "num_columns = len(numeric_data[0])": 1256636,
-        "num_rows = len(numeric_data)": 1256664,
-        "means = []": 1256720,
-        "for col_idx in range(num_columns):\n    total = 0\n    for row_idx in range(num_rows):\n        total = total + numeric_data[row_idx]\n    mean = total / num_rows\n    means.append(mean)": 1258920,
+        "def compute_column_means(numeric_data):": 7262608,
+        "num_columns = len(numeric_data[0])": 7262636,
+        "num_rows = len(numeric_data)": 7262664,
+        "means = []": 7262720,
+        "for col_idx in range(num_columns):\n    total = 0.0\n    for row_idx in range(num_rows):\n        total = total + numeric_data[row_idx]\n    mean = total / num_rows\n    means.append(mean)": 7265024,
         "aggregation": "a:means",
-        "return means": 1258920
+        "return means": 7265024
     },
-    "output = compute_correlation_matrix(numeric_data, means)#2:compute_correlation_matrix(numeric_data, means)": {
-        "def compute_correlation_matrix(numeric_data, means):": 1258864,
-        "num_columns = len(numeric_data[0])": 1258892,
-        "num_rows = len(numeric_data)": 1258920,
-        "matrix = []": 1258976,
-        "for i in range(num_columns):\n    row = []\n    for j in range(num_columns):\n        num = 0\n        denom1 = 0\n        denom2 = 0\n        corr = 0\n        for k in range(num_rows):\n            xi = numeric_data[k] - means[i]\n            xj = numeric_data[k] - means[j]\n            num = num + xi * xj\n            denom1 = denom1 + xi * xi\n            denom2 = denom2 + xj * xj\n        if denom1 == 0 or denom2 == 0:\n            corr = 0\n        else:\n            corr = num / (denom1 ** 0.5 * denom2 ** 0.5)\n        row.append(corr)\n    matrix.append(row)": 2383528,
-        "aggregation": "c:matrix",
-        "return matrix": 2383528
+    "stds = compute_column_stds(numeric_data, means)#2:compute_column_stds(numeric_data, means)": {
+        "def compute_column_stds(numeric_data, means):": 7264864,
+        "num_columns = len(numeric_data[0])": 7264892,
+        "num_rows = len(numeric_data)": 7264920,
+        "stds = []": 7264976,
+        "for col_idx in range(num_columns):\n    var_sum = 0.0\n    mean_i = means[col_idx]\n    for row_idx in range(num_rows):\n        diff = numeric_data[row_idx] - mean_i\n        var_sum = var_sum + diff * diff\n    std = (var_sum / num_rows) ** 0.5\n    stds.append(std)": 7267280,
+        "aggregation": "a:stds",
+        "return stds": 7267280
+    },
+    "output = normalize_data(numeric_data, means, stds)#3:normalize_data(numeric_data, means, stds)": {
+        "def normalize_data(numeric_data, means, stds):": 7267120,
+        "num_columns = len(numeric_data[0])": 7267148,
+        "num_rows = len(numeric_data)": 7267176,
+        "normalized_data = []": 7267232,
+        "for row_idx in range(num_rows):\n    norm_row = []\n    for col_idx in range(num_columns):\n        val = numeric_data[row_idx]\n        std_i = stds[col_idx]\n        if std_i == 0:\n            norm_val = 0.0\n        else:\n            norm_val = (val - means[col_idx]) / std_i\n        norm_row.append(norm_val)\n    normalized_data.append(norm_row)": 20469920,
+        "aggregation": "c:normalized_data",
+        "return normalized_data": 20469920
     }
 }

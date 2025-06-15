@@ -12,19 +12,37 @@
         },
         "numeric_data": {
             "length": 11,
-            "size": 1256608
+            "size": 7262608
         }
     },
-    "output = compute_correlation_matrix(numeric_data, means)": {
+    "stds = compute_column_stds(numeric_data, means)": {
         "data": {
             "length": 11,
             "size": 576
         },
         "numeric_data": {
             "length": 11,
-            "size": 1256608
+            "size": 7262608
         },
         "means": {
+            "length": 11,
+            "size": 2256
+        }
+    },
+    "output = normalize_data(numeric_data, means, stds)": {
+        "data": {
+            "length": 11,
+            "size": 576
+        },
+        "numeric_data": {
+            "length": 11,
+            "size": 7262608
+        },
+        "means": {
+            "length": 11,
+            "size": 2256
+        },
+        "stds": {
             "length": 11,
             "size": 2256
         }

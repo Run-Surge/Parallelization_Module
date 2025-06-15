@@ -12,7 +12,7 @@ FILE_NAME = 'test.csv'  # Name of the file to read data from
 
 
 ##########################################################################################################
-#! User Code is written below this line (Note: code is written in the form of fucntions and entry point is a function named 'main')
+#! User Code is written below this line (Note: code is written in the form of functions and entry point is a function named 'main')
 #! all functions must have a return statement
 #! the returned value is not assumed to be by reference, but a copy of it
 #! no nested user defined functions are allowed
@@ -22,9 +22,10 @@ FILE_NAME = 'test.csv'  # Name of the file to read data from
 
 def preprocess_data(data):
     numeric_data = []
-    for row in data[1:]:
+    for row in data[1:]:  # Skip header
         numeric_row = []
         for x in row:
+            # convert to float
             numeric_row.append(float(x))
         numeric_data.append(numeric_row)
     aggregation = "c:numeric_data"
@@ -35,7 +36,7 @@ def compute_column_means(numeric_data):
     num_rows = len(numeric_data)
     means = []
     for col_idx in range(num_columns):
-        total = 0
+        total = 0.0
         for row_idx in range(num_rows):
             total += numeric_data[row_idx][col_idx]
         mean = total / num_rows
@@ -43,30 +44,39 @@ def compute_column_means(numeric_data):
     aggregation = "a:means"
     return means
 
-def compute_correlation_matrix(numeric_data, means):
+def compute_column_stds(numeric_data, means):
     num_columns = len(numeric_data[0])
     num_rows = len(numeric_data)
-    matrix = []
-    for i in range(num_columns):
-        row = []
-        for j in range(num_columns):
-            num = 0
-            denom1 = 0
-            denom2 = 0
-            for k in range(num_rows):
-                xi = numeric_data[k][i] - means[i]
-                xj = numeric_data[k][j] - means[j]
-                num += xi * xj
-                denom1 += xi * xi
-                denom2 += xj * xj
-            if denom1 == 0 or denom2 == 0:
-                corr = 0
+    stds = []
+    for col_idx in range(num_columns):
+        var_sum = 0.0
+        mean_i = means[col_idx]
+        for row_idx in range(num_rows):
+            diff = numeric_data[row_idx][col_idx] - mean_i
+            var_sum += diff * diff
+        # population variance: divide by num_rows
+        std = (var_sum / num_rows) ** 0.5
+        stds.append(std)
+    aggregation = "a:stds"
+    return stds
+
+def normalize_data(numeric_data, means, stds):
+    num_columns = len(numeric_data[0])
+    num_rows = len(numeric_data)
+    normalized_data = []
+    for row_idx in range(num_rows):
+        norm_row = []
+        for col_idx in range(num_columns):
+            val = numeric_data[row_idx][col_idx]
+            std_i = stds[col_idx]
+            if std_i == 0:
+                norm_val = 0.0
             else:
-                corr = num / ((denom1 ** 0.5) * (denom2 ** 0.5))
-            row.append(corr)
-        matrix.append(row)
-    aggregation = "c:matrix"
-    return matrix
+                norm_val = (val - means[col_idx]) / std_i
+            norm_row.append(norm_val)
+        normalized_data.append(norm_row)
+    aggregation = "c:normalized_data"
+    return normalized_data
 
 ##########################################################################################################
 
@@ -74,7 +84,7 @@ def compute_correlation_matrix(numeric_data, means):
 ##########################################################################################################
 if __name__ == '__main__':
 #---------------------------------------------------------------------------------------------------------
-#! This block handles data loading please don't edit it (Note:The data is loaded into a list of name data)
+#! This block handles data loading please don't edit it (Note: The data is loaded into a list named data)
     try:
         with open(FILE_NAME, 'r') as file:
             lines = file.readlines()
@@ -84,19 +94,17 @@ if __name__ == '__main__':
 #---------------------------------------------------------------------------------------------------------
 
 #! User main function is defined here
-#! Note for boosting performance if list is modified inside the function (each function call is independent) then return pass a 
-#! copy of the list instead of the same list for performing different operations in parallel
+#! Note: each function call is independent; if modifying lists in-place, return a copy to avoid conflicts in parallel use
     numeric_data = preprocess_data(data)
     means = compute_column_means(numeric_data)
-    output = compute_correlation_matrix(numeric_data, means)
+    stds = compute_column_stds(numeric_data, means)
+    output = normalize_data(numeric_data, means, stds)
 
 #---------------------------------------------------------------------------------------------------------
 #! Saving the output to a file please don't edit this block
 #! output name should be a list named output
     with open('output.csv', 'w') as file:
         for row in output:
+            # convert each float to string
             file.write(','.join(str(x) for x in row) + '\n')
 #---------------------------------------------------------------------------------------------------------
-
-
-##########################################################################################################

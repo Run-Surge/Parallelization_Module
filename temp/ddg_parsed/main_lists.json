@@ -21,7 +21,17 @@
             "numeric_data:0"
         ],
         "statements": [
-            "output = compute_correlation_matrix(numeric_data, means)"
+            "stds = compute_column_stds(numeric_data, means)"
+        ]
+    },
+    {
+        "key": [
+            "means:1",
+            "numeric_data:0",
+            "stds:2"
+        ],
+        "statements": [
+            "output = normalize_data(numeric_data, means, stds)"
         ]
     }
 ]
