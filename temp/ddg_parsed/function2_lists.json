@@ -4,7 +4,16 @@
             "args:none"
         ],
         "statements": [
-            "def mean_filtered_columns(filtered):"
+            "def compute_column_means(numeric_data):"
+        ]
+    },
+    {
+        "key": [
+            "numeric_data:0"
+        ],
+        "statements": [
+            "num_columns = len(numeric_data[0])",
+            "num_rows = len(numeric_data)"
         ]
     },
     {
@@ -12,26 +21,26 @@
             "none:none"
         ],
         "statements": [
-            "mean_values = []",
-            "mean = 0"
+            "means = []"
         ]
     },
     {
         "key": [
-            "filtered:0",
-            "mean:1",
-            "mean_values:1"
+            "means:2",
+            "num_columns:1",
+            "num_rows:1",
+            "numeric_data:0"
         ],
         "statements": [
-            "for column in filtered:\n    if len(column) > 0:\n        total = 0\n        for x in column:\n            total = total + x\n        mean = total / len(column)\n    else:\n        mean = 0\n    mean_values.append(mean)"
+            "for col_idx in range(num_columns):\n    total = 0\n    for row_idx in range(num_rows):\n        total = total + numeric_data[row_idx][col_idx]\n    mean = total / num_rows\n    means.append(mean)"
         ]
     },
     {
         "key": [
-            "mean_values:2"
+            "means:3"
         ],
         "statements": [
-            "return mean_values"
+            "return means"
         ]
     }
 ]

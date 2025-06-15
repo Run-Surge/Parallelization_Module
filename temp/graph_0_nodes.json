@@ -1,30 +1,31 @@
 [
     {
         "code line": 1,
-        "statement": "filtered = filter_above_threshold(data)",
+        "statement": "numeric_data = preprocess_data(data)",
         "has": [
-            "filtered"
+            "numeric_data"
         ],
         "needs": []
     },
     {
         "code line": 2,
-        "statement": "mean_values = mean_filtered_columns(filtered)",
+        "statement": "means = compute_column_means(numeric_data)",
         "has": [
-            "mean_values"
+            "means"
         ],
         "needs": [
-            "filtered"
+            "numeric_data"
         ]
     },
     {
         "code line": 3,
-        "statement": "output = [mean_values]",
+        "statement": "output = compute_correlation_matrix(numeric_data, means)",
         "has": [
             "output"
         ],
         "needs": [
-            "mean_values"
+            "means",
+            "numeric_data"
         ]
     }
 ]

@@ -4,7 +4,16 @@
             "args:none"
         ],
         "statements": [
-            "def hello2():"
+            "def compute_correlation_matrix(numeric_data,means):"
+        ]
+    },
+    {
+        "key": [
+            "numeric_data:0"
+        ],
+        "statements": [
+            "num_columns = len(numeric_data[0])",
+            "num_rows = len(numeric_data)"
         ]
     },
     {
@@ -12,15 +21,27 @@
             "none:none"
         ],
         "statements": [
-            "v = 4 + 3"
+            "matrix = []"
         ]
     },
     {
         "key": [
-            "v:1"
+            "matrix:2",
+            "means:0",
+            "num_columns:1",
+            "num_rows:1",
+            "numeric_data:0"
         ],
         "statements": [
-            "return v"
+            "for i in range(num_columns):\n    row = []\n    for j in range(num_columns):\n        num = 0\n        denom1 = 0\n        denom2 = 0\n        corr = 0\n        for k in range(num_rows):\n            xi = numeric_data[k][i] - means[i]\n            xj = numeric_data[k][j] - means[j]\n            num = num + xi * xj\n            denom1 = denom1 + xi * xi\n            denom2 = denom2 + xj * xj\n        if denom1 == 0 or denom2 == 0:\n            corr = 0\n        else:\n            corr = num / (denom1 ** 0.5 * denom2 ** 0.5)\n        row.append(corr)\n    matrix.append(row)"
+        ]
+    },
+    {
+        "key": [
+            "matrix:3"
+        ],
+        "statements": [
+            "return matrix"
         ]
     }
 ]

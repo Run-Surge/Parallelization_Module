@@ -1,7 +1,7 @@
 [
     {
         "code line": 0,
-        "statement": "def filter_above_threshold(data):",
+        "statement": "def preprocess_data(data):",
         "has": [
             "data"
         ],
@@ -9,14 +9,6 @@
     },
     {
         "code line": 1,
-        "statement": "threshold = 50",
-        "has": [
-            "threshold"
-        ],
-        "needs": []
-    },
-    {
-        "code line": 2,
         "statement": "numeric_data = []",
         "has": [
             "numeric_data"
@@ -24,7 +16,7 @@
         "needs": []
     },
     {
-        "code line": 3,
+        "code line": 2,
         "statement": "for row in data[1:]:\n    numeric_row = []\n    for x in row:\n        numeric_row.append(x)\n    numeric_data.append(numeric_row)",
         "has": [
             "numeric_data"
@@ -35,61 +27,19 @@
         ]
     },
     {
-        "code line": 4,
-        "statement": "num_columns = len(numeric_data[0])",
-        "has": [
-            "num_columns"
-        ],
-        "needs": [
-            "numeric_data"
-        ]
-    },
-    {
-        "code line": 5,
-        "statement": "num_rows = len(numeric_data)",
-        "has": [
-            "num_rows"
-        ],
-        "needs": [
-            "numeric_data"
-        ]
-    },
-    {
-        "code line": 6,
-        "statement": "filtered = []",
-        "has": [
-            "filtered"
-        ],
-        "needs": []
-    },
-    {
-        "code line": 7,
-        "statement": "for col_idx in range(num_columns):\n    col_filtered = []\n    for row_idx in range(num_rows):\n        value = numeric_data[row_idx][col_idx]\n        if value > threshold:\n            col_filtered.append(value)\n    filtered.append(col_filtered)",
-        "has": [
-            "filtered"
-        ],
-        "needs": [
-            "filtered",
-            "numeric_data",
-            "threshold",
-            "num_rows",
-            "num_columns"
-        ]
-    },
-    {
-        "code line": 8,
-        "statement": "aggregation = 'c:filtered'",
+        "code line": 3,
+        "statement": "aggregation = 'c:numeric_data'",
         "has": [
             "aggregation"
         ],
         "needs": []
     },
     {
-        "code line": 9,
-        "statement": "return filtered",
+        "code line": 4,
+        "statement": "return numeric_data",
         "has": [],
         "needs": [
-            "filtered"
+            "numeric_data"
         ]
     }
 ]

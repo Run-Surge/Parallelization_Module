@@ -221,6 +221,9 @@ def get_memory_foortprint(file_path, entry_point, functions):
                         tree = ast.parse(modified_code).body[0]
                     else:
                         raise ValueError(f"Variable {var_name} not found in local parser variables.")
+                #! skip break and continue statements
+                if (ast.unparse(tree).startswith('break') or ast.unparse(tree).startswith('continue')):
+                    return
                 local_parser._assignmemt_handler(tree)
             elif  isinstance(tree, ast.AugAssign):
                 local_parser._insertion_handler(tree)
@@ -384,7 +387,7 @@ def main():
     #     sys.exit(1)
 
     # filename = sys.argv[1]
-    filename= 'testcases/mean_above_threshold.py'
+    filename= 'testcases/correlation_matrix.py'
     #! Check for syntax errors
     if check_syntax_errors(filename, error_file):
        print(f"1. Syntax check passed for {filename}.")

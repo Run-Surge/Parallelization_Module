@@ -4,7 +4,7 @@
             "args:none"
         ],
         "statements": [
-            "def filter_above_threshold(data):"
+            "def preprocess_data(data):"
         ]
     },
     {
@@ -12,9 +12,7 @@
             "none:none"
         ],
         "statements": [
-            "threshold = 50",
-            "numeric_data = []",
-            "filtered = []"
+            "numeric_data = []"
         ]
     },
     {
@@ -31,28 +29,7 @@
             "numeric_data:2"
         ],
         "statements": [
-            "num_columns = len(numeric_data[0])",
-            "num_rows = len(numeric_data)"
-        ]
-    },
-    {
-        "key": [
-            "filtered:1",
-            "num_columns:3",
-            "num_rows:3",
-            "numeric_data:2",
-            "threshold:1"
-        ],
-        "statements": [
-            "for col_idx in range(num_columns):\n    col_filtered = []\n    for row_idx in range(num_rows):\n        value = numeric_data[row_idx][col_idx]\n        if value > threshold:\n            col_filtered.append(value)\n    filtered.append(col_filtered)"
-        ]
-    },
-    {
-        "key": [
-            "filtered:4"
-        ],
-        "statements": [
-            "return filtered"
+            "return numeric_data"
         ]
     }
 ]

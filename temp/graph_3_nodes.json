@@ -1,32 +1,69 @@
 [
     {
         "code line": 0,
-        "statement": "def hello2():",
-        "has": [],
-        "needs": []
-    },
-    {
-        "code line": 1,
-        "statement": "v = 4 + 3",
+        "statement": "def compute_correlation_matrix(numeric_data,means):",
         "has": [
-            "v"
+            "numeric_data",
+            "means"
         ],
         "needs": []
     },
     {
+        "code line": 1,
+        "statement": "num_columns = len(numeric_data[0])",
+        "has": [
+            "num_columns"
+        ],
+        "needs": [
+            "numeric_data"
+        ]
+    },
+    {
         "code line": 2,
-        "statement": "aggregation = ''",
+        "statement": "num_rows = len(numeric_data)",
+        "has": [
+            "num_rows"
+        ],
+        "needs": [
+            "numeric_data"
+        ]
+    },
+    {
+        "code line": 3,
+        "statement": "matrix = []",
+        "has": [
+            "matrix"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 4,
+        "statement": "for i in range(num_columns):\n    row = []\n    for j in range(num_columns):\n        num = 0\n        denom1 = 0\n        denom2 = 0\n        corr = 0\n        for k in range(num_rows):\n            xi = numeric_data[k][i] - means[i]\n            xj = numeric_data[k][j] - means[j]\n            num = num + xi * xj\n            denom1 = denom1 + xi * xi\n            denom2 = denom2 + xj * xj\n        if denom1 == 0 or denom2 == 0:\n            corr = 0\n        else:\n            corr = num / (denom1 ** 0.5 * denom2 ** 0.5)\n        row.append(corr)\n    matrix.append(row)",
+        "has": [
+            "matrix"
+        ],
+        "needs": [
+            "num_columns",
+            "matrix",
+            "num_rows",
+            "numeric_data",
+            "means"
+        ]
+    },
+    {
+        "code line": 5,
+        "statement": "aggregation = 'c:matrix'",
         "has": [
             "aggregation"
         ],
         "needs": []
     },
     {
-        "code line": 3,
-        "statement": "return v",
+        "code line": 6,
+        "statement": "return matrix",
         "has": [],
         "needs": [
-            "v"
+            "matrix"
         ]
     }
 ]

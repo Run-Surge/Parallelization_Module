@@ -1,55 +1,67 @@
 [
     {
         "code line": 0,
-        "statement": "def mean_filtered_columns(filtered):",
+        "statement": "def compute_column_means(numeric_data):",
         "has": [
-            "filtered"
+            "numeric_data"
         ],
         "needs": []
     },
     {
         "code line": 1,
-        "statement": "mean_values = []",
+        "statement": "num_columns = len(numeric_data[0])",
         "has": [
-            "mean_values"
-        ],
-        "needs": []
-    },
-    {
-        "code line": 2,
-        "statement": "mean = 0",
-        "has": [
-            "mean"
-        ],
-        "needs": []
-    },
-    {
-        "code line": 3,
-        "statement": "for column in filtered:\n    if len(column) > 0:\n        total = 0\n        for x in column:\n            total = total + x\n        mean = total / len(column)\n    else:\n        mean = 0\n    mean_values.append(mean)",
-        "has": [
-            "mean",
-            "mean_values"
+            "num_columns"
         ],
         "needs": [
-            "mean",
-            "mean_values",
-            "filtered"
+            "numeric_data"
         ]
     },
     {
+        "code line": 2,
+        "statement": "num_rows = len(numeric_data)",
+        "has": [
+            "num_rows"
+        ],
+        "needs": [
+            "numeric_data"
+        ]
+    },
+    {
+        "code line": 3,
+        "statement": "means = []",
+        "has": [
+            "means"
+        ],
+        "needs": []
+    },
+    {
         "code line": 4,
-        "statement": "aggregation = 'a:mean_values'",
+        "statement": "for col_idx in range(num_columns):\n    total = 0\n    for row_idx in range(num_rows):\n        total = total + numeric_data[row_idx][col_idx]\n    mean = total / num_rows\n    means.append(mean)",
+        "has": [
+            "means"
+        ],
+        "needs": [
+            "numeric_data",
+            "num_columns",
+            "means",
+            "num_rows"
+        ]
+    },
+    {
+        "code line": 5,
+        "statement": "aggregation = 'a:means'",
         "has": [
             "aggregation"
         ],
         "needs": []
     },
     {
-        "code line": 5,
-        "statement": "return mean_values",
+        "code line": 6,
+        "statement": "return means",
         "has": [],
         "needs": [
-            "mean_values"
+            "means"
         ]
     }
 ]

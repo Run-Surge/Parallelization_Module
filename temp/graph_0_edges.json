@@ -5,7 +5,7 @@
             {
                 "Node": 1,
                 "Dependency": [
-                    "filtered"
+                    "numeric_data"
                 ]
             }
         ]
@@ -16,7 +16,13 @@
             {
                 "Node": 2,
                 "Dependency": [
-                    "mean_values"
+                    "means"
+                ]
+            },
+            {
+                "Node": 1,
+                "Dependency": [
+                    "numeric_data"
                 ]
             }
         ]

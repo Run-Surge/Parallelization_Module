@@ -4,23 +4,24 @@
             "data:none"
         ],
         "statements": [
-            "filtered = filter_above_threshold(data)"
+            "numeric_data = preprocess_data(data)"
         ]
     },
     {
         "key": [
-            "filtered:0"
+            "numeric_data:0"
         ],
         "statements": [
-            "mean_values = mean_filtered_columns(filtered)"
+            "means = compute_column_means(numeric_data)"
         ]
     },
     {
         "key": [
-            "mean_values:1"
+            "means:1",
+            "numeric_data:0"
         ],
         "statements": [
-            "output = [mean_values]"
+            "output = compute_correlation_matrix(numeric_data, means)"
         ]
     }
 ]
