@@ -526,151 +526,277 @@ def plan_data_parallelization(
 # ==============================================================================
 # 5. FINAL EXECUTION PLAN GENERATION
 # ==============================================================================
+
+# ==============================================================================
+# 6. FINAL EXECUTION PLAN GENERATION (WITH ABSTRACT AGGREGATOR)
+# ==============================================================================
+# ==============================================================================
+# 6. FINAL EXECUTION PLAN GENERATION (COMPLETE AND CORRECTED)
+# ==============================================================================
+# --- NEW HELPER: Reconstructs all function definitions from footprints ---
+def build_function_definitions(func_footprints_data):
+    """
+    Parses the function footprints to build a dictionary of unique,
+    reconstructed Python function source code.
+    """
+    all_functions_code = {}
+    
+    # Use a set to track processed function names to avoid duplicates
+    processed_function_names = set()
+
+    for key, footprint in func_footprints_data.items():
+        # The first line of the footprint is the 'def' statement
+        def_line = list(footprint.keys())[0]
+        match = re.match(r"def\s+(\w+)\s*\(", def_line)
+        if not match:
+            continue # Not a valid function definition start
+        
+        func_name = match.groups()[0]
+        if func_name in processed_function_names:
+            continue # We've already reconstructed this function
+            
+        print(f"Reconstructing function: {func_name}")
+        lines_from_footprints = [line for line in footprint.keys() if line != "aggregation"]
+        reconstructed_code = reconstruct_source_with_indentation(lines_from_footprints)
+        all_functions_code[func_name] = reconstructed_code
+        processed_function_names.add(func_name)
+        
+    return all_functions_code
+# ==============================================================================
+# 6. FINAL EXECUTION PLAN GENERATION (EXECUTABLE CODE)
+# ==============================================================================
+# ==============================================================================
+# 6. FINAL EXECUTION PLAN GENERATION (EXECUTABLE CODE)
+# ==============================================================================
 def generate_execution_plan(
     consolidated_schedule_info,
     parallelization_plan,
-    nodes_data
+    nodes_data,
+    live_vars_data,
+    func_footprints_data # Required
 ):
     """
-    Generates a master schedule and individual instruction files for each node,
-    including synchronization hints and parallel execution plans.
+    Generates a master schedule, and COMPLETE, well-structured, executable
+    Python scripts and data files for each node.
     """
-    print("\n--- Generating Final Execution Plan ---")
+    print("\n--- Generating Final Execution Plan (Executable Code) ---")
     
-    # Initialize plans for each node and the master schedule
-    node_plans = {node['name']: [] for node in nodes_data}
+    # --- Phase 0: Setup ---
+    if not nodes_data: return
+
+    AGGREGATOR_NAME = "AGGREGATOR_SERVICE"
+    WORKER_NODES = [node['name'] for node in nodes_data]
+    
+    node_plans = {node['name']: {'initial_data': {}, 'python_code': []} for node in nodes_data}
     master_plan = ["# Master Execution Schedule\n"]
-    
-    # Helper to get the variable on the left-hand side of an assignment
     get_lhs_var = lambda s: s.split('=')[0].strip()
 
-    # --- Step 1: Map blocks to their assigned nodes for easy dependency lookup ---
+    # Build all function definitions first
+    function_definitions = build_function_definitions(func_footprints_data)
+
+    # Create maps for dependency lookups
     block_to_node_map = {
         info['consolidated_block_index']: info['assigned_node']['name']
         for info in consolidated_schedule_info if info['is_schedulable']
     }
+    produced_by_scheduled_blocks = {get_lhs_var(stmt) for info in consolidated_schedule_info if info['is_schedulable'] for stmt in info['statements']}
     
-    # --- Step 2: Process all blocks from the consolidated schedule ---
+    var_consumers = {}
+    for info in consolidated_schedule_info:
+        valid_keys = [k for k in info.get('key', []) if k != "none:none"]
+        for key in valid_keys:
+            var, source_idx_str = key.split(':')
+            if source_idx_str.isdigit():
+                source_idx = int(source_idx_str)
+                producer_block = next((p for p in consolidated_schedule_info if p['consolidated_block_index'] == source_idx), None)
+                if producer_block:
+                    produced_var = get_lhs_var(producer_block['statements'][-1]) if producer_block['is_schedulable'] else get_lhs_var(producer_block['statements'][0])
+                    if produced_var not in var_consumers: var_consumers[produced_var] = set()
+                    consuming_node = block_to_node_map.get(info['consolidated_block_index'])
+                    if consuming_node: var_consumers[produced_var].add(consuming_node)
+
+    # --- Phase 1: Process all blocks and generate plan fragments ---
     for i, info in enumerate(consolidated_schedule_info):
         block_idx = info['consolidated_block_index']
-        
-        # --- CASE A: The block is schedulable and has a definite assignment ---
+        valid_keys = [k for k in info.get('key', []) if k != "none:none"]
+
+        # --- CASE A: The block is schedulable on a worker node ---
         if info['is_schedulable']:
             node_name = info['assigned_node']['name']
-            master_plan.append(f"--- BLOCK {block_idx} (On {node_name}) ---")
+            master_plan.append(f"\n--- BLOCK {block_idx} (On {node_name}) ---")
+            plan = node_plans[node_name]
+            plan['python_code'].append(f"\n    # --- Task: Execute Block {block_idx} ---")
             
-            node_plans[node_name].append(f"\n# --- Task: Execute Block {block_idx} ---")
-            
-            # Add synchronization hints by checking dependencies
-            for key in info['key']:
+            for key in valid_keys:
                 var, source_idx_str = key.split(':')
                 if source_idx_str.isdigit():
                     source_idx = int(source_idx_str)
-                    if source_idx in block_to_node_map:
-                        source_node = block_to_node_map[source_idx]
-                        sync_msg = f"WAIT for variable '{var}' from Node: {source_node}"
-                        node_plans[node_name].append(sync_msg)
-                        master_plan.append(f"  - {node_name} must WAIT for '{var}' from {source_node}")
-            
-            # Add the actual execution statements
+                    source_node = block_to_node_map.get(source_idx, AGGREGATOR_NAME)
+                    plan['python_code'].append(f"    print('--- Loading dependency ---')")
+                    plan['python_code'].append(f"    {var} = wait_for_data('{var}', from_node='{source_node}')")
+                elif source_idx_str == 'none' and info['statements']:
+                    stmt = info['statements'][0]
+                    var_info = live_vars_data.get(stmt, {}).get(var)
+                    plan['initial_data'][var] = var_info
+                    plan['python_code'].append(f"    print('--- Loading initial data ---')")
+                    plan['python_code'].append(f"    {var} = initial_data['{var}']")
+
             for stmt in info['statements']:
-                node_plans[node_name].append(f"RUN: {stmt}")
+                output_var = get_lhs_var(stmt)
+                consumers = list(var_consumers.get(output_var, []))
+                plan['python_code'].append(f"    print(f'EXECUTING: {stmt}')")
+                plan['python_code'].append(f"    {stmt}") # The statement is directly executable Python
+                if consumers:
+                    plan['python_code'].append(f"    send_data('{output_var}', {output_var}, consumers={consumers})")
             
             master_plan.append(f"  - {node_name} executes {len(info['statements'])} statement(s).")
-            node_plans[node_name].append(f"# --- End Block {block_idx} ---")
 
-        # --- CASE B: The block is unschedulable, consult the parallelization plan ---
+        # --- CASE B: The block is unschedulable (handle parallelization) ---
         else:
             if not info['statements']: continue
-            
             statement = info['statements'][0]
-            plan = parallelization_plan.get(statement)
+            plan_result = parallelization_plan.get(statement)
             
-            if not plan:
-                master_plan.append(f"--- Task '{statement}' (UNHANDLED) ---")
-                master_plan.append("  - No valid plan found for this unschedulable block.")
+            if not plan_result or plan_result['status'] != 'Success':
+                master_plan.append(f"\n--- Task '{statement}' (UNPLANNED) ---")
+                master_plan.append(f"  - Status: {plan_result.get('status', 'Unknown') if plan_result else 'No Plan'}")
                 continue
 
-            master_plan.append(f"--- Task '{statement}' (Unscheduled) ---")
+            master_plan.append(f"\n--- Task '{statement}' (PARALLEL) ---")
+            output_var = get_lhs_var(statement)
+            arg_names_match = re.match(r".*?\((.*)\)", statement)
+            arg_names = [arg.strip() for arg in arg_names_match.groups()[0].split(',') if arg.strip()] if arg_names_match else []
+            func_name_match = re.search(r"=\s*([\w.]+)\(", statement)
+            func_name = func_name_match.groups()[0] if func_name_match else "unknown_function"
 
-            # Subcase B1: The task is deferred for a feedback loop
-            if plan['status'] == "Deferred: Requires Feedback":
-                master_plan.append("  - STATUS: DEFERRED, requires runtime feedback.")
-                master_plan.append(f"  - REASON: {plan['reason']}")
+            master_plan.append(f"  - Aggregator: {AGGREGATOR_NAME} (External Service)")
+            
+            worker_chunk_assignments = {}
+            all_chunk_ids = list(range(plan_result.get('parallelization_factor', 0)))
+            for i, chunk_id in enumerate(all_chunk_ids):
+                worker_name = WORKER_NODES[i % len(WORKER_NODES)]
+                if worker_name not in worker_chunk_assignments: worker_chunk_assignments[worker_name] = []
+                worker_chunk_assignments[worker_name].append(chunk_id)
 
-            # Subcase B2: The task can be parallelized
-            elif plan['status'] == "Success":
-                master_plan.append("  - STATUS: To be executed in PARALLEL.")
+            for worker_name, assigned_chunks in worker_chunk_assignments.items():
+                worker_plan = node_plans[worker_name]
+                worker_plan['python_code'].append(f"\n    # --- PARALLEL TASK (Fork-Join) for '{statement}' ---")
                 
-                # A. Identify free nodes and designate an aggregator
-                primary_busy_nodes = set(block_to_node_map.values())
-                free_nodes = [node for node in nodes_data if node['name'] not in primary_busy_nodes]
-                if not free_nodes: # If all nodes are busy, use all of them as workers
-                    free_nodes = sorted(nodes_data, key=lambda n: n['memory'], reverse=True)
+                # Load or wait for the full data arrays needed for slicing
+                for arg in arg_names:
+                    if arg not in produced_by_scheduled_blocks:
+                        worker_plan['initial_data'][arg] = live_vars_data.get(statement, {}).get(arg, f"MISSING_DATA_FOR_{arg}")
+                        worker_plan['python_code'].append(f"    {arg} = initial_data.get('{arg}')")
+                    else:
+                        producer_node = "UNKNOWN"
+                        for key_str in valid_keys:
+                            if key_str.startswith(arg + ':'):
+                                producer_node = block_to_node_map.get(int(key_str.split(':')[1]), AGGREGATOR_NAME)
+                                break
+                        worker_plan['python_code'].append(f"    {arg} = wait_for_data('{arg}', from_node='{producer_node}')")
                 
-                aggregator_node = free_nodes[0]['name']
-                worker_nodes = [n['name'] for n in free_nodes]
-                
-                master_plan.append(f"  - Aggregator Node: {aggregator_node}")
-                master_plan.append(f"  - Worker Nodes: {', '.join(worker_nodes)}")
-
-                # B. Add aggregation task to the aggregator node's plan
-                output_var = get_lhs_var(statement)
-                node_plans[aggregator_node].append(f"\n# --- Task: Aggregate results for '{output_var}' ---")
-                node_plans[aggregator_node].append(f"WAIT for results from all workers for '{statement}'")
-                node_plans[aggregator_node].append(f"RUN: {output_var} = aggregate_results()")
-                node_plans[aggregator_node].append(f"# --- End Aggregation ---")
-
-                # C. Distribute chunks and generate worker instructions
-                chunk_details = plan.get('chunks', {})
-                all_chunk_ids = list(range(plan.get('parallelization_factor', 0)))
-
-                for i, chunk_id in enumerate(all_chunk_ids):
-                    worker_node = worker_nodes[i % len(worker_nodes)] # Round-robin assignment
-                    
-                    if i == 0: # Add header and sync hints only for the first chunk on any worker
-                        node_plans[worker_node].append(f"\n# --- Task: Parallel execution for '{statement}' ---")
-                        # Add sync hints for the *initial data* needed for this parallel task
-                        for key in info['key']:
-                            var, source_idx_str = key.split(':')
-                            if source_idx_str.isdigit():
-                                source_idx = int(source_idx_str)
-                                if source_idx in block_to_node_map:
-                                    source_node = block_to_node_map[source_idx]
-                                    node_plans[worker_node].append(f"WAIT for variable '{var}' from Node: {source_node}")
-                    
-                    master_plan.append(f"  - Node {worker_node} assigned to run chunk {chunk_id}.")
-                    node_plans[worker_node].append(f"# -- Chunk {chunk_id} --")
-                    for arg_name, chunks in chunk_details.items():
+                # Process each assigned chunk
+                for chunk_id in assigned_chunks:
+                    chunk_details_dict = {}
+                    for arg, chunks in plan_result['chunks'].items():
                         if chunk_id < len(chunks):
-                            chunk_info = chunks[chunk_id]
-                            start, end = chunk_info['start_index'], chunk_info['end_index']
-                            node_plans[worker_node].append(f"RUN task on chunk of '{arg_name}', indices {start}:{end}")
-                
-                # Add the final 'send' instruction to all workers
-                for worker in set(worker_nodes):
-                    node_plans[worker].append(f"SEND results to aggregator: {aggregator_node}")
-                    node_plans[worker].append(f"# --- End Parallel Task ---")
+                            chunk_details_dict[arg] = chunks[chunk_id]
+                    
+                    worker_plan['python_code'].append(f"\n    # -- Sub-Task: Process Chunk {chunk_id} --")
+                    worker_plan['python_code'].append(f"    chunk_params_{chunk_id} = {{}}")
+                    for arg, chunk_info in chunk_details_dict.items():
+                        start, end = chunk_info['start_index'], chunk_info['end_index']
+                        worker_plan['python_code'].append(f"    chunk_params_{chunk_id}['{arg}'] = {arg}[{start}:{end}]")
+                    
+                    worker_plan['python_code'].append(f"    print(f'RUNNING PARALLEL TASK for {func_name} on chunk {chunk_id}')")
+                    worker_plan['python_code'].append(f"    partial_result_{chunk_id} = {func_name}(**chunk_params_{chunk_id})")
+                    worker_plan['python_code'].append(f"    send_data('partial_result_for_{output_var}', partial_result_{chunk_id}, consumers=['{AGGREGATOR_NAME}'])")
+                    master_plan.append(f"  - Worker {worker_name} assigned Chunk {chunk_id}.")
 
-    # --- Step 3: Write all generated plans to files ---
+            # Add the JOIN barrier to all active workers
+            for worker_name in worker_chunk_assignments.keys():
+                worker_plan = node_plans[worker_name]
+                worker_plan['python_code'].append(f"\n    # --- SYNCHRONIZATION BARRIER (JOIN) ---")
+                worker_plan['python_code'].append(f"    print('Waiting for final aggregated result...')")
+                worker_plan['python_code'].append(f"    {output_var} = wait_for_data('{output_var}', from_node='{AGGREGATOR_NAME}')")
+            master_plan.append(f"  - All workers ({', '.join(worker_chunk_assignments.keys())}) will WAIT for final result '{output_var}' from {AGGREGATOR_NAME}.")
+
+    # --- Phase 2: Write all generated files ---
+    python_harness_preamble = """
+import json
+import time
+
+# --- Communication & Execution Stubs ---
+# In a real system, these would interact with a message queue (e.g., RabbitMQ, ZeroMQ)
+def wait_for_data(variable_name, from_node):
+    print(f"--> [WAIT] Waiting for '{variable_name}' from {from_node}...")
+    time.sleep(1) # Simulate network latency
+    print(f"<-- [RECV] Received '{variable_name}'.")
+    # In a real system, this would block until data is received.
+    # Here, we return a placeholder.
+    return f"data_for_{variable_name}"
+
+def send_data(variable_name, data, consumers):
+    print(f"--> [SEND] Sending '{variable_name}' to {consumers}...")
+    time.sleep(0.5) # Simulate network latency
+    print(f"<-- [SENT] '{variable_name}'.")
+"""
+    
+    all_functions_source = "\n\n".join(function_definitions.values())
+    
     try:
-        # Write the master plan
         with open("master_schedule.txt", "w") as f:
             f.write("\n".join(master_plan))
         print("Master schedule written to master_schedule.txt")
 
-        # Write individual node plans
-        for node_name, plan_steps in node_plans.items():
-            if not plan_steps: continue # Don't create empty files
-            with open(f"{node_name}.txt", "w") as f:
-                f.write("\n".join(plan_steps))
-            print(f"Execution plan for {node_name} written to {node_name}.txt")
+        for node_name, plan_details in node_plans.items():
+            if not plan_details['python_code']: continue
+            
+            with open(f"{node_name}_data.json", "w") as f:
+                json.dump(plan_details['initial_data'], f, indent=4)
+            print(f"Initial data for {node_name} written to {node_name}_data.json")
+
+            # Correctly join the list of python code lines with newlines
+            scheduled_tasks_code = "\n".join(plan_details['python_code'])
+            
+            main_logic = f"""
+def main(node_name):
+    print(f"\\n*** Starting execution on {{node_name}} ***\\n")
+    try:
+        with open(f'{{node_name}}_data.json', 'r') as f:
+            initial_data = json.load(f)
+        print("--- Loaded initial data. ---")
+    except FileNotFoundError:
+        initial_data = {{}}
+        print("--- No initial data file found. ---")
+    
+    # --- SCHEDULED TASKS ---
+{scheduled_tasks_code}
+    
+    print(f"\\n*** Execution on {{node_name}} complete. ***\\n")
+
+if __name__ == "__main__":
+    main("{node_name}")
+"""
+            full_python_code = (
+                python_harness_preamble +
+                "\n\n# ==================================================\n" +
+                "#          RECONSTRUCTED FUNCTION DEFINITIONS          \n" +
+                "# ==================================================\n\n" +
+                all_functions_source +
+                "\n\n# ==================================================\n" +
+                "#               MAIN EXECUTION LOGIC                 \n" +
+                "# ==================================================\n" +
+                main_logic
+            )
+            
+            with open(f"{node_name}.py", "w") as f:
+                f.write(full_python_code)
+            print(f"Executable script for {node_name} written to {node_name}.py")
 
     except IOError as e:
         print(f"Error writing execution plan files: {e}")
-    
-    
-
+        
 # ==============================================================================
 # 6. MAIN EXECUTION BLOCK
 # ==============================================================================
@@ -736,7 +862,9 @@ def main():
         generate_execution_plan(
             consolidated_schedule_info,
             parallelization_plan,
-            nodes_data
+            nodes_data,
+            live_vars_data,
+            func_footprints_data
         )
 
         # --- OUTPUTS ---

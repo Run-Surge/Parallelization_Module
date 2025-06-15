@@ -4,3 +4,4 @@ myenv/*
 __pycache__
 temp_scheduler.py
 *.txt
+node-*.py
