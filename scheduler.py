@@ -28,7 +28,26 @@ def calculate_peak_memory_for_statements(statements, live_vars_data, func_footpr
         if instantaneous_memory > peak_memory_for_block:
             peak_memory_for_block = instantaneous_memory
     return peak_memory_for_block
+# ==============================================================================
+# 2. SCHEDULING ALGORITHMS
+# ==============================================================================
+def schedule_program_whole(program_statements, nodes_data, live_vars_data, func_footprints_data, stmt_to_idx_map):
+    """Attempt 1: Tries to schedule the entire program as one single block."""
+    print("--- Attempt 1: Scheduling the entire program on a single node ---")
+    
+    peak_memory = calculate_peak_memory_for_statements(program_statements, live_vars_data, func_footprints_data, stmt_to_idx_map)
+    print(f"Peak memory requirement for the whole program is: {peak_memory}")
 
+    sorted_nodes = sorted(nodes_data, key=lambda x: x['memory'])
+    print(sorted_nodes)
+    fitting_node = next((node for node in sorted_nodes if node['memory'] >= peak_memory), None)
+    
+    if fitting_node:
+        print(f"SUCCESS: Program fits on '{fitting_node['name']}' (Memory: {fitting_node['memory']}).")
+    else:
+        print("FAILURE: No single node has enough memory for the entire program.")
+        
+    return fitting_node
 # ==============================================================================
 # 1.1. CONTEXT-AWARE MEMORY CALCULATION
 # ==============================================================================
@@ -50,6 +69,9 @@ def calculate_peak_memory_for_merged_block(
     # These are the input variables the block depends on from the outside.
     external_dependency_vars = {k.split(':')[0] for k in block_keys if k.split(':')[0] != 'none'}
 
+    # This set will track variables created within the block as we iterate through its statements.
+    created_internal_vars = set()
+
     for i, stmt in enumerate(block_statements):
         # 1. Get the memory cost of the function call itself.
         func_execution_size = 0
@@ -58,12 +80,13 @@ def calculate_peak_memory_for_merged_block(
             key_prefix_to_find = f"{stmt}"
             found_key = next((k for k in func_footprints_data if k.startswith(key_prefix_to_find)), None)
             if found_key and func_footprints_data[found_key]:
+                # The peak memory inside a function is its final memory state
                 func_execution_size = list(func_footprints_data[found_key].values())[-1]
 
         # 2. Identify all variables that should be live at this point *within this block's context*.
         # These are the external dependencies PLUS any variables created in previous statements of this block.
-        internal_vars_so_far = {get_lhs_var(s) for s in block_statements[:i]}
-        relevant_vars = external_dependency_vars.union(internal_vars_so_far)
+        # We don't need to union the sets on each iteration, just check membership in either.
+        relevant_vars = external_dependency_vars.union(created_internal_vars)
 
         # 3. Sum the sizes of only these relevant live variables.
         # We look up their sizes in the global live_vars_data for the current statement.
@@ -72,35 +95,19 @@ def calculate_peak_memory_for_merged_block(
             var_info['size'] for var_name, var_info in live_vars_at_line.items()
             if var_name in relevant_vars
         )
+        
+        # 4. Update the set of internally created variables *after* calculating memory for the current line.
+        created_internal_vars.add(get_lhs_var(stmt))
 
-        # 4. Calculate total instantaneous memory and update the peak.
+        # 5. Calculate total instantaneous memory and update the peak.
         instantaneous_memory = sum_of_relevant_live_vars + func_execution_size
         if instantaneous_memory > peak_memory_for_block:
             peak_memory_for_block = instantaneous_memory
             
     return peak_memory_for_block
-
 # ==============================================================================
-# 2. SCHEDULING ALGORITHMS
+# 2.1. MERGING EXECUTION BLOCKS
 # ==============================================================================
-def schedule_program_whole(program_statements, nodes_data, live_vars_data, func_footprints_data, stmt_to_idx_map):
-    """Attempt 1: Tries to schedule the entire program as one single block."""
-    print("--- Attempt 1: Scheduling the entire program on a single node ---")
-    
-    peak_memory = calculate_peak_memory_for_statements(program_statements, live_vars_data, func_footprints_data, stmt_to_idx_map)
-    print(f"Peak memory requirement for the whole program is: {peak_memory}")
-
-    sorted_nodes = sorted(nodes_data, key=lambda x: x['memory'])
-    print(sorted_nodes)
-    fitting_node = next((node for node in sorted_nodes if node['memory'] >= peak_memory), None)
-    
-    if fitting_node:
-        print(f"SUCCESS: Program fits on '{fitting_node['name']}' (Memory: {fitting_node['memory']}).")
-    else:
-        print("FAILURE: No single node has enough memory for the entire program.")
-        
-    return fitting_node
-
 def process_and_merge_blocks(blocks_data, nodes_data, func_footprints_data, live_vars_data):
     """Attempt 2: Merges blocks based on dependencies and memory, then schedules the final blocks."""
     print("\n--- Attempt 2: Merging execution blocks to find a feasible schedule ---")
@@ -111,7 +118,6 @@ def process_and_merge_blocks(blocks_data, nodes_data, func_footprints_data, live
     max_node_memory = max(node['memory'] for node in nodes_data)
     print(f"System's Maximum Node Memory for merging: {max_node_memory}")
     
-    # This map is crucial and must be based on the original blocks_data, not the changing 'blocks' list
     stmt_to_idx_map = {stmt: i for i, block in enumerate(blocks_data) for stmt in block['statements']}
     
     blocks = json.loads(json.dumps(blocks_data)) 
@@ -122,24 +128,38 @@ def process_and_merge_blocks(blocks_data, nodes_data, func_footprints_data, live
         merged_in_pass = False
         source_idx = 0
         while source_idx < len(blocks):
-            current_block, did_merge_and_restart = blocks[source_idx], False
-            for key_str in current_block['key']:
-                target_idx = -1
+            current_block = blocks[source_idx]
+            did_merge_and_restart = False
+            
+            # Create a copy of keys to iterate over, as we might modify the original
+            for key_str in list(current_block['key']):
                 try:
                     var, index_str = key_str.split(':')
-                    if var != 'none' and index_str != 'none' and int(index_str) != source_idx:
-                        target_idx = int(index_str)
-                except (ValueError, IndexError): continue
-                if target_idx == -1: continue
+                    if var == 'none' or index_str == 'none' or not index_str.isdigit():
+                        continue
+                    
+                    ### BUG FIX 1: Convert 1-based key to 0-based index ###
+                    # The keys in the file are 1-based, but Python lists are 0-based.
+                    target_idx = int(index_str) - 1
+
+                    # A block cannot depend on itself. Also check for invalid indices.
+                    if target_idx == source_idx or target_idx < 0 or target_idx >= len(blocks):
+                        continue
+
+                except (ValueError, IndexError):
+                    continue
 
                 target_block = blocks[target_idx]
                 
-                # --- MODIFIED LOGIC START ---
+                # The dependent block's statements must come AFTER the precedent's statements.
+                # `current_block` depends on `target_block`.
                 temp_merged_statements = target_block['statements'] + current_block['statements']
-                # Combine keys for the temporary merged block to check its dependencies accurately
-                temp_merged_keys = list(dict.fromkeys(target_block['key'] + current_block['key']))
+                
+                # Combine keys, removing keys that are now internal to the merged block.
+                # The dependency of `current_block` on `target_block` is resolved by the merge.
+                temp_merged_keys = [k for k in current_block['key'] if k != key_str] + target_block['key']
+                temp_merged_keys = list(dict.fromkeys(temp_merged_keys)) # Remove duplicates
 
-                # Use the new, context-aware memory calculation function
                 merged_footprint = calculate_peak_memory_for_merged_block(
                     temp_merged_statements,
                     temp_merged_keys,
@@ -147,28 +167,54 @@ def process_and_merge_blocks(blocks_data, nodes_data, func_footprints_data, live
                     func_footprints_data,
                     stmt_to_idx_map
                 )
-                # --- MODIFIED LOGIC END ---
                 
                 if merged_footprint <= max_node_memory:
-                    print(f"  -> Merge PASSED: block {source_idx} -> block {target_idx} (New Peak: {merged_footprint})")
+                    print(f"  -> Merge PASSED: block {source_idx} (dep) into block {target_idx} (precedent). New Peak: {merged_footprint}")
+                    
+                    # Perform the merge: append dependent statements to precedent statements
                     target_block['statements'].extend(current_block['statements'])
-                    inherited_keys = [k for k in current_block['key'] if k.split(':')[-1] != str(target_idx)]
-                    target_block['key'] = list(dict.fromkeys(target_block['key'] + inherited_keys))
+                    target_block['key'] = temp_merged_keys # Use the already calculated keys
+                    
+                    # The block at source_idx is being removed.
+                    removed_block_key_val = source_idx + 1
                     blocks.pop(source_idx)
-                    # This key re-indexing logic remains the same
+                    
+                    # After removing, the target block might have a new index if it was after the source.
+                    merge_target_new_idx = target_idx if target_idx < source_idx else target_idx - 1
+                    merge_target_new_key_val = merge_target_new_idx + 1
+
+                    ### BUG FIX 2: Correctly re-index all keys in the system ###
                     for block_to_update in blocks:
-                        block_to_update['key'] = [
-                            f"{k.split(':')[0]}:{int(k.split(':')[1]) - 1}" if k.split(':')[1].isdigit() and int(k.split(':')[1]) > source_idx
-                            else f"{k.split(':')[0]}:{target_idx if target_idx < source_idx else target_idx - 1}" if k.split(':')[1].isdigit() and int(k.split(':')[1]) == source_idx
-                            else k
-                            for k in block_to_update['key']
-                        ]
-                    merged_in_pass, did_merge_and_restart = True, True
-                    break
-                else:
-                    print(f"  -> Merge FAILED: block {source_idx} -> block {target_idx} (New Peak: {merged_footprint})")
-            if did_merge_and_restart: break
-            else: source_idx += 1
+                        new_keys = []
+                        for k in block_to_update['key']:
+                            k_var, k_idx_str = k.split(':')
+                            if not k_idx_str.isdigit():
+                                new_keys.append(k)
+                                continue
+                            
+                            k_idx_val = int(k_idx_str)
+                            
+                            if k_idx_val == removed_block_key_val:
+                                # Dependency pointed to the removed block, so remap it to the merge target.
+                                new_keys.append(f"{k_var}:{merge_target_new_key_val}")
+                            elif k_idx_val > removed_block_key_val:
+                                # Dependency pointed to a block after the removed one, so its index shifts down.
+                                new_keys.append(f"{k_var}:{k_idx_val - 1}")
+                            else:
+                                # Dependency is unaffected.
+                                new_keys.append(k)
+                        block_to_update['key'] = new_keys
+
+                    merged_in_pass = True
+                    did_merge_and_restart = True
+                    break # Exit the keys loop for the current_block
+            
+            if did_merge_and_restart:
+                # The `blocks` list has changed, so restart the scan from the beginning.
+                source_idx = 0
+            else:
+                # No merge was performed for this block, move to the next one.
+                source_idx += 1
         
         pass_num += 1
 
@@ -176,8 +222,6 @@ def process_and_merge_blocks(blocks_data, nodes_data, func_footprints_data, live
     block_scheduling_info = []
     sorted_nodes = sorted(nodes_data, key=lambda x: x['memory'])
     for i, block in enumerate(blocks):
-        # --- MODIFIED LOGIC START ---
-        # Also use the new function for the final calculation
         final_peak_memory = calculate_peak_memory_for_merged_block(
             block['statements'],
             block['key'],
@@ -185,8 +229,6 @@ def process_and_merge_blocks(blocks_data, nodes_data, func_footprints_data, live
             func_footprints_data,
             stmt_to_idx_map
         )
-        # --- MODIFIED LOGIC END ---
-
         fitting_node = next((node for node in sorted_nodes if node['memory'] >= final_peak_memory), None)
         block_scheduling_info.append({"block_index": i, "statements": block['statements'], "peak_memory": final_peak_memory, "fitting_node": fitting_node})
         print(f"Final Block {i}: Peak Memory = {final_peak_memory}, Recommended Node = {fitting_node['name'] if fitting_node else 'None'}")
@@ -213,13 +255,13 @@ def consolidate_to_block_format(
         print("Error: No node data provided. Cannot perform consolidation.")
         return final_blocks, scheduling_info
 
-    # Determine the maximum memory available in the system
     max_node_memory = max(node['memory'] for node in nodes_data)
     print(f"System's Maximum Node Memory for consolidation: {max_node_memory}")
 
     if not any(info['fitting_node'] for info in scheduling_info):
         print("No schedulable blocks found. No consolidation performed.")
-        # ... (same handling as before for no schedulable blocks)
+        # If nothing is schedulable, just return the final blocks as is, but with final info
+        # (This part of the original code was missing a return, which could be an issue)
         return final_blocks, scheduling_info
 
     # --- Phase 1: Group contiguous schedulable blocks CONDITIONALLY ---
@@ -227,7 +269,9 @@ def consolidate_to_block_format(
     old_to_new_index_map = {}
     i = 0
     while i < len(final_blocks):
-        is_schedulable = scheduling_info[i].get('fitting_node') is not None
+        # We need the full info block, not just the fitting_node boolean
+        block_info = scheduling_info[i]
+        is_schedulable = block_info.get('fitting_node') is not None
         
         if is_schedulable:
             # Start a new potential group with the current block.
@@ -238,35 +282,29 @@ def consolidate_to_block_format(
             new_idx = len(preliminary_blocks)
             old_to_new_index_map[i] = new_idx
             
-            # Look ahead to the *next* blocks to see if we can merge them.
             j = i + 1
             while j < len(final_blocks) and (scheduling_info[j].get('fitting_node') is not None):
                 potential_next_block = final_blocks[j]
                 
-                # --- SIMULATE THE MERGE ---
                 temp_merged_statements = current_group["statements"] + potential_next_block["statements"]
-                # Combine keys for accurate context-aware calculation
                 temp_merged_keys = list(set(current_group["key"] + potential_next_block["key"]))
 
                 simulated_peak = calculate_peak_memory_for_merged_block(
                     temp_merged_statements, temp_merged_keys, live_vars_data, func_footprints_data, stmt_to_idx_map
                 )
 
-                # --- CHECK IF THE MERGE IS VALID ---
                 if simulated_peak <= max_node_memory:
                     print(f"  -> Merge SIMULATION PASSED: block {j} into group starting at {i} (New Peak: {simulated_peak})")
-                    # The merge is valid, so commit it.
                     current_group["statements"] = temp_merged_statements
                     current_group["key"] = temp_merged_keys
                     old_to_new_index_map[j] = new_idx
-                    j += 1 # Move on to try the next block
+                    j += 1
                 else:
                     print(f"  -> Merge SIMULATION FAILED: block {j} into group starting at {i} (New Peak: {simulated_peak} > {max_node_memory})")
-                    # The merge would create a block that is too large. Stop growing this group.
                     break
             
             preliminary_blocks.append(current_group)
-            i = j # IMPORTANT: Advance the main loop counter past all merged blocks
+            i = j
         else:
             # This is an unschedulable block, add it as-is
             new_idx = len(preliminary_blocks)
@@ -277,26 +315,29 @@ def consolidate_to_block_format(
     # --- Phase 2: Iterate through the new structure and rewrite all keys using the map ---
     final_consolidated_blocks = []
     for new_idx, block in enumerate(preliminary_blocks):
-        updated_keys = set() # Use a set to handle duplicates automatically
+        updated_keys = set()
         for key_str in block['key']:
             try:
                 var, index_str = key_str.split(':')
-                if index_str == 'none':
+                if not index_str.isdigit():
                     updated_keys.add(key_str)
                     continue
                 
-                old_dep_index = int(index_str)
+                # --- BUG FIX 1: Convert 1-based key from file to 0-based index for logic ---
+                old_dep_index_0_based = int(index_str) - 1
+                
                 # Find the new index that the old dependency now maps to
-                new_dep_index = old_to_new_index_map.get(old_dep_index)
+                new_dep_index = old_to_new_index_map.get(old_dep_index_0_based)
                 
                 # Only keep the key if it points to a DIFFERENT consolidated block
                 if new_dep_index is not None and new_dep_index != new_idx:
-                    updated_keys.add(f"{var}:{new_dep_index}")
+                    # --- BUG FIX 2: Convert new 0-based index back to 1-based for consistent output ---
+                    updated_keys.add(f"{var}:{new_dep_index + 1}")
             except (ValueError, IndexError):
-                updated_keys.add(key_str) # Keep malformed keys as is
+                updated_keys.add(key_str)
                 
         final_consolidated_blocks.append({
-            "key": sorted(list(updated_keys)), # Sort for consistent output
+            "key": sorted(list(updated_keys)),
             "statements": block["statements"]
         })
 
@@ -306,7 +347,6 @@ def consolidate_to_block_format(
     
     for i, block in enumerate(final_consolidated_blocks):
         if block['statements']:
-            # Use the correct peak memory calculation for the now-contiguous block
             peak_memory = calculate_peak_memory_for_merged_block(
                 block['statements'], block['key'], live_vars_data, func_footprints_data, stmt_to_idx_map
             )
@@ -328,7 +368,6 @@ def consolidate_to_block_format(
             })
 
     return final_consolidated_blocks, consolidated_schedule_info
-
 # ==============================================================================
 # 4. PARALLELIZATION WITH DEFERRAL LOGIC
 # ==============================================================================
@@ -522,18 +561,9 @@ def plan_data_parallelization(
         }
 
     return parallelization_plan
-
 # ==============================================================================
-# 5. FINAL EXECUTION PLAN GENERATION
+# 5. FINAL EXECUTION PLAN GENERATION (COMPLETE AND CORRECTED)
 # ==============================================================================
-
-# ==============================================================================
-# 6. FINAL EXECUTION PLAN GENERATION (WITH ABSTRACT AGGREGATOR)
-# ==============================================================================
-# ==============================================================================
-# 6. FINAL EXECUTION PLAN GENERATION (COMPLETE AND CORRECTED)
-# ==============================================================================
-# --- NEW HELPER: Reconstructs all function definitions from footprints ---
 def build_function_definitions(func_footprints_data):
     """
     Parses the function footprints to build a dictionary of unique,
@@ -562,12 +592,6 @@ def build_function_definitions(func_footprints_data):
         processed_function_names.add(func_name)
         
     return all_functions_code
-# ==============================================================================
-# 6. FINAL EXECUTION PLAN GENERATION (EXECUTABLE CODE)
-# ==============================================================================
-# ==============================================================================
-# 6. FINAL EXECUTION PLAN GENERATION (EXECUTABLE CODE)
-# ==============================================================================
 def generate_execution_plan(
     consolidated_schedule_info,
     parallelization_plan,
@@ -868,10 +892,10 @@ def main():
         )
 
         # --- OUTPUTS ---
-        # with open("final.json", 'w') as f:
-        #     json.dump(final_blocks, f, indent=4)
-        # with open("blocks.json", 'w') as f:
-        #     json.dump(scheduling_info, f, indent=4)
+        with open("final.json", 'w') as f:
+            json.dump(final_blocks, f, indent=4)
+        with open("blocks.json", 'w') as f:
+            json.dump(scheduling_info, f, indent=4)
         with open("final_schedule_info.json", 'w') as f:
             json.dump(consolidated_schedule_info, f, indent=4)
         with open("consolidated_schedule.json", 'w') as f:
