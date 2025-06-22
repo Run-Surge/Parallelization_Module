@@ -73,14 +73,6 @@ def compute_correlation_matrix(numeric_data, means):
 
 ##########################################################################################################
 if __name__ == '__main__':
-    def infer_type(value):
-        try:
-            return int(value)
-        except ValueError:
-            try:
-                return float(value)
-            except ValueError:
-                return value.strip()
 #---------------------------------------------------------------------------------------------------------
 #! This block handles data loading please don't edit it (Note:The data is loaded into a list of name data)
     def infer_type(value):
