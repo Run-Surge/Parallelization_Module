@@ -190,7 +190,7 @@ def get_memory_foortprint(file_path, entry_point, functions):
                 if func_tuple[0] == func_name:
                     return idx
             return -1
-        def get_footprint(node,local_parser,func_lines_footprint):
+        def get_footprint(node,local_parser,func_lines_footprint,original_code):
             tree = copy.deepcopy(node.body[0])  # Get the first statement in the function body
             # print(ast.dump(tree, indent=4))  # Debugging: print the AST nodes
             if isinstance(tree, ast.Assign):
@@ -241,7 +241,7 @@ def get_memory_foortprint(file_path, entry_point, functions):
                 local_parser._handle_if_footprint(tree)
             # print(ast.unparse(node))  # Debugging: print the source code of the node
             key = f"{main_code_line}#{lineno}:{func_name}"
-            func_lines_footprint[key][ast.unparse(node)] = sum(val[1] for val in local_parser.vars.values())
+            func_lines_footprint[key][original_code] = sum(val[1] for val in local_parser.vars.values())
         local_parser = Memory_Parser()
         lines_footprint = {}
         index = find_func_index(func_name, functions)
@@ -260,6 +260,7 @@ def get_memory_foortprint(file_path, entry_point, functions):
             tree = ast.parse(code)
             agg = False
             for node in tree.body:
+                original_code = ast.unparse(node)
                 # print(ast.dump(node, indent=4))  # Debugging: print the AST nodes
                 node = AugAssignToAssignTransformer().visit(node)
                 ast.fix_missing_locations(node)
@@ -285,7 +286,7 @@ def get_memory_foortprint(file_path, entry_point, functions):
                        else:
                            raise ValueError(f"Invalid aggregation type: {letter}")
                 else:
-                    get_footprint(node, local_parser, func_lines_footprint)
+                    get_footprint(node, local_parser, func_lines_footprint,original_code)
             if not agg:
                 raise ValueError(f"Function {func_name} does not have an aggregation type defined.")
            
