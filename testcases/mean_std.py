@@ -1,6 +1,6 @@
 ##########################################################################################################
 #! User defined variables
-
+import csv
 FILE_NAME = 'test.csv'  # Name of the file to read data from
 
 ##########################################################################################################
@@ -67,12 +67,20 @@ def calculate_std(data,mean_values):
 
 ##########################################################################################################
 if __name__ == '__main__':
+    def infer_type(value):
+        try:
+            return int(value)
+        except ValueError:
+            try:
+                return float(value)
+            except ValueError:
+                return value.strip()
 #---------------------------------------------------------------------------------------------------------
 #! This block handles data loading please don't edit it (Note:The data is loaded into a list of name data)
     try:
         with open(FILE_NAME, 'r') as file:
             lines = file.readlines()
-            data = [line.strip().split(',') for line in lines]
+            data = [[infer_type(cell) for cell in line.strip().split(',')] for line in lines]
     except FileNotFoundError:
         print("File not found. Please ensure 'test.csv' exists in the current directory.")
 #---------------------------------------------------------------------------------------------------------
@@ -82,15 +90,16 @@ if __name__ == '__main__':
 #! copy of the list instead of the same list for performing different operations in parallel
     mean_values = calculate_mean(data)
     std_data = calculate_std(data,mean_values)
-    output = std_data
+    output = [std_data]
     
     
 #---------------------------------------------------------------------------------------------------------
 #! Saving the output to a file please don't edit this block
 #! output name should be a list named output
-    with open('output.csv', 'w') as file:
+    with open('output.csv', 'w', newline='') as file:
+        writer = csv.writer(file)
         for row in output:
-            file.write(','.join(row) + '\n')
+            writer.writerow(row)
 #---------------------------------------------------------------------------------------------------------
 
 
