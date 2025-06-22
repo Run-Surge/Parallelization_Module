@@ -1,43 +1,30 @@
 [
     {
         "code line": 1,
-        "statement": "numeric_data = preprocess_data(data)",
+        "statement": "mean_values = calculate_mean(data)",
         "has": [
-            "numeric_data"
+            "mean_values"
         ],
         "needs": []
     },
     {
         "code line": 2,
-        "statement": "means = compute_column_means(numeric_data)",
+        "statement": "std_data = calculate_std(data, mean_values)",
         "has": [
-            "means"
+            "std_data"
         ],
         "needs": [
-            "numeric_data"
+            "mean_values"
         ]
     },
     {
         "code line": 3,
-        "statement": "stds = compute_column_stds(numeric_data, means)",
-        "has": [
-            "stds"
-        ],
-        "needs": [
-            "means",
-            "numeric_data"
-        ]
-    },
-    {
-        "code line": 4,
-        "statement": "output = normalize_data(numeric_data, means, stds)",
+        "statement": "output = [std_data]",
         "has": [
             "output"
         ],
         "needs": [
-            "stds",
-            "means",
-            "numeric_data"
+            "std_data"
         ]
     }
 ]

@@ -1,6 +1,6 @@
 ##########################################################################################################
 #! User defined variables
-
+import csv
 FILE_NAME = 'test.csv'  # Name of the file to read data from
 
 ##########################################################################################################
@@ -21,29 +21,30 @@ FILE_NAME = 'test.csv'  # Name of the file to read data from
 #! format aggregation = "type:list"
 #! each function must have an aggregation variable just before the return statement
 def add1(data):
-    header = data[0][0]
+    header = data[0]
     rows = data[1:]
-    new_data = []
-    for row in data:
-        new_row = []
-        for value in row:
-            new_value = int(value) + 1  
-            new_row.append(new_value)
-        new_data.append(new_row)
-    new_data.insert(0, header) 
-    aggregation = "s:new_data"  
-    return new_data            
+    new_data = [header]
+    for row in rows:
+        val = int(row[0])
+        new_val = val + 1
+        to_add = str(new_val)  # Convert to string for consistency with the original data format
+        new_data.append([to_add])
+        new_data.append(row)
+    aggregation = "s:new_data"
+    return new_data
 def hello(z):
-    z = z + 1
+    z.append(1)
     aggregation = ""
     return z
 def hello2():
     v  = 4 + 3
+    v = [v]
     aggregation = ""
     return v
 def hello3(x,y,z):
-    x = x+1
-    x += y + z + 5
+    x = x * 8 + 7
+    x += 5
+    x = [x]
     aggregation = ""
     return x 
 def calc(x,y,z,a,b,c,d):
@@ -58,10 +59,18 @@ def calc(x,y,z,a,b,c,d):
 if __name__ == '__main__':
 #---------------------------------------------------------------------------------------------------------
 #! This block handles data loading please don't edit it (Note:The data is loaded into a list of name data)
+    def infer_type(value):
+        try:
+            return int(value)
+        except ValueError:
+            try:
+                return float(value)
+            except ValueError:
+                return value.strip()
     try:
         with open(FILE_NAME, 'r') as file:
             lines = file.readlines()
-            data = [line.strip().split(',') for line in lines]
+            data = [[infer_type(cell) for cell in line.strip().split(',')] for line in lines]
     except FileNotFoundError:
         print("File not found. Please ensure 'test.csv' exists in the current directory.")
 #---------------------------------------------------------------------------------------------------------
@@ -87,9 +96,10 @@ if __name__ == '__main__':
 #---------------------------------------------------------------------------------------------------------
 #! Saving the output to a file please don't edit this block
 #! output name should be a list named output
-    with open('output.csv', 'w') as file:
+    with open('output.csv', 'w', newline='') as file:
+        writer = csv.writer(file)
         for row in output:
-            file.write(','.join(row) + '\n')
+            writer.writerow(row)
 #---------------------------------------------------------------------------------------------------------
 
 

@@ -387,7 +387,7 @@ def main():
     #     sys.exit(1)
 
     # filename = sys.argv[1]
-    filename= 'testcases/z_score_norm.py'
+    filename= 'testcases/mean_std.py'
     #! Check for syntax errors
     if check_syntax_errors(filename, error_file):
        print(f"1. Syntax check passed for {filename}.")

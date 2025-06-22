@@ -4,45 +4,39 @@
             "args:none"
         ],
         "statements": [
-            "def normalize_data(numeric_data,means,stds):"
+            "def hello3(x,y,z):"
         ]
     },
     {
         "key": [
-            "numeric_data:0"
+            "x:0"
         ],
         "statements": [
-            "num_columns = len(numeric_data[0])",
-            "num_rows = len(numeric_data)"
+            "x = x * 8 + 7"
         ]
     },
     {
         "key": [
-            "none:none"
+            "x:1"
         ],
         "statements": [
-            "normalized_data = []"
+            "x = x + 5"
         ]
     },
     {
         "key": [
-            "means:0",
-            "normalized_data:2",
-            "num_columns:1",
-            "num_rows:1",
-            "numeric_data:0",
-            "stds:0"
+            "x:2"
         ],
         "statements": [
-            "for row_idx in range(num_rows):\n    norm_row = []\n    for col_idx in range(num_columns):\n        val = numeric_data[row_idx][col_idx]\n        std_i = stds[col_idx]\n        if std_i == 0:\n            norm_val = 0.0\n        else:\n            norm_val = (val - means[col_idx]) / std_i\n        norm_row.append(norm_val)\n    normalized_data.append(norm_row)"
+            "x = [x]"
         ]
     },
     {
         "key": [
-            "normalized_data:3"
+            "x:3"
         ],
         "statements": [
-            "return normalized_data"
+            "return x"
         ]
     }
 ]

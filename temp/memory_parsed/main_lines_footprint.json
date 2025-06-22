@@ -1,48 +1,30 @@
 {
-    "numeric_data = preprocess_data(data)": {
+    "mean_values = calculate_mean(data)": {
         "data": {
             "length": 11,
             "size": 576
         }
     },
-    "means = compute_column_means(numeric_data)": {
+    "std_data = calculate_std(data, mean_values)": {
         "data": {
             "length": 11,
             "size": 576
         },
-        "numeric_data": {
-            "length": 11,
-            "size": 7262608
-        }
-    },
-    "stds = compute_column_stds(numeric_data, means)": {
-        "data": {
-            "length": 11,
-            "size": 576
-        },
-        "numeric_data": {
-            "length": 11,
-            "size": 7262608
-        },
-        "means": {
+        "mean_values": {
             "length": 11,
             "size": 2256
         }
     },
-    "output = normalize_data(numeric_data, means, stds)": {
+    "output = [std_data]": {
         "data": {
             "length": 11,
             "size": 576
         },
-        "numeric_data": {
-            "length": 11,
-            "size": 7262608
-        },
-        "means": {
+        "mean_values": {
             "length": 11,
             "size": 2256
         },
-        "stds": {
+        "std_data": {
             "length": 11,
             "size": 2256
         }

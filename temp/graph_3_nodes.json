@@ -1,69 +1,42 @@
 [
     {
         "code line": 0,
-        "statement": "def compute_column_stds(numeric_data,means):",
-        "has": [
-            "numeric_data",
-            "means"
-        ],
+        "statement": "def hello2():",
+        "has": [],
         "needs": []
     },
     {
         "code line": 1,
-        "statement": "num_columns = len(numeric_data[0])",
+        "statement": "v = 4 + 3",
         "has": [
-            "num_columns"
-        ],
-        "needs": [
-            "numeric_data"
-        ]
-    },
-    {
-        "code line": 2,
-        "statement": "num_rows = len(numeric_data)",
-        "has": [
-            "num_rows"
-        ],
-        "needs": [
-            "numeric_data"
-        ]
-    },
-    {
-        "code line": 3,
-        "statement": "stds = []",
-        "has": [
-            "stds"
+            "v"
         ],
         "needs": []
     },
     {
-        "code line": 4,
-        "statement": "for col_idx in range(num_columns):\n    var_sum = 0.0\n    mean_i = means[col_idx]\n    for row_idx in range(num_rows):\n        diff = numeric_data[row_idx][col_idx] - mean_i\n        var_sum = var_sum + diff * diff\n    std = (var_sum / num_rows) ** 0.5\n    stds.append(std)",
+        "code line": 2,
+        "statement": "v = [v]",
         "has": [
-            "stds"
+            "v"
         ],
         "needs": [
-            "num_rows",
-            "num_columns",
-            "stds",
-            "means",
-            "numeric_data"
+            "v"
         ]
     },
     {
-        "code line": 5,
-        "statement": "aggregation = 'a:stds'",
+        "code line": 3,
+        "statement": "aggregation = ''",
         "has": [
             "aggregation"
         ],
         "needs": []
     },
     {
-        "code line": 6,
-        "statement": "return stds",
+        "code line": 4,
+        "statement": "return v",
         "has": [],
         "needs": [
-            "stds"
+            "v"
         ]
     }
 ]

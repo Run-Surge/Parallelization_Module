@@ -45,3 +45,11 @@ Syntax error in mean_std.py:   File "mean_std.py", line 34
                                      ^
 SyntaxError: unmatched ')'
 
+Syntax error in sample_submission.py: Sorry: IndentationError: unindent does not match any outer indentation level (sample_submission.py, line 70)
+Syntax error in sample_submission.py: Sorry: IndentationError: unindent does not match any outer indentation level (sample_submission.py, line 70)
+Syntax error in sample_submission.py: Sorry: IndentationError: unindent does not match any outer indentation level (sample_submission.py, line 70)
+Syntax error in testcases/mean_std.py:   File "testcases/mean_std.py", line 102
+    writer.writerow(row))
+                        ^
+SyntaxError: unmatched ')'
+

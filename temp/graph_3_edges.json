@@ -1,22 +1,11 @@
 {
-    "1": {
-        "Node": 1,
-        "Depends on": [
-            {
-                "Node": 0,
-                "Dependency": [
-                    "numeric_data"
-                ]
-            }
-        ]
-    },
     "2": {
         "Node": 2,
         "Depends on": [
             {
-                "Node": 0,
+                "Node": 1,
                 "Dependency": [
-                    "numeric_data"
+                    "v"
                 ]
             }
         ]
@@ -27,37 +16,7 @@
             {
                 "Node": 2,
                 "Dependency": [
-                    "num_rows"
-                ]
-            },
-            {
-                "Node": 1,
-                "Dependency": [
-                    "num_columns"
-                ]
-            },
-            {
-                "Node": 3,
-                "Dependency": [
-                    "stds"
-                ]
-            },
-            {
-                "Node": 0,
-                "Dependency": [
-                    "means",
-                    "numeric_data"
-                ]
-            }
-        ]
-    },
-    "6": {
-        "Node": 6,
-        "Depends on": [
-            {
-                "Node": 4,
-                "Dependency": [
-                    "stds"
+                    "v"
                 ]
             }
         ]
