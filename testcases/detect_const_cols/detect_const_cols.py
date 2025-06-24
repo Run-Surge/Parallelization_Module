@@ -21,7 +21,7 @@ FILE_NAME = 'test.csv'  # Name of the file to read data from
 #! format aggregation = "type:list"
 #! each function must have an aggregation variable just before the return statement
 
-def calculate_min(data):
+def detect_constant_columns(data):
     numeric_data = []
     for row in data[1:]:  # Skip header
         numeric_row = []
@@ -31,35 +31,23 @@ def calculate_min(data):
 
     num_columns = len(numeric_data[0])
     num_rows = len(numeric_data)
-    min_values = []
+    is_constant = []
     for col_idx in range(num_columns):
-        min_val = numeric_data[0][col_idx]
+        first_value = numeric_data[0][col_idx]
+        constant = True
         for row_idx in range(1, num_rows):
-            if numeric_data[row_idx][col_idx] < min_val:
-                min_val = numeric_data[row_idx][col_idx]
-        min_values.append(min_val)
-    aggregation = "n:min_values"
-    return min_values
-
-def calculate_max(data):
-    numeric_data = []
-    for row in data[1:]:  # Skip header
-        numeric_row = []
-        for x in row:
-            numeric_row.append(x)
-        numeric_data.append(numeric_row)
-
-    num_columns = len(numeric_data[0])
-    num_rows = len(numeric_data)
-    max_values = []
-    for col_idx in range(num_columns):
-        max_val = numeric_data[0][col_idx]
-        for row_idx in range(1, num_rows):
-            if numeric_data[row_idx][col_idx] > max_val:
-                max_val = numeric_data[row_idx][col_idx]
-        max_values.append(max_val)
-    aggregation = "m:max_values"
-    return max_values
+            if numeric_data[row_idx][col_idx] != first_value:
+                constant = False
+                break
+        if constant:
+            is_constant.append(1)
+        else:
+            is_constant.append(0)
+    result = []
+    result.append(data[0])
+    result.append(is_constant)
+    aggregation = "c:result"
+    return result
 
 ##########################################################################################################
 
@@ -83,12 +71,12 @@ if __name__ == '__main__':
     except FileNotFoundError:
         print("File not found. Please ensure 'test.csv' exists in the current directory.")
 #---------------------------------------------------------------------------------------------------------
+
 #! User main function is defined here
 #! Note for boosting performance if list is modified inside the function (each function call is independent) then return pass a 
 #! copy of the list instead of the same list for performing different operations in parallel
-    min_values = calculate_min(data)
-    max_values = calculate_max(data)
-    output = [min_values, max_values]
+    is_constant = detect_constant_columns(data)
+    output = is_constant
 
 #---------------------------------------------------------------------------------------------------------
 #! Saving the output to a file please don't edit this block

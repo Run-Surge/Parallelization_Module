@@ -21,7 +21,8 @@ FILE_NAME = 'test.csv'  # Name of the file to read data from
 #! format aggregation = "type:list"
 #! each function must have an aggregation variable just before the return statement
 
-def calculate_sum(data):
+def filter_above_threshold(data):
+    threshold = 20
     numeric_data = []
     for row in data[1:]:  # Skip header
         numeric_row = []
@@ -31,14 +32,31 @@ def calculate_sum(data):
 
     num_columns = len(numeric_data[0])
     num_rows = len(numeric_data)
-    sum_values = []
+    filtered = []
     for col_idx in range(num_columns):
-        total = 0
+        col_filtered = []
         for row_idx in range(num_rows):
-            total += numeric_data[row_idx][col_idx]
-        sum_values.append(total)
-    aggregation = "s:sum_values"
-    return sum_values
+            value = numeric_data[row_idx][col_idx]
+            if value > threshold:
+                col_filtered.append(value)
+        filtered.append(col_filtered)
+    aggregation = "c:filtered"
+    return filtered
+
+def mean_filtered_columns(filtered):
+    mean_values = []
+    mean = 0
+    for column in filtered:
+        if len(column) > 0:
+            total = 0
+            for x in column:
+                total += x
+            mean = total / len(column)
+        else:
+            mean = 0
+        mean_values.append(mean)
+    aggregation = "a:mean_values"
+    return mean_values
 
 ##########################################################################################################
 
@@ -66,8 +84,9 @@ if __name__ == '__main__':
 #! User main function is defined here
 #! Note for boosting performance if list is modified inside the function (each function call is independent) then return pass a 
 #! copy of the list instead of the same list for performing different operations in parallel
-    sum_values = calculate_sum(data)
-    output = sum_values
+    filtered = filter_above_threshold(data)
+    mean_values = mean_filtered_columns(filtered)
+    output = [mean_values]
 
 #---------------------------------------------------------------------------------------------------------
 #! Saving the output to a file please don't edit this block
