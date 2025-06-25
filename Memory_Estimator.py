@@ -169,7 +169,7 @@ class Memory_Parser:
         if match:
             var_name = match.group(1)
             if var_name in self.vars:
-                length = self.vars[var_name][0] if self.vars[var_name][2] == 'list' else 500
+                length = self.vars[var_name][0] if self.vars[var_name][2] == 'list' else 420
                 modified_code = re.sub(pattern, str(length), code)
                 # print(f"Modified code: {modified_code}")  # Debugging: print the modified code
                 tree = ast.parse(modified_code).body[0]  
@@ -183,7 +183,7 @@ class Memory_Parser:
             full_index_expr = match.group(1)  # e.g., numeric_data[0]
             var_name = full_index_expr.split('[')[0]  # Extract base variable name, e.g., numeric_data
             if var_name in self.vars:
-                length = str(self.vars[var_name][0] if self.vars[var_name][2] == 'list' else 500)  # Convert to string
+                length = str(self.vars[var_name][0] if self.vars[var_name][2] == 'list' else 420)  # Convert to string
                 # Replace only the matched part
                 modified_code = code[:match.start()] + str(length) + code[match.end():]
                 # print(f"Modified code: {modified_code}")  # Debugging: print the modified code
@@ -413,7 +413,7 @@ class Memory_Parser:
             stmt=stmt.value.args[0]
         elif (isinstance(stmt.value, ast.Subscript)):
             size, length = handle_subscript(stmt.value)
-            self.vars[var] = (length, size, 'list')
+            self.vars[var] = (length, size//10, 'list')
             return  
                         
         elif (isinstance(stmt.value, ast.BinOp)): 
@@ -453,7 +453,7 @@ class Memory_Parser:
                     if length == -1:
                         self.vars[var] = (111111111, size, 'unk')
                     else:
-                        self.vars[var] = (length, size, 'list')               
+                        self.vars[var] = (length, size//10, 'list')               
                 return
         elif (isinstance(stmt.value, ast.ListComp)):
             elt = stmt.value.elt
@@ -470,7 +470,7 @@ class Memory_Parser:
             self._evaluate_list_assignment(new_assign)
             length = self.vars[var][0] * multiplier
             size = self.vars[var][1] * multiplier
-            self.vars[var] = (length, size, 'list')
+            self.vars[var] = (length, size//10, 'list')
             return
         else:
             stmt=stmt.value
@@ -479,9 +479,9 @@ class Memory_Parser:
         memory = self.primitives_estimator.estimate_list_size(list_length)
         elements_size = _parse_list_elements_sizes(stmt)[0] * multiplier
         if first:
-           self.vars[var] = (list_length,elements_size,'list')
+           self.vars[var] = (list_length,elements_size//2,'list')
         else:
-            self.vars[var] = (self.vars[var][0] + list_length, self.vars[var][1] + elements_size, 'list')
+            self.vars[var] = (self.vars[var][0] + list_length, (self.vars[var][1] + elements_size)//2, 'list')
         
           
     def _assignmemt_handler(self,tree):
@@ -521,7 +521,7 @@ class Memory_Parser:
                             length = self.vars[item][0]
                             size = self.vars[item][1]
                             total_size = size + self.primitives_estimator.estimate_list_size(length) -  sys.getsizeof([]) #! should be 2 one for get the size of the list and one for the pointer in the original list
-                            self.vars[var] = (self.vars[var][0] + length, self.vars[var][1] + total_size, 'list')
+                            self.vars[var] = (self.vars[var][0] + length, (self.vars[var][1] + total_size)//2, 'list')
                             continue
                     flattened_args.append(item)
             args = flattened_args
@@ -646,12 +646,12 @@ class Memory_Parser:
                 else:
                     length = total_length - 1
                     size = total_size - total_size // total_length
-                self.vars[var_id] = (length, size, 'list')
+                self.vars[var_id] = (length, size//10, 'list')
             elif lower is None and upper is not None:
                 length = upper// step
                 size = total_size - total_size//total_length * length
                 length = total_length - length
-                self.vars[var_id] = (length, size, 'list')     
+                self.vars[var_id] = (length, size//10, 'list')     
 
                 
             return                
@@ -832,11 +832,9 @@ class Memory_Parser:
             if not isinstance(node, ast.For):
                 return
             # print("  " * depth + f"Handling loop at depth {depth}")
-            n_iters = n_outer_iterations if depth == 0 else n_inner_iterations * n_outer_iterations
+            n_iters = n_outer_iterations if depth == 0 else n_inner_iterations #* n_outer_iterations
             if not isinstance(n_iters, int):
-                n_iters = 500
-            n_iters = n_iters // 16
-            n_iters = max(n_iters, 1)  # Ensure at least one iteration
+                n_iters = 420
             for stmt in node.body:
                 # print(ast.dump(stmt, indent=4))
                 if isinstance(stmt, ast.For):
@@ -857,20 +855,20 @@ class Memory_Parser:
                         if isinstance(stmt.targets[0], ast.Subscript):
                            return #! most probably changing a value not inserting anything 
                         stmt = self.conv_len_assignment(deepcopy(stmt))
-                        if stmt.targets[0].id in self.vars: 
-                            if self.vars[stmt.targets[0].id][2] == 'list':
-                                size_before_loop = self.vars[stmt.targets[0].id][1]
-                                len_before_loop = self.vars[stmt.targets[0].id][0]
-                                self._assignmemt_handler(stmt)
-                                size_after_loop = self.vars[stmt.targets[0].id][1]
-                                len_after_loop = self.vars[stmt.targets[0].id][0]
-                                size_increment = size_after_loop - size_before_loop
-                                len_increment = len_after_loop - len_before_loop
-                                new_size = size_before_loop + size_increment * int(n_iters)
-                                new_length = len_before_loop + len_increment * int(n_iters)
-                                self.vars[stmt.targets[0].id] = (new_length,new_size, 'list')
-                        else:
-                            self._assignmemt_handler(stmt)
+                        # if stmt.targets[0].id in self.vars: 
+                        #     if self.vars[stmt.targets[0].id][2] == 'list':
+                        #         size_before_loop = self.vars[stmt.targets[0].id][1]
+                        #         len_before_loop = self.vars[stmt.targets[0].id][0]
+                        #         self._assignmemt_handler(stmt)
+                        #         size_after_loop = self.vars[stmt.targets[0].id][1]
+                        #         len_after_loop = self.vars[stmt.targets[0].id][0]
+                        #         size_increment = size_after_loop - size_before_loop
+                        #         len_increment = len_after_loop - len_before_loop
+                        #         new_size = size_before_loop + size_increment * int(n_iters)
+                        #         new_length = len_before_loop + len_increment * int(n_iters)
+                        #         self.vars[stmt.targets[0].id] = (new_length,new_size, 'list')
+                        # else:
+                        self._assignmemt_handler(stmt)
                     elif  isinstance(stmt, ast.AugAssign):
                         size_before_loop = self.vars[stmt.target.id][1]
                         len_before_loop = self.vars[stmt.target.id][0]
@@ -881,7 +879,7 @@ class Memory_Parser:
                         len_increment = len_after_loop - len_before_loop
                         new_size = size_before_loop + size_increment * int(n_iters)
                         new_length = len_before_loop + len_increment * int(n_iters)
-                        self.vars[stmt.target.id] = (new_length,new_size, 'list')
+                        self.vars[stmt.target.id] = (new_length,new_size//10, 'list')
                     elif isinstance(stmt, ast.Expr):
                         func = stmt.value.func.attr 
                         if func in ['insert', 'append', 'extend']:
@@ -894,7 +892,7 @@ class Memory_Parser:
                             len_increment = len_after_loop - len_before_loop
                             new_size = size_before_loop + size_increment * int(n_iters)
                             new_length = len_before_loop + len_increment * int(n_iters)
-                            self.vars[stmt.value.func.value.id] = (new_length,new_size, 'list')
+                            self.vars[stmt.value.func.value.id] = (new_length,new_size//10, 'list')
                         elif func in ['pop', 'remove','clear']:
                             size_before_loop = self.vars[stmt.value.func.value.id][1]
                             len_before_loop = self.vars[stmt.value.func.value.id][0]
@@ -905,7 +903,7 @@ class Memory_Parser:
                             len_decrement = len_after_loop - len_before_loop
                             new_size = size_before_loop + size_decrement * int(n_iters)
                             new_length = len_before_loop + len_decrement * int(n_iters)
-                            self.vars[stmt.value.func.value.id] = (new_length,new_size, 'list')
+                            self.vars[stmt.value.func.value.id] = (new_length,new_size//10, 'list')
                     elif  isinstance(stmt, ast.Delete):
                             for target in stmt.targets:
                                 if isinstance(target, ast.Subscript) and isinstance(target.value, ast.Name):    
@@ -962,7 +960,7 @@ class Memory_Parser:
         
         original_vars = self.vars.copy()
         n_outer_iterations = get_number_outer_iterations(node)
-        n_inner_iterations = 500 if has_inner_for_loop(node) else None
+        n_inner_iterations = 420 if has_inner_for_loop(node) else None
         targets = get_assignment_targets(node)
         costs = get_iterable_cost_expr_only(node, self.vars) 
         for i,target in enumerate(targets):
@@ -988,8 +986,7 @@ class Memory_Parser:
             return blocks
         def handle_if_blocks(blocks,n_iterations = 1):
             vars_footprints_dicts= []
-            n_iter = n_iterations // 16 #heuristic by trial and error
-            n_iter = max(n_iter,1)  #heuristic by trial and error
+            n_iter = n_iterations 
             for block in blocks:
                 original_vars = self.vars.copy()
                 for stmt in block.body:
@@ -997,20 +994,20 @@ class Memory_Parser:
                         if isinstance(stmt.targets[0], ast.Subscript):
                            return #! most probably changing a value not inserting anything 
                         stmt = self.conv_len_assignment(deepcopy(stmt))
-                        if stmt.targets[0].id in self.vars: 
-                            if self.vars[stmt.targets[0].id][2] == 'list':
-                                size_before_loop = self.vars[stmt.targets[0].id][1]
-                                len_before_loop = self.vars[stmt.targets[0].id][0]
-                                self._assignmemt_handler(stmt)
-                                size_after_loop = self.vars[stmt.targets[0].id][1]
-                                len_after_loop = self.vars[stmt.targets[0].id][0]
-                                size_increment = size_after_loop - size_before_loop
-                                len_increment = len_after_loop - len_before_loop
-                                new_size = size_before_loop + size_increment * int(n_iter)
-                                new_length = len_before_loop + len_increment * int(n_iter)
-                                self.vars[stmt.targets[0].id] = (new_length,new_size, 'list')
-                        else:
-                            self._assignmemt_handler(stmt)
+                        # if stmt.targets[0].id in self.vars: 
+                        #     if self.vars[stmt.targets[0].id][2] == 'list':
+                        #         size_before_loop = self.vars[stmt.targets[0].id][1]
+                        #         len_before_loop = self.vars[stmt.targets[0].id][0]
+                        #         self._assignmemt_handler(stmt)
+                        #         size_after_loop = self.vars[stmt.targets[0].id][1]
+                        #         len_after_loop = self.vars[stmt.targets[0].id][0]
+                        #         size_increment = size_after_loop - size_before_loop
+                        #         len_increment = len_after_loop - len_before_loop
+                        #         new_size = size_before_loop + size_increment * int(n_iter)
+                        #         new_length = len_before_loop + len_increment * int(n_iter)
+                        #         self.vars[stmt.targets[0].id] = (new_length,new_size, 'list')
+                        # else:
+                        self._assignmemt_handler(stmt)
                     elif  isinstance(stmt, ast.AugAssign):
                         size_before_loop = self.vars[stmt.target.id][1]
                         len_before_loop = self.vars[stmt.target.id][0]
@@ -1021,7 +1018,7 @@ class Memory_Parser:
                         len_increment = len_after_loop - len_before_loop
                         new_size = size_before_loop + size_increment * int(n_iter)
                         new_length = len_before_loop + len_increment * int(n_iter)
-                        self.vars[stmt.target.id] = (new_length,new_size, 'list')
+                        self.vars[stmt.target.id] = (new_length,new_size//10, 'list')
                     elif isinstance(stmt, ast.Expr):
                         func = stmt.value.func.attr 
                         if func in ['insert', 'append', 'extend']:
@@ -1034,7 +1031,7 @@ class Memory_Parser:
                             len_increment = len_after_loop - len_before_loop
                             new_size = size_before_loop + size_increment * int(n_iter)
                             new_length = len_before_loop + len_increment * int(n_iter)
-                            self.vars[stmt.value.func.value.id] = (new_length,new_size, 'list')
+                            self.vars[stmt.value.func.value.id] = (new_length,new_size//10, 'list')
                         elif func in ['pop', 'remove','clear']:
                             size_before_loop = self.vars[stmt.value.func.value.id][1]
                             len_before_loop = self.vars[stmt.value.func.value.id][0]

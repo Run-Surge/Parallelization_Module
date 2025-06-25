@@ -234,7 +234,7 @@ def get_memory_foortprint(file_path, entry_point, functions):
                     full_index_expr = match.group(1)  # e.g., numeric_data[0]
                     var_name = full_index_expr.split('[')[0]  # Extract base variable name, e.g., numeric_data
                     if var_name in local_parser.vars:
-                        length = str(local_parser.vars[var_name][0])  # Convert to string
+                        length = 420  # Convert to string
                         # Replace only the matched part
                         modified_code = code[:match.start()] + str(length) + code[match.end():]
                         print(f"Modified code: {modified_code}")  # Debugging: print the modified code
@@ -408,7 +408,7 @@ def main():
     #     sys.exit(1)
 
     # filename = sys.argv[1]
-    filename= 'sample_submission.py'
+    filename= 'testcases/sobel/sobel.py'
     #! Check for syntax errors
     if check_syntax_errors(filename, error_file):
        print(f"1. Syntax check passed for {filename}.")
