@@ -21,8 +21,7 @@ FILE_NAME = 'test.csv'  # Name of the file to read data from
 #! format aggregation = "type:list"
 #! each function must have an aggregation variable just before the return statement
 
-def count_above_threshold(data):
-    threshold = 50
+def calculate_min(data):
     numeric_data = []
     for row in data[1:]:  # Skip header
         numeric_row = []
@@ -32,15 +31,35 @@ def count_above_threshold(data):
 
     num_columns = len(numeric_data[0])
     num_rows = len(numeric_data)
-    count_values = []
+    min_values = []
     for col_idx in range(num_columns):
-        count = 0
-        for row_idx in range(num_rows):
-            if numeric_data[row_idx][col_idx] > threshold:
-                count += 1
-        count_values.append(count)
-    aggregation = "s:count_values"
-    return count_values
+        min_val = numeric_data[0][col_idx]
+        for row_idx in range(1, num_rows):
+            if numeric_data[row_idx][col_idx] < min_val:
+                min_val = numeric_data[row_idx][col_idx]
+        min_values.append(min_val)
+    aggregation = "n:min_values"
+    return min_values
+
+def calculate_max(data):
+    numeric_data = []
+    for row in data[1:]:  # Skip header
+        numeric_row = []
+        for x in row:
+            numeric_row.append(x)
+        numeric_data.append(numeric_row)
+
+    num_columns = len(numeric_data[0])
+    num_rows = len(numeric_data)
+    max_values = []
+    for col_idx in range(num_columns):
+        max_val = numeric_data[0][col_idx]
+        for row_idx in range(1, num_rows):
+            if numeric_data[row_idx][col_idx] > max_val:
+                max_val = numeric_data[row_idx][col_idx]
+        max_values.append(max_val)
+    aggregation = "m:max_values"
+    return max_values
 
 ##########################################################################################################
 
@@ -64,12 +83,12 @@ if __name__ == '__main__':
     except FileNotFoundError:
         print("File not found. Please ensure 'test.csv' exists in the current directory.")
 #---------------------------------------------------------------------------------------------------------
-
 #! User main function is defined here
 #! Note for boosting performance if list is modified inside the function (each function call is independent) then return pass a 
 #! copy of the list instead of the same list for performing different operations in parallel
-    count_values = count_above_threshold(data)
-    output = [count_values]
+    min_values = calculate_min(data)
+    max_values = calculate_max(data)
+    output = [["min"], min_values, ["max"],max_values]
 
 #---------------------------------------------------------------------------------------------------------
 #! Saving the output to a file please don't edit this block

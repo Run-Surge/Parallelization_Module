@@ -1,7 +1,6 @@
 ##########################################################################################################
 #! User defined variables
 import csv
-import csv
 FILE_NAME = 'test.csv'  # Name of the file to read data from
 
 ##########################################################################################################
@@ -113,11 +112,9 @@ if __name__ == '__main__':
 #---------------------------------------------------------------------------------------------------------
 #! Saving the output to a file please don't edit this block
 #! output name should be a list named output
-    with open('output.csv', 'w', newline='') as file:
-        writer = csv.writer(file)
+   
     with open('output.csv', 'w', newline='') as file:
         writer = csv.writer(file)
         for row in output:
-            writer.writerow(row)
             writer.writerow(row)
 #---------------------------------------------------------------------------------------------------------
