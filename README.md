@@ -1,6 +1,6 @@
 # Parallelization Module 🚀
 
-The **Parallelization Module** is a robust Python toolkit designed to analyze, optimize, and parallelize Python code. It provides functionalities for constructing Data Dependency Graphs (DDGs), estimating memory usage, aggregating results from parallel computations, and generating large datasets for testing. This project is ideal for developers and data scientists aiming to enhance code efficiency and scalability.
+The **Parallelization Module** is a robust Python toolkit designed to analyze, optimize, and parallelize Python code. It provides functionalities for constructing Data Dependency Graphs (DDGs), estimating memory usage, scheduling splitted python scripts and data, and aggregating results from parallel computations.
 
 ---
 
@@ -86,8 +86,8 @@ The main entry point for code analysis and parallelization is `Parallelizer.py`.
 
 3. **Review Outputs**:
    - **Syntax Errors**: Logged to `errors.txt` if issues are detected.
-   - **DDG Data**: Nodes and edges saved as JSON files (e.g., `temp/graph_0_nodes.json`, `temp/graph_0_edges.json`).
-   - **Memory Footprint**: Printed to the console, detailing variable memory usage.
+   - **DDG Refined Output**: saved as JSON files (e.g., `temp/ddg_parsed`).
+   - **Memory Footprint**: saved as JSON files (e.g., `temp/memory_parsed`).
 
 ### Example: Generating Test Data
 To create a large CSV file for testing:
