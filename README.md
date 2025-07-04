@@ -12,7 +12,7 @@ The **Parallelization Module** is a robust Python toolkit designed to analyze, o
   - [Data Aggregation](#data-aggregation)
   - [Data Generation](#data-generation)
   - [Task Scheduling](#task-scheduling)
-- [🛠️ Installation](#-installation)
+- [🛠️ Installation](#installation)
 - [🚀 Usage](#-usage)
 - [📁 Project Structure](#-project-structure)
 - [🐛 Error Handling](#-error-handling)
@@ -44,7 +44,7 @@ The **Parallelization Module** is a robust Python toolkit designed to analyze, o
 
 ---
 
-## 🛠️ Installation
+## 🛠️ Installation  <a name="installation"></a>
 
 To set up the Parallelization Module, ensure you have **Python 3.8+** installed. Follow these steps:
 
