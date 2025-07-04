@@ -1,0 +1,86 @@
+[
+    {
+        "code line": 0,
+        "statement": "def calculate_mean(data):",
+        "has": [
+            "data"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 1,
+        "statement": "numeric_data = []",
+        "has": [
+            "numeric_data"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 2,
+        "statement": "for row in data[1:]:\n    numeric_row = []\n    for x in row:\n        numeric_row.append(x)\n    numeric_data.append(numeric_row)",
+        "has": [
+            "numeric_data"
+        ],
+        "needs": [
+            "numeric_data",
+            "data"
+        ]
+    },
+    {
+        "code line": 3,
+        "statement": "num_columns = len(numeric_data[0])",
+        "has": [
+            "num_columns"
+        ],
+        "needs": [
+            "numeric_data"
+        ]
+    },
+    {
+        "code line": 4,
+        "statement": "num_rows = len(numeric_data)",
+        "has": [
+            "num_rows"
+        ],
+        "needs": [
+            "numeric_data"
+        ]
+    },
+    {
+        "code line": 5,
+        "statement": "mean_values = []",
+        "has": [
+            "mean_values"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 6,
+        "statement": "for col_idx in range(num_columns):\n    total = 0\n    for row_idx in range(num_rows):\n        total = total + numeric_data[row_idx][col_idx]\n    mean = total / num_rows\n    mean_values.append(mean)",
+        "has": [
+            "mean_values"
+        ],
+        "needs": [
+            "num_columns",
+            "numeric_data",
+            "mean_values",
+            "num_rows"
+        ]
+    },
+    {
+        "code line": 7,
+        "statement": "aggregation = 'a:mean_values'",
+        "has": [
+            "aggregation"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 8,
+        "statement": "return mean_values",
+        "has": [],
+        "needs": [
+            "mean_values"
+        ]
+    }
+]

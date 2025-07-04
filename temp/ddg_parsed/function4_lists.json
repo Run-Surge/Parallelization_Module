@@ -1,0 +1,42 @@
+[
+    {
+        "key": [
+            "args:none"
+        ],
+        "statements": [
+            "def hello3(x,y,z):"
+        ]
+    },
+    {
+        "key": [
+            "x:0"
+        ],
+        "statements": [
+            "x = x * 8 + 7"
+        ]
+    },
+    {
+        "key": [
+            "x:1"
+        ],
+        "statements": [
+            "x = x + 5"
+        ]
+    },
+    {
+        "key": [
+            "x:2"
+        ],
+        "statements": [
+            "x = [x]"
+        ]
+    },
+    {
+        "key": [
+            "x:3"
+        ],
+        "statements": [
+            "return x"
+        ]
+    }
+]

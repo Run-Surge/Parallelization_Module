@@ -1,0 +1,88 @@
+[
+    {
+        "code line": 0,
+        "statement": "def calculate_std(data,mean_values):",
+        "has": [
+            "data",
+            "mean_values"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 1,
+        "statement": "numeric_data = []",
+        "has": [
+            "numeric_data"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 2,
+        "statement": "for row in data[1:]:\n    numeric_row = []\n    for x in row:\n        numeric_row.append(x)\n    numeric_data.append(numeric_row)",
+        "has": [
+            "numeric_data"
+        ],
+        "needs": [
+            "numeric_data",
+            "data"
+        ]
+    },
+    {
+        "code line": 3,
+        "statement": "num_columns = len(numeric_data[0])",
+        "has": [
+            "num_columns"
+        ],
+        "needs": [
+            "numeric_data"
+        ]
+    },
+    {
+        "code line": 4,
+        "statement": "num_rows = len(numeric_data)",
+        "has": [
+            "num_rows"
+        ],
+        "needs": [
+            "numeric_data"
+        ]
+    },
+    {
+        "code line": 5,
+        "statement": "std_values = []",
+        "has": [
+            "std_values"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 6,
+        "statement": "for col_idx in range(num_columns):\n    variance = 0\n    for row_idx in range(num_rows):\n        diff = numeric_data[row_idx][col_idx] - mean_values[col_idx]\n        variance = variance + diff ** 2\n    std = (variance / num_rows) ** 0.5\n    std_values.append(std)",
+        "has": [
+            "std_values"
+        ],
+        "needs": [
+            "num_rows",
+            "numeric_data",
+            "num_columns",
+            "std_values",
+            "mean_values"
+        ]
+    },
+    {
+        "code line": 7,
+        "statement": "aggregation = 'a:std_values'",
+        "has": [
+            "aggregation"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 8,
+        "statement": "return std_values",
+        "has": [],
+        "needs": [
+            "std_values"
+        ]
+    }
+]

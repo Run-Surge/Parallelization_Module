@@ -1,0 +1,32 @@
+{
+    "mean_values = calculate_mean(data)": {
+        "data": {
+            "length": 11,
+            "size": 576
+        }
+    },
+    "std_data = calculate_std(data, mean_values)": {
+        "data": {
+            "length": 11,
+            "size": 576
+        },
+        "mean_values": {
+            "length": 11,
+            "size": 2256
+        }
+    },
+    "output = [std_data]": {
+        "data": {
+            "length": 11,
+            "size": 576
+        },
+        "mean_values": {
+            "length": 11,
+            "size": 2256
+        },
+        "std_data": {
+            "length": 11,
+            "size": 2256
+        }
+    }
+}

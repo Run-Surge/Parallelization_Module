@@ -1,0 +1,24 @@
+{
+    "2": {
+        "Node": 2,
+        "Depends on": [
+            {
+                "Node": 1,
+                "Dependency": [
+                    "mean_values"
+                ]
+            }
+        ]
+    },
+    "3": {
+        "Node": 3,
+        "Depends on": [
+            {
+                "Node": 2,
+                "Dependency": [
+                    "std_data"
+                ]
+            }
+        ]
+    }
+}

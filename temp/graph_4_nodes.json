@@ -1,0 +1,58 @@
+[
+    {
+        "code line": 0,
+        "statement": "def hello3(x,y,z):",
+        "has": [
+            "x",
+            "y",
+            "z"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 1,
+        "statement": "x = x * 8 + 7",
+        "has": [
+            "x"
+        ],
+        "needs": [
+            "x"
+        ]
+    },
+    {
+        "code line": 2,
+        "statement": "x = x + 5",
+        "has": [
+            "x"
+        ],
+        "needs": [
+            "x"
+        ]
+    },
+    {
+        "code line": 3,
+        "statement": "x = [x]",
+        "has": [
+            "x"
+        ],
+        "needs": [
+            "x"
+        ]
+    },
+    {
+        "code line": 4,
+        "statement": "aggregation = ''",
+        "has": [
+            "aggregation"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 5,
+        "statement": "return x",
+        "has": [],
+        "needs": [
+            "x"
+        ]
+    }
+]

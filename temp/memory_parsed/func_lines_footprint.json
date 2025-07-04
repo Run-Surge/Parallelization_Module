@@ -1,0 +1,24 @@
+{
+    "mean_values = calculate_mean(data)#0:calculate_mean(data)": {
+        "def calculate_mean(data):": 576,
+        "numeric_data = []": 632,
+        "for row in data[1:]:\n    numeric_row = []\n    for x in row:\n        numeric_row.append(x)\n    numeric_data.append(numeric_row)": 15051344,
+        "num_columns = len(numeric_data[0])": 15051372,
+        "num_rows = len(numeric_data)": 15051400,
+        "mean_values = []": 15051456,
+        "for col_idx in range(num_columns):\n    total = 0\n    for row_idx in range(num_rows):\n        total = total + numeric_data[row_idx]\n    mean = total / num_rows\n    mean_values.append(mean)": 15053764,
+        "aggregation": "a:mean_values",
+        "return mean_values": 15053764
+    },
+    "std_data = calculate_std(data, mean_values)#1:calculate_std(data, mean_values)": {
+        "def calculate_std(data, mean_values):": 2832,
+        "numeric_data = []": 2888,
+        "for row in data[1:]:\n    numeric_row = []\n    for x in row:\n        numeric_row.append(x)\n    numeric_data.append(numeric_row)": 15053600,
+        "num_columns = len(numeric_data[0])": 15053628,
+        "num_rows = len(numeric_data)": 15053656,
+        "std_values = []": 15053712,
+        "for col_idx in range(num_columns):\n    variance = 0\n    for row_idx in range(num_rows):\n        diff = numeric_data[row_idx] - mean_values[col_idx]\n        variance = variance + diff ** 2\n    std = (variance / num_rows) ** 0.5\n    std_values.append(std)": 15056020,
+        "aggregation": "a:std_values",
+        "return std_values": 15056020
+    }
+}

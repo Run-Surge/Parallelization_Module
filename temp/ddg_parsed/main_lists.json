@@ -1,0 +1,26 @@
+[
+    {
+        "key": [
+            "data:none"
+        ],
+        "statements": [
+            "mean_values = calculate_mean(data)"
+        ]
+    },
+    {
+        "key": [
+            "mean_values:0"
+        ],
+        "statements": [
+            "std_data = calculate_std(data, mean_values)"
+        ]
+    },
+    {
+        "key": [
+            "std_data:1"
+        ],
+        "statements": [
+            "output = [std_data]"
+        ]
+    }
+]

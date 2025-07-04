@@ -1,0 +1,81 @@
+{
+    "2": {
+        "Node": 2,
+        "Depends on": [
+            {
+                "Node": 1,
+                "Dependency": [
+                    "numeric_data"
+                ]
+            },
+            {
+                "Node": 0,
+                "Dependency": [
+                    "data"
+                ]
+            }
+        ]
+    },
+    "3": {
+        "Node": 3,
+        "Depends on": [
+            {
+                "Node": 2,
+                "Dependency": [
+                    "numeric_data"
+                ]
+            }
+        ]
+    },
+    "4": {
+        "Node": 4,
+        "Depends on": [
+            {
+                "Node": 2,
+                "Dependency": [
+                    "numeric_data"
+                ]
+            }
+        ]
+    },
+    "6": {
+        "Node": 6,
+        "Depends on": [
+            {
+                "Node": 3,
+                "Dependency": [
+                    "num_columns"
+                ]
+            },
+            {
+                "Node": 2,
+                "Dependency": [
+                    "numeric_data"
+                ]
+            },
+            {
+                "Node": 5,
+                "Dependency": [
+                    "mean_values"
+                ]
+            },
+            {
+                "Node": 4,
+                "Dependency": [
+                    "num_rows"
+                ]
+            }
+        ]
+    },
+    "8": {
+        "Node": 8,
+        "Depends on": [
+            {
+                "Node": 6,
+                "Dependency": [
+                    "mean_values"
+                ]
+            }
+        ]
+    }
+}

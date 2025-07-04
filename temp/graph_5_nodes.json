@@ -1,0 +1,48 @@
+[
+    {
+        "code line": 0,
+        "statement": "def calc(x,y,z,a,b,c,d):",
+        "has": [
+            "x",
+            "y",
+            "z",
+            "a",
+            "b",
+            "c",
+            "d"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 1,
+        "statement": "x = [['Output', x, y, z, a, b, c, d]]",
+        "has": [
+            "x"
+        ],
+        "needs": [
+            "y",
+            "a",
+            "b",
+            "d",
+            "x",
+            "c",
+            "z"
+        ]
+    },
+    {
+        "code line": 2,
+        "statement": "aggregation = ''",
+        "has": [
+            "aggregation"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 3,
+        "statement": "return x",
+        "has": [],
+        "needs": [
+            "x"
+        ]
+    }
+]

@@ -5,3 +5,5 @@ __pycache__
 temp_scheduler.py
 *.txt
 node-*.py
+*.csv
+*.json

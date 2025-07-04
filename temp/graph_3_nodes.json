@@ -1,0 +1,42 @@
+[
+    {
+        "code line": 0,
+        "statement": "def hello2():",
+        "has": [],
+        "needs": []
+    },
+    {
+        "code line": 1,
+        "statement": "v = 4 + 3",
+        "has": [
+            "v"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 2,
+        "statement": "v = [v]",
+        "has": [
+            "v"
+        ],
+        "needs": [
+            "v"
+        ]
+    },
+    {
+        "code line": 3,
+        "statement": "aggregation = ''",
+        "has": [
+            "aggregation"
+        ],
+        "needs": []
+    },
+    {
+        "code line": 4,
+        "statement": "return v",
+        "has": [],
+        "needs": [
+            "v"
+        ]
+    }
+]

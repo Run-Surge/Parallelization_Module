@@ -1,0 +1,34 @@
+[
+    {
+        "key": [
+            "args:none"
+        ],
+        "statements": [
+            "def hello2():"
+        ]
+    },
+    {
+        "key": [
+            "none:none"
+        ],
+        "statements": [
+            "v = 4 + 3"
+        ]
+    },
+    {
+        "key": [
+            "v:1"
+        ],
+        "statements": [
+            "v = [v]"
+        ]
+    },
+    {
+        "key": [
+            "v:2"
+        ],
+        "statements": [
+            "return v"
+        ]
+    }
+]
