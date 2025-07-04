@@ -403,12 +403,12 @@ def get_memory_foortprint(file_path, entry_point, functions):
     # print(memory_parser.vars)
 def main():
     error_file = "errors.txt"
-    # if len(sys.argv) < 2:
-    #     print("Usage: python Parallelizer .py <filename>")
-    #     sys.exit(1)
+    if len(sys.argv) < 2:
+        print("Usage: python Parallelizer .py <filename>")
+        sys.exit(1)
 
-    # filename = sys.argv[1]
-    filename= 'testcases/sobel/sobel.py'
+    filename = sys.argv[1]
+    # filename= 'testcases/sobel/sobel.py'
     #! Check for syntax errors
     if check_syntax_errors(filename, error_file):
        print(f"1. Syntax check passed for {filename}.")
