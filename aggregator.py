@@ -13,7 +13,7 @@ class PartialResult:
     item_count: int = 0
     min_value: float = float('inf')
     max_value: float = float('-inf')
-    frequency_map: Dict[Any, int] = None
+    frequency_map: Dict[Any, int] = None 
 
 class Aggregator:
     """

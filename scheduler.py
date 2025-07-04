@@ -5,7 +5,7 @@ import re
 import math
 
 # ==============================================================================
-# 1. CORE MEMORY CALCULATION LOGIC
+# 1. CORE MEMORY CALCULATION LOGIC 
 # ==============================================================================
 def calculate_peak_memory_for_statements(statements, live_vars_data, func_footprints_data, stmt_to_idx_map):
     """Calculates the true peak memory for a list of statements by simulating its execution."""
