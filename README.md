@@ -1,6 +1,6 @@
 # Parallelization Module 🚀
 
-The **Parallelization Module** is a robust Python toolkit designed to analyze, optimize, and parallelize Python code. It provides functionalities for constructing Data Dependency Graphs (DDGs), estimating memory usage, scheduling splitted python scripts and data, and aggregating results from parallel computations.
+The **Parallelization Module** is a robust Python toolkit designed to analyze, optimize, and parallelize Python code. It provides functionalities for constructing Data Dependency Graphs (DDGs), estimating memory usage, and scheduling splitted python scripts and data.
 
 ---
 
