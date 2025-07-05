@@ -29,7 +29,7 @@ The **Parallelization Module** is a robust Python toolkit designed to analyze, o
 - **Dependency Analysis**: Groups statements by dependencies to identify parallelizable code segments, implemented in `Parallelizer.py` (e.g., `group_by_needs_with_wait_index`).
 
 ### Memory Estimation
-- **Primitive & List Size Calculation**: Estimates memory usage for primitive data types and lists using `sys.getsizeof` and precomputed list capacities in `Memory_Estimator.py`.
+- **Primitive & List Size Calculation**: Estimates memory usage for primitive data types and lists in `Memory_Estimator.py`.
 - **Variable Memory Tracking**: Dynamically tracks memory consumption of variables across assignments, loops, and conditionals.
 - **Memory Footprint Analysis**: Computes maximum memory usage by analyzing execution paths, accounting for dynamic changes in data structures.
 
@@ -113,9 +113,7 @@ parallelization-module/
 ├── testcases/             # Directory for input Python code files
 │   └── sobel/
 │       └── sobel.py
-└── temp/                  # Stores intermediate DDG JSON files
-    ├── graph_0_nodes.json
-    └── graph_0_edges.json
+└── temp/                  # Stores output JSON files
 ```
 
 ---
