@@ -9,7 +9,6 @@ The **Parallelization Module** is a robust Python toolkit designed to analyze, o
 - [✨ Features](#-features)
   - [Code Analysis & Parallelization](#code-analysis--parallelization)
   - [Memory Estimation](#memory-estimation)
-  - [Data Aggregation](#data-aggregation)
   - [Data Generation](#data-generation)
   - [Task Scheduling](#task-scheduling)
 - [🛠️ Installation](#installation)
@@ -32,9 +31,6 @@ The **Parallelization Module** is a robust Python toolkit designed to analyze, o
 - **Primitive & List Size Calculation**: Estimates memory usage for primitive data types and lists in `Memory_Estimator.py`.
 - **Variable Memory Tracking**: Dynamically tracks memory consumption of variables across assignments, loops, and conditionals.
 - **Memory Footprint Analysis**: Computes maximum memory usage by analyzing execution paths, accounting for dynamic changes in data structures.
-
-### Data Aggregation
-- **Parallel Result Aggregation**: Combines partial results (e.g., sum, count, min, max, frequency maps) from parallel nodes into a cohesive report using the `Aggregator` class and `PartialResult` dataclass in `aggregator.py`.
 
 ### Data Generation
 - **Large-Scale CSV Generation**: Creates large CSV files with numerical data for testing parallel workflows. The `generator.py` script leverages `numpy` for efficient data generation.
